@@ -1,8 +1,29 @@
+"""
+Module with functions for the k-best pairwise alignment.
+"""
+
 # Import Python standard libraries
-from itertools import product
+from itertools import product, islice, tee, groupby
+import operator
 
 # Import 3rd party libraries
 import networkx as nx
+
+
+# Define an internal auxiliary function.
+def _pairwise(iterable):
+    """
+    Internal function for sequential pairwise iteration.
+    The function follows the recipe in Python's itertools documentation.
+    [https://docs.python.org/3/library/itertools.html]
+    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+    """
+
+    item_a, item_b = tee(iterable)
+    next(item_a, None)
+
+    return zip(item_a, item_b)
+
 
 # TODO: allow different gap symbol, also in align_graph
 # TODO: allow to use median instead of mean (or even mode?)
@@ -142,6 +163,7 @@ def fill_scorer(alpha_a, alpha_b, scorer=None, defaults=None):
 # TODO: function to export/represent the graph, or the matrix (should it be
 #       an object?)
 # TODO: allow to correct costs by some parameter, perhaps even non-linear?
+# TODO: investigate usage of tuples of integers as keys
 def compute_graph(seq_a, seq_b, scorer=None):
     """
     Computes a weighted directed graph for alignment.
@@ -260,3 +282,185 @@ def compute_graph(seq_a, seq_b, scorer=None):
                 )
 
     return graph
+
+
+def build_align(path, seq_a, seq_b, gap="-"):
+    """
+    Builds a pairwise alignment from a path of sequence indexes.
+    The function receives a `path` as provided from a k shortest path
+    searching method and applies it to a pair of sequences, building the
+    alignment with the actual values and adding gaps if necessary.
+    Paths do not need to start at the top left corner nor end at the bottom
+    right one. Sequences are allowed to already have gaps in them.
+    Parameters
+    ==========
+    path : list
+        A list of string labels in the format `"seq_a_idx:seq_b_idx"`.
+    seq_a : list
+        A list of elements used as the first sequence (on the vertical
+        border).
+    seq_b : list
+        A list of elements used as the second sequences (on the horizontal
+        border).
+    gap : str
+        A string used as gap symbol. Defaults to `"-"`.
+    Returns
+    =======
+    alm_a, alm_b : lists
+        The alignments for sequence A and B.
+    """
+
+    # Transform `path`, which is a list of string labels in the format
+    # `"seq_a_idx:seq_b_idx"`, into an easily iterable list of tuples
+    # in the format (seq_a_idx, seq_b_idx). We can then extract the
+    # initial values of `prev_i` and `prev_j`.
+    path = [[int(v) for v in cell.split(":")] for cell in path]
+
+    # We make a copy of the sequences so that we can pop from them without
+    # consuming the original value. This also simplifies the code, as
+    # we can slice from the original point in the path (allowing a starting
+    # path different from (0,0).
+    seq_a = seq_a[path[0][0] :]
+    seq_b = seq_b[path[0][1] :]
+
+    # Build the alignment sequences, adding (more) gaps if necessary
+    alm_a = []
+    alm_b = []
+    for source, target in _pairwise(path):
+        if target[1] == source[1]:
+            # vertical movement
+            alm_a.append(seq_a.pop(0))
+            alm_b.append(gap)
+        elif target[0] == source[0]:
+            # horizontal movement
+            alm_a.append(gap)
+            alm_b.append(seq_b.pop(0))
+        else:
+            # diagonal movement
+            alm_a.append(seq_a.pop(0))
+            alm_b.append(seq_b.pop(0))
+
+    return alm_a, alm_b
+
+
+# TODO: different gap penalties at the borders? -- strip border gaps
+#       (related) benefit for longer non-gaps?
+# TODO: allow exclusion, force inclusion? (exclusion probably must be done
+# skipping over or setting an extremily high weight, and inclusion just
+# joining different sub paths)
+# TODO: gap opening and extension are traditionally defined as negative
+# numbers, should we try to follow it here? The scorers are also following
+# the tradition....
+# TODO: should allow scoring gaps only in seq2, or in both?
+# TODO: should have bidirectional
+# TODO: should gap penalties be allowed to be functions?
+# TODO: allow to search for *all* paths?
+def get_aligns(
+    graph,
+    nodes,
+    seq_a,
+    seq_b,
+    k,
+    gap_open=1.0,
+    gap_ext=0.0,
+    gap="-",
+    n_paths=None,
+):
+    """
+    Return the `k` best alignments in terms of costs.
+    The function with take a path as source and target nodes in a graph,
+    score the best alignments in terms of transition weights and gap
+    penalties, and return the `k` best alignments. As an NP hard problem,
+    it is not mathmatically guaranteed that the best path will be found
+    unless the search pass, defined by `n_paths`, includes all possible
+    paths.
+    Parameters
+    ==========
+    graph : networkx object
+        A directed weighted graph for the alignment, as returned by
+        compute_graph().
+    nodes : list
+        A list of two graph labels in the format `(source, target)`,
+        indicating the alignment path source and target.
+    seq_a : list
+        A list of elements used as the first sequence (on the vertical
+        border).
+    seq_b : list
+        A list of elements used as the second sequences (on the horizontal
+        border).
+    k : int
+        The maximum number of best alignments to be returned.
+    gap_open : number
+        The penalty score for gap openings. The higher the value, the
+        more penalty will be applied to each gap. Defaults to 1.0.
+    gap_ext : number
+        The penalty score for gap extension. The higher the value, the
+        more penalty will be applied to each gap. Defaults to 0.0.
+    gap : str
+        A string used as gap symbol. Defaults to `"-"`.
+    n_paths : int
+        The number of alignment paths to be collected for scoring. If
+        not provided, a default value will be calculated based on the
+        length of the sequences and the complexity of the graph.
+    Returns
+    =======
+    alms : list
+        A sorted list of best alignments in the format `[alm, cost]`,
+        with `alm` as a list of aligned sequences and `cost` the
+        computed alignment cost including transitions and penalties.
+    """
+
+    # Given that `networkx` does not return the sum of edge weights and
+    # that we need to perform individual score adjustments for
+    # gap opening and gap extension, we first need to collect the `n`
+    # shortest simple paths, build the alignments, and correct the scores
+    # before yielding the top `k` alignments. The number of `n` paths
+    # to collect is difficult to determine beforehand, so wither the
+    # user is allowed to provide it or we determine it with this simple
+    # operation.
+    if not n_paths:
+        n_paths = min(len(seq_a), len(seq_b))
+
+    paths = list(
+        islice(
+            nx.shortest_simple_paths(
+                graph, nodes[0], nodes[1], weight="weight"
+            ),
+            n_paths,
+        )
+    )
+
+    # Iterate over the collected paths, collecting the corresponding
+    # alignments and weights so we can sort after the loop
+    alignments = []
+    for path in paths:
+        # Sum edge weights
+        weight = sum(
+            [
+                graph.edges[edge[1], edge[0]]["weight"]
+                for edge in _pairwise(path)
+            ]
+        )
+
+        # Build sequential representation of the alignment alignment
+        alignment = build_align(path, seq_a, seq_b, gap=gap)
+
+        # Add weights from gap opening and extension in both sequences
+        # NOTE: as `groupby` returns an iterator, two subsequent list
+        # comprehensions are needed in order not to consume it immediately,
+        # thus casting to a list.
+        for aligned_seq in alignment:
+            # Get all the gap groups
+            gap_seqs = [list(g) for k, g in groupby(aligned_seq)]
+            gap_seqs = [g for g in gap_seqs if g[0] is gap]
+
+            # Add weights due to gap opening and extension
+            weight += gap_open * len(gap_seqs)
+            weight += sum([gap_ext * len(gap_seq) for gap_seq in gap_seqs])
+
+        alignments.append([alignment, weight])
+
+    # sort by weight
+    alignments = sorted(alignments, key=operator.itemgetter(1))
+
+    return alignments[:k]
