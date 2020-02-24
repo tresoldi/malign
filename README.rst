@@ -1,7 +1,9 @@
-# malign
+malign
+======
 
 Code and data for the library on Multiple ALIGNments
 
-## TODO
+TODO
+----
 
-- Setup readthedocs
+-  Setup readthedocs
