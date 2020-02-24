@@ -1,4 +1,8 @@
+# Import Python standard libraries
 from itertools import product
+
+# Import 3rd party libraries
+import networkx as nx
 
 # TODO: allow different gap symbol, also in align_graph
 # TODO: allow to use median instead of mean (or even mode?)
@@ -33,6 +37,7 @@ def fill_scorer(alpha_a, alpha_b, scorer=None, defaults=None):
 
     Parameters
     ==========
+
     alpha_a : list
         A list with the symbols in alphabet A (the values in the first
         elements of the tuples serving as scorer keys).
@@ -51,6 +56,7 @@ def fill_scorer(alpha_a, alpha_b, scorer=None, defaults=None):
 
     Returns
     =======
+
     scorer : dict
         A copy of `scorer` or a new `scorer` with all possible alignments,
         including with gaps, specified.
@@ -123,3 +129,134 @@ def fill_scorer(alpha_a, alpha_b, scorer=None, defaults=None):
             scorer[("-", symbol_b)] = gap
 
     return scorer
+
+
+# TODO: allow different gap symbols
+# TODO: check what happens with the ("-", "-") default of 0.0 when adjusting
+#       weight for cost
+# TODO: should add notes in SE direction, instead of NW? This could be
+#       potentially be used to improve path finding, combining/selecting the
+#       results of both directions, but it *cannot* be mixed in a single
+#       graph, as we can't have loops for Yen's -- maybe this also implies
+#       adding gaps to the end, in a mirrored needleman-wunsch
+# TODO: function to export/represent the graph, or the matrix (should it be
+#       an object?)
+# TODO: allow to correct costs by some parameter, perhaps even non-linear?
+def compute_graph(seq_a, seq_b, scorer=None):
+    """
+    Computes a weighted directed graph for alignment.
+
+    The function builds a weighted directed graph for a pairwise alignment
+    between two sequences, in a manner analogous to a Needleman-Wunsch
+    alignment matrix. Alignment sites are used as graph nodes and
+    transitions are used as weighted edges.
+
+    Unlike in Needleman-Wunsch, no prior decision of transition "direction"
+    is performed (i.e., no selection for the maximum in each cell),
+    meaning that all possible diagonal, vertical, and horizontal directions
+    are computed.
+
+    As this alignment methods is designed as a building block for the
+    alignment of sequences with different alphabets and with non symmetric
+    transitions costs, the alignment and the scorer are intended to align
+    the second sequence (`seq_b`) in terms of the first one (`seq_a`).
+    Sequences can include gap symbols.
+
+    Parameters
+    ==========
+
+    seq_a : list
+        A list of hasheable elements to be aligned. The pairwise alignment
+        is build in terms of this first sequence.
+    seq_b : list
+        A list of hasheable elements to be aligned.
+    scorer: dict
+        A dictionary of scoring weights for the alignments. Dictionary keys
+        are tuples in the format (`seq_a character`, `seq_b character`),
+        dictionary values are numbers holding the
+        score (the higher the score, the more favoured will the
+        alignment be). Gaps have individual scores in relation to sequence
+        values. The scorer itself is optional and, if not provided,
+        a default one will be built.
+
+    Returns
+    =======
+    graph : networkx graph
+        A Diretional Graph with alignment sites as nodes and transitions
+        as weighted edges.
+    """
+
+    # Create a scorer if it was not provided and extract its maximum
+    # value (score), so that scores are later corrected to costs when
+    # adding edges.
+    # Please note that, while it would make more sense or at least be more
+    # natural, given our graph approach, to store *cost* values instead of
+    # *score* vaues (also favoring smaller/negative ones), the "tradition" in
+    # sequence alignment is to report scorer.
+    scorer = fill_scorer(set(seq_a), set(seq_b), scorer)
+    max_score = max(scorer.values())
+
+    # Add gaps to the beginning of both sequences, emulating the first row
+    # and first column in NW.
+    # NOTE: the "+" operation on lists here allows us to, in a single step,
+    # add the necessary alignment gap and make an in-memory copy of both
+    # sequences, preserving the original ones.
+    seq_a = ["-"] + seq_a
+    seq_b = ["-"] + seq_b
+
+    # Build the directional graph and add edges iterating from the bottom
+    # right to the top left corner (as in NW).
+    # NOTE: the `networkx` library will automatically add the nodes.
+    graph = nx.DiGraph()
+    for i in range(len(seq_a) - 1, -1, -1):
+        # Cache symbol
+        symbol_a = seq_a[i]
+
+        for j in range(len(seq_b) - 1, -1, -1):
+            # Cache symbol
+            symbol_b = seq_b[j]
+
+            # Get the correspondence for the current cell (diagonal),
+            # horizontal (gap in the top sequence, `seq_b`) and vertical
+            # (gap in the left sequence, `seq_a`). We also check if we are
+            # at a border, where diagonal and either vertical or horizontal
+            # movement is not possible. Note that the logic is more
+            # explicit to save computation time.
+            if i == 0 and j == 0:
+                dig_score = None
+                hor_score = None
+                ver_score = None
+            elif i == 0:
+                dig_score = None
+                hor_score = None
+                ver_score = scorer[symbol_a, "-"]
+            elif j == 0:
+                dig_score = None
+                hor_score = scorer["-", symbol_b]
+                ver_score = None
+            else:
+                dig_score = scorer[symbol_a, symbol_b]
+                hor_score = scorer["-", symbol_b]
+                ver_score = scorer[symbol_a, "-"]
+
+            # Add edges (and nodes automatically)
+            if dig_score:
+                graph.add_edge(
+                    "%i:%i" % (i - 1, j - 1),
+                    "%i:%i" % (i, j),
+                    weight=max_score - dig_score,
+                )
+            if hor_score:
+                graph.add_edge(
+                    "%i:%i" % (i - 1, j),
+                    "%i:%i" % (i, j),
+                    weight=max_score - hor_score,
+                )
+            if ver_score:
+                graph.add_edge(
+                    "%i:%i" % (i, j - 1),
+                    "%i:%i" % (i, j),
+                    weight=max_score - ver_score,
+                )
+
+    return graph
