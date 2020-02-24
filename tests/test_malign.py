@@ -103,6 +103,30 @@ class TestMalign(unittest.TestCase):
         assert graph.edges["0:0", "1:1"]["weight"] == 2
         assert graph.edges["6:5", "7:6"]["weight"] == 1
 
+    def test_get_aligns(self):
+        """
+        Test k-best alignments.
+        """
+
+        dna_seq1 = [base for base in "TGGACCCGGGAAGGTGACCCAC"]
+        dna_seq2 = [base for base in "TTACCACCGGCGCGAACCCCCCCCC"]
+        scorer = malign.fill_scorer("ACGT", "ACGT", DNA_SCORER)
+        graph = malign.compute_graph(dna_seq1, dna_seq2, scorer)
+
+        dest = "%i:%i" % (len(dna_seq1), len(dna_seq2))
+        aligns = malign.get_aligns(graph, ("0:0", dest), dna_seq1, dna_seq2, 3)
+       
+        assert "".join(aligns[0][0][0]) == "TGG--ACC--CGGGAAGGTGACCCAC"
+        assert "".join(aligns[0][0][1]) == "TTACCACCGGCGCGAACC-CCCCCCC"
+        assert aligns[0][1] == 203.0
+
+        assert "".join(aligns[1][0][0]) == "TGGAC-CCGG---GAAGGTGACCCAC"
+        assert "".join(aligns[1][0][1]) == "TTACCACCGGCGCGAACC-CCCCCCC"
+        assert aligns[1][1] == 204.0
+
+        assert "".join(aligns[2][0][0]) == "TGGAC-CCGG-G--AAGGTGACCCAC"
+        assert "".join(aligns[2][0][1]) == "TTACCACCGGCGCGAACC-CCCCCCC"
+        assert aligns[2][1] == 205.0
 
 if __name__ == "__main__":
     # Explicitly creating and running a test suite allows to profile it
