@@ -8,6 +8,7 @@ Tests for the `malign` package.
 """
 
 # Import Python libraries
+import math
 import sys
 import unittest
 
@@ -16,14 +17,25 @@ import malign
 
 
 class TestMalign(unittest.TestCase):
-    def test_align(self):
+    def test_dumb_align(self):
         """
-        Test pairwise alignment.
+        Test `dumb` pairwise alignment.
         """
 
-        alm_a, alm_b = malign.align("tra", "fata")
-        assert tuple(alm_a) == ("f", "a", "t", "a")
-        assert tuple(alm_b) == ("t", "r", "a", "-")
+        alm_a, alm_b, score = malign.align("tra", "fata", method="dumb")
+        assert tuple(alm_a) == ("t", "r", "a", "-")
+        assert tuple(alm_b) == ("f", "a", "t", "a")
+        assert math.isclose(score, 0.75)
+
+    def test_nw_align(self):
+        """
+        Test `nw` pairwise alignment.
+        """
+
+        alm_a, alm_b, score = malign.align("tra", "fata", method="nw")
+        assert tuple(alm_a) == ("-", "-", "t", "r", "a")
+        assert tuple(alm_b) == ("f", "a", "t", "-", "a")
+        assert math.isclose(score, 0.0)
 
 
 if __name__ == "__main__":
