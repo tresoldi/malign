@@ -11,3 +11,4 @@ __email__ = "tresoldi@shh.mpg.de"
 
 # Build the namespace
 from malign.malign import align
+from malign.kbest import fill_scorer
