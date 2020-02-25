@@ -79,7 +79,8 @@ Version 0.2:
   - Setup readthedocs
   - Sort in consistent and reproducible way all alignments, even when the
     score is the same
-  - Deal with conflicting package versions due to `lingpy`
+  - Deal with conflicting package versions due to `lingpy`, or write new
+    NW implementation
   - Implement single-pass function with defaults, with scorer, graph,
     destnation, etc.
 

@@ -60,10 +60,12 @@ class TestMalign(unittest.TestCase):
         Test `nw` pairwise alignment.
         """
 
-        alm_a, alm_b, score = malign.align("tra", "fata", method="nw")
-        assert tuple(alm_a) == ("-", "-", "t", "r", "a")
-        assert tuple(alm_b) == ("f", "a", "t", "-", "a")
-        assert math.isclose(score, 0.0)
+        # alm_a, alm_b, score = malign.align("tra", "fata", method="nw")
+        # assert tuple(alm_a) == ("-", "-", "t", "r", "a")
+        # assert tuple(alm_b) == ("f", "a", "t", "-", "a")
+        # assert math.isclose(score, 0.0)
+
+        self.assertRaises(ValueError, malign.align, "tra", "fata", method="nw")
 
     # TODO: test class only for multiple alignment?
     def test_fill_scorer(self):
