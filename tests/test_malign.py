@@ -15,6 +15,7 @@ import unittest
 # Impor the library itself
 import malign
 
+# TODO: use the default DNA scorer
 DNA_SCORER = {
     ("A", "A"): 10,
     ("A", "G"): -1,
