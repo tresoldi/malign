@@ -113,7 +113,7 @@ If you use `malign`, please cite it as:
 ```bibtex
 @misc{Tresoldi2020malign,
   author = {Tresoldi, Tiago},
-  title = {DAFSA, a library for multiple asymmetric alignments on different alphabets. Version 0.1.},
+  title = {MALIGN, a library for multiple asymmetric alignments on different alphabets. Version 0.1.},
   howpublished = {\url{https://github.com/tresoldi/malign}},
   address = {Jena},
   year = {2020},
