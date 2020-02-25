@@ -116,7 +116,7 @@ class TestMalign(unittest.TestCase):
 
         dest = "%i:%i" % (len(dna_seq1), len(dna_seq2))
         aligns = malign.get_aligns(graph, ("0:0", dest), dna_seq1, dna_seq2, 3)
-       
+
         assert "".join(aligns[0][0][0]) == "TGG--ACC--CGGGAAGGTGACCCAC"
         assert "".join(aligns[0][0][1]) == "TTACCACCGGCGCGAACC-CCCCCCC"
         assert aligns[0][1] == 203.0
@@ -128,6 +128,7 @@ class TestMalign(unittest.TestCase):
         assert "".join(aligns[2][0][0]) == "TGGAC-CCGG-G--AAGGTGACCCAC"
         assert "".join(aligns[2][0][1]) == "TTACCACCGGCGCGAACC-CCCCCCC"
         assert aligns[2][1] == 205.0
+
 
 if __name__ == "__main__":
     # Explicitly creating and running a test suite allows to profile it
