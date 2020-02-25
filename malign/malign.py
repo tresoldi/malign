@@ -1,6 +1,3 @@
-# Import 3rd-party libraries
-import lingpy
-
 # TODO: score from 0 to 1 or from 1 to 0?
 
 # TODO: specify gap symbol
@@ -32,24 +29,9 @@ def dumb_align(seq_a, seq_b, args):
 def nw_align(seq_a, seq_b, args):
     """
     Perform pairwise alignment with the `nw` method.
-
-    Currently wrapping `lingpy`.
     """
 
-    args = {}
-
-    # TODO: use arguments, defaults, etc.
-    # TODO: should scorer be part of args?
-    alm = lingpy.align.pairwise.pw_align(
-        seq_a,
-        seq_b,
-        scorer=args.get("scorer", None),
-        mode=args.get("mode", "global"),
-        gop=args.get("gop", -1),
-        scale=args.get("scale", 0.5),
-    )
-
-    return alm[0], alm[1], alm[2]
+    raise ValueError("Not implemented.")
 
 
 # TODO: rename for pairwise and multiple
