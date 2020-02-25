@@ -106,7 +106,7 @@ No. [ERC Grant #715618](https://cordis.europa.eu/project/rcn/206320/factsheet/en
 
 If you use `malign`, please cite it as:
 
-  > Tresoldi, Tiago (2020). MALIGN, a library for multiple asymmetric alignments on different alphabets. Version 1.0. Jena. DOI: 10.5281/zenodo.3668870
+  > Tresoldi, Tiago (2020). MALIGN, a library for multiple asymmetric alignments on different alphabets. Version 1.0. Jena.
 
   In BibTeX:
 
