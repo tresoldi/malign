@@ -355,6 +355,7 @@ def build_align(path, seq_a, seq_b, gap="-"):
 # TODO: should have bidirectional
 # TODO: should gap penalties be allowed to be functions?
 # TODO: allow to search for *all* paths?
+# TODO: do we really need to pass `seq_a` and `seq_b` again?
 def get_aligns(
     graph,
     nodes,
