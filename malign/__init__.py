@@ -5,7 +5,7 @@ __init__.py file for the `malign` library.
 """
 
 # Package information for the library
-__version__ = "0.1"
+__version__ = "0.1.1"
 __author__ = "Tiago Tresoldi"
 __email__ = "tresoldi@shh.mpg.de"
 

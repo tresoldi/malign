@@ -14,7 +14,7 @@ with open("requirements.txt") as fp:
 # This call to setup() does all the work
 setup(
     name="malign",
-    version="0.1",  # remember to sync with __init__.py
+    version="0.1.1",  # remember to sync with __init__.py
     description="Library for multiple asymmetric alignments on different alphabets",
     long_description=README_FILE,
     long_description_content_type="text/x-rst",
