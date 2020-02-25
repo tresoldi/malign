@@ -12,34 +12,6 @@ import argparse
 # Import our library
 import malign
 
-# TODO: Remove temporary DNA scorer holder in future versions
-DNA_SCORER = {
-    ("A", "A"): 10,
-    ("A", "G"): -1,
-    ("A", "C"): -3,
-    ("A", "T"): -4,
-    ("G", "A"): -1,
-    ("G", "G"): 7,
-    ("G", "C"): -5,
-    ("G", "T"): -3,
-    ("C", "A"): -3,
-    ("C", "G"): -5,
-    ("C", "C"): 9,
-    ("C", "T"): 0,
-    ("T", "A"): -4,
-    ("T", "G"): -3,
-    ("T", "C"): 0,
-    ("T", "T"): 8,
-    ("A", "-"): -5,
-    ("G", "-"): -5,
-    ("C", "-"): -5,
-    ("T", "-"): -5,
-    ("-", "A"): -5,
-    ("-", "G"): -5,
-    ("-", "C"): -5,
-    ("-", "T"): -5,
-}
-
 
 def parse_arguments():
     """
@@ -81,7 +53,7 @@ def main():
     dna_seq1 = [base for base in args.seq_a]
     dna_seq2 = [base for base in args.seq_b]
     if args.dna:
-        scorer = malign.fill_scorer("ACGT", "ACGT", DNA_SCORER)
+        scorer = malign.fill_scorer("ACGT", "ACGT", malign.DNA_SCORER)
     else:
         scorer = malign.fill_scorer("ACGT", "ACGT")
     graph = malign.compute_graph(dna_seq1, dna_seq2, scorer)
