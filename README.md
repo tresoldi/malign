@@ -3,6 +3,7 @@
 [![PyPI](https://img.shields.io/pypi/v/malign.svg)](https://pypi.org/project/malign)
 [![Build Status](https://travis-ci.org/tresoldi/malign.svg?branch=master)](https://travis-ci.org/tresoldi/malign)
 [![codecov](https://codecov.io/gh/tresoldi/malign/branch/master/graph/badge.svg)](https://codecov.io/gh/tresoldi/malign)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f6428290a03742e69a6a5cb512a99650)](https://www.codacy.com/manual/tresoldi/malign?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tresoldi/malign&amp;utm_campaign=Badge_Grade)
 
 MALIGN is a library for multiple asymmetric alignments on different alphabets.
 It is currently under initial research and development, but can already be
