@@ -15,34 +15,6 @@ import unittest
 # Impor the library itself
 import malign
 
-# TODO: use the default DNA scorer
-DNA_SCORER = {
-    ("A", "A"): 10,
-    ("A", "G"): -1,
-    ("A", "C"): -3,
-    ("A", "T"): -4,
-    ("G", "A"): -1,
-    ("G", "G"): 7,
-    ("G", "C"): -5,
-    ("G", "T"): -3,
-    ("C", "A"): -3,
-    ("C", "G"): -5,
-    ("C", "C"): 9,
-    ("C", "T"): 0,
-    ("T", "A"): -4,
-    ("T", "G"): -3,
-    ("T", "C"): 0,
-    ("T", "T"): 8,
-    ("A", "-"): -5,
-    ("G", "-"): -5,
-    ("C", "-"): -5,
-    ("T", "-"): -5,
-    ("-", "A"): -5,
-    ("-", "G"): -5,
-    ("-", "C"): -5,
-    ("-", "T"): -5,
-}
-
 
 class TestMalign(unittest.TestCase):
     def test_dumb_align(self):
@@ -60,12 +32,10 @@ class TestMalign(unittest.TestCase):
         Test `nw` pairwise alignment.
         """
 
-        # alm_a, alm_b, score = malign.align("tra", "fata", method="nw")
-        # assert tuple(alm_a) == ("-", "-", "t", "r", "a")
-        # assert tuple(alm_b) == ("f", "a", "t", "-", "a")
-        # assert math.isclose(score, 0.0)
-
-        self.assertRaises(ValueError, malign.align, "tra", "fata", method="nw")
+        alm_a, alm_b, score = malign.align("tra", "fata", method="nw")
+        assert tuple(alm_a) == ("-", "-", "t", "r", "a")
+        assert tuple(alm_b) == ("f", "a", "t", "-", "a")
+        assert math.isclose(score, -7.0)
 
     # TODO: test class only for multiple alignment?
     def test_fill_scorer(self):
@@ -74,10 +44,10 @@ class TestMalign(unittest.TestCase):
         """
 
         # TODO: test from zero first
-        scorer = malign.fill_scorer("AGCT", "AGCT", DNA_SCORER)
-        assert math.isclose(scorer["A", "A"], DNA_SCORER["A", "A"])
-        assert math.isclose(scorer["A", "T"], DNA_SCORER["A", "T"])
-        assert math.isclose(scorer["A", "-"], DNA_SCORER["A", "-"])
+        scorer = malign.fill_scorer("AGCT", "AGCT", malign.DNA_SCORER)
+        assert math.isclose(scorer["A", "A"], malign.DNA_SCORER["A", "A"])
+        assert math.isclose(scorer["A", "T"], malign.DNA_SCORER["A", "T"])
+        assert math.isclose(scorer["A", "-"], malign.DNA_SCORER["A", "-"])
         assert scorer["-", "-"] == 0.0
 
         # Remove some entries and check computation from mean values
@@ -100,7 +70,7 @@ class TestMalign(unittest.TestCase):
 
         dna_seq1 = [base for base in "TGGAACC"]
         dna_seq2 = [base for base in "TAGACC"]
-        graph = malign.compute_graph(dna_seq1, dna_seq2, DNA_SCORER)
+        graph = malign.compute_graph(dna_seq1, dna_seq2, malign.DNA_SCORER)
         assert len(graph.nodes) == 56
         assert len(graph.edges) == 122
         assert graph.edges["0:0", "1:1"]["weight"] == 2
@@ -113,7 +83,7 @@ class TestMalign(unittest.TestCase):
 
         dna_seq1 = [base for base in "TGGACCCGGGAAGGTGACCCAC"]
         dna_seq2 = [base for base in "TTACCACCGGCGCGAACCCCCCCCC"]
-        scorer = malign.fill_scorer("ACGT", "ACGT", DNA_SCORER)
+        scorer = malign.fill_scorer("ACGT", "ACGT", malign.DNA_SCORER)
         graph = malign.compute_graph(dna_seq1, dna_seq2, scorer)
 
         dest = "%i:%i" % (len(dna_seq1), len(dna_seq2))

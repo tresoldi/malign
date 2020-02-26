@@ -1,4 +1,10 @@
+# Import other modules
+import malign.nw as nw
+
 # TODO: score from 0 to 1 or from 1 to 0?
+
+# TODO: make sure dumb_align returns a collection of a single alignment,
+# as other methods do
 
 # TODO: specify gap symbol
 def dumb_align(seq_a, seq_b, args):
@@ -26,12 +32,17 @@ def dumb_align(seq_a, seq_b, args):
     return alm_a, alm_b, score
 
 
+# TODO: just returning the best for now, build later
 def nw_align(seq_a, seq_b, args):
     """
     Perform pairwise alignment with the `nw` method.
     """
 
-    raise ValueError("Not implemented.")
+    seq_a = [c for c in seq_a]
+    seq_b = [c for c in seq_b]
+    alms = nw.nw_align(seq_a, seq_b)
+
+    return alms[0]["a"], alms[0]["b"], alms[0]["score"]
 
 
 # TODO: rename for pairwise and multiple
