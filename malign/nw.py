@@ -199,9 +199,7 @@ def add_nw_scores(alms):
 
 
 # TODO: pass gap
-def nw_align(seq_a, seq_b, scorer=None):
-    gap = "-"
-
+def nw_align(seq_a, seq_b, gap="-", scorer=None):
     # Build normal scorer if not provided
     if not scorer:
         scorer = utils.build_basic_scorer(set(seq_a), set(seq_b))
