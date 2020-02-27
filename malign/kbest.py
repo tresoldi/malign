@@ -11,7 +11,7 @@ import networkx as nx
 
 
 # Define an internal auxiliary function.
-def _pairwise(iterable):
+def _pairwise_iter(iterable):
     """
     Internal function for sequential pairwise iteration.
     The function follows the recipe in Python's itertools documentation.
@@ -292,6 +292,7 @@ def build_align(path, seq_a, seq_b, gap="-"):
     alignment with the actual values and adding gaps if necessary.
     Paths do not need to start at the top left corner nor end at the bottom
     right one. Sequences are allowed to already have gaps in them.
+
     Parameters
     ==========
     path : list
@@ -304,6 +305,7 @@ def build_align(path, seq_a, seq_b, gap="-"):
         border).
     gap : str
         A string used as gap symbol. Defaults to `"-"`.
+
     Returns
     =======
     alm_a, alm_b : lists
@@ -326,7 +328,7 @@ def build_align(path, seq_a, seq_b, gap="-"):
     # Build the alignment sequences, adding (more) gaps if necessary
     alm_a = []
     alm_b = []
-    for source, target in _pairwise(path):
+    for source, target in _pairwise_iter(path):
         if target[1] == source[1]:
             # vertical movement
             alm_a.append(seq_a.pop(0))
@@ -340,7 +342,7 @@ def build_align(path, seq_a, seq_b, gap="-"):
             alm_a.append(seq_a.pop(0))
             alm_b.append(seq_b.pop(0))
 
-    return alm_a, alm_b
+    return {'a':alm_a, 'b':alm_b}
 
 
 # TODO: different gap penalties at the borders? -- strip border gaps
@@ -375,6 +377,7 @@ def get_aligns(
     it is not mathmatically guaranteed that the best path will be found
     unless the search pass, defined by `n_paths`, includes all possible
     paths.
+
     Parameters
     ==========
     graph : networkx object
@@ -403,6 +406,7 @@ def get_aligns(
         The number of alignment paths to be collected for scoring. If
         not provided, a default value will be calculated based on the
         length of the sequences and the complexity of the graph.
+
     Returns
     =======
     alms : list
@@ -439,7 +443,7 @@ def get_aligns(
         weight = sum(
             [
                 graph.edges[edge[1], edge[0]]["weight"]
-                for edge in _pairwise(path)
+                for edge in _pairwise_iter(path)
             ]
         )
 
