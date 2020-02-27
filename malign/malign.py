@@ -1,5 +1,6 @@
 # Import other modules
 import malign.nw as nw
+import malign.kbest as kbest
 
 # TODO: score from 0 to 1 or from 1 to 0?
 
@@ -40,15 +41,28 @@ def dumb_align(seq_a, seq_b, gap="-", **kwargs):
     ]
 
 
-# TODO: treat kwargs
+# TODO: treat kwargs, pass k
 def nw_align(seq_a, seq_b, gap="-", **kwargs):
     """
     Perform pairwise alignment with the `nw` method.
     """
 
-    seq_a = [c for c in seq_a]
-    seq_b = [c for c in seq_b]
     alms = nw.nw_align(seq_a, seq_b, gap=gap)
+
+    return alms
+
+
+# TODO: treat kwargs, etc
+# TODO: decide on n_paths
+def kbest_align(seq_a, seq_b, k=1, gap="-", scorer=None, **kwargs):
+
+    if not scorer:
+        scorer = kbest.fill_scorer(set(seq_a), set(seq_b))
+
+    graph = kbest.compute_graph(seq_a, seq_b, scorer)
+
+    dest = "%i:%i" % (len(seq_a), len(seq_b))
+    alms = kbest.align(graph, ("0:0", dest), seq_a, seq_b, k, n_paths=k * 2)
 
     return alms
 
@@ -82,8 +96,8 @@ def pw_align(seq_a, seq_b, **kwargs):
     method : str
         The alignment method to be used; choices are are `"dumb"` (position
         based, intended for development and prototyping and always
-        returning a single alignment), and `"nw"` (asymmetric
-        Needleman–Wunsch).
+        returning a single alignment), `"nw"` (asymmetric
+        Needleman–Wunsch), and `kbest` (asymmetric graph k-best path).
     gap : str
         Gap symbol. Defaults to `"-"`.
 
@@ -93,6 +107,11 @@ def pw_align(seq_a, seq_b, **kwargs):
         A list of dictionaries with the top `k` alignments, as described
         above.
     """
+
+    # TODO: remove need for this in future
+    if isinstance(seq_a, str):
+        seq_a = [c for c in seq_a]
+        seq_b = [c for c in seq_b]
 
     # Get default parameters
     gap = kwargs.get("gap", "-")
@@ -104,12 +123,14 @@ def pw_align(seq_a, seq_b, **kwargs):
         raise ValueError("Gap symbol must be a non-empty string.")
     if k < 1:
         raise ValueError("At least one alignment must be returned.")
-    if method not in ["dumb", "nw"]:
+    if method not in ["dumb", "nw", "kbest"]:
         raise ValueError("Invalid alignment method `%s`." % method)
 
     # Run alignment method
     if method == "nw":
         alms = nw_align(seq_a, seq_b, k=k, gap=gap)
+    elif method == "kbest":
+        alms = kbest_align(seq_a, seq_b, k=k, gap=gap)
     else:
         alms = dumb_align(seq_a, seq_b, gap=gap)
 

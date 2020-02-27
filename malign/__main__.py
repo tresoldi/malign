@@ -53,19 +53,21 @@ def main():
     dna_seq1 = [base for base in args.seq_a]
     dna_seq2 = [base for base in args.seq_b]
     if args.dna:
-        scorer = malign.fill_scorer("ACGT", "ACGT", malign.DNA_SCORER)
+        scorer = malign.kbest.fill_scorer("ACGT", "ACGT", malign.DNA_SCORER)
     else:
-        scorer = malign.fill_scorer("ACGT", "ACGT")
-    graph = malign.compute_graph(dna_seq1, dna_seq2, scorer)
+        scorer = malign.kbest.fill_scorer("ACGT", "ACGT")
+    graph = malign.kbest.compute_graph(dna_seq1, dna_seq2, scorer)
 
     dest = "%i:%i" % (len(dna_seq1), len(dna_seq2))
-    aligns = malign.get_aligns(graph, ("0:0", dest), dna_seq1, dna_seq2, args.k)
+    aligns = malign.kbest.align(
+        graph, ("0:0", dest), dna_seq1, dna_seq2, args.k
+    )
 
     # Output
     for idx, align in enumerate(aligns):
-        print("Alignment #%i (score: %.2f)" % (idx, align[1]))
-        print(" ".join(align[0][0]))
-        print(" ".join(align[0][1]))
+        print("Alignment #%i (score: %.2f)" % (idx, align["score"]))
+        print(" ".join(align["a"]), align["score_a"])
+        print(" ".join(align["b"]), align["score_b"])
         print()
 
 

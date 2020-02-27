@@ -10,8 +10,10 @@ __author__ = "Tiago Tresoldi"
 __email__ = "tresoldi@shh.mpg.de"
 
 # Build the namespace
+# TODO: be consistent in importing
 from malign.malign import pw_align
-from malign.nw import *
-from malign.kbest import fill_scorer, compute_graph, get_aligns
+
+# from malign.nw import *
+# from malign.graph import *
 
 from malign.utils import DNA_SCORER, print_alms
