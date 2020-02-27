@@ -10,7 +10,7 @@ __author__ = "Tiago Tresoldi"
 __email__ = "tresoldi@shh.mpg.de"
 
 # Build the namespace
-from malign.malign import align
+from malign.malign import pw_align
 from malign.nw import *
 from malign.kbest import fill_scorer, compute_graph, get_aligns
 

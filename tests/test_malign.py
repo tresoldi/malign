@@ -17,25 +17,27 @@ import malign
 
 
 class TestMalign(unittest.TestCase):
-    def test_dumb_align(self):
+    def test_dumb_pw_align(self):
         """
         Test `dumb` pairwise alignment.
         """
 
-        alm_a, alm_b, score = malign.align("tra", "fata", method="dumb")
-        assert tuple(alm_a) == ("t", "r", "a", "-")
-        assert tuple(alm_b) == ("f", "a", "t", "a")
-        assert math.isclose(score, 0.75)
+        alms = malign.pw_align("tra", "fatata", method="dumb")
+        assert len(alms) == 1
+        assert tuple(alms[0]["a"]) == ("-", "t", "r", "a", "-", "-")
+        assert tuple(alms[0]["b"]) == ("f", "a", "t", "a", "t", "a")
+        assert math.isclose(alms[0]["score"], 0.5)
 
-    def test_nw_align(self):
+    def test_nw_pw_align(self):
         """
         Test `nw` pairwise alignment.
         """
 
-        alm_a, alm_b, score = malign.align("tra", "fata", method="nw")
-        assert tuple(alm_a) == ("-", "-", "t", "r", "a")
-        assert tuple(alm_b) == ("f", "a", "t", "-", "a")
-        assert math.isclose(score, -7.0)
+        alms = malign.pw_align("tra", "fata", k=2, method="nw")
+        assert len(alms) == 1
+        assert tuple(alms[0]["a"]) == ("-", "-", "t", "r", "a")
+        assert tuple(alms[0]["b"]) == ("f", "a", "t", "-", "a")
+        assert math.isclose(alms[0]["score"], -7.0)
 
     # TODO: test class only for multiple alignment?
     def test_fill_scorer(self):
