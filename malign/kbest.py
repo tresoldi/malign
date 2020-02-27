@@ -27,6 +27,7 @@ def _pairwise_iter(iterable):
 
 # TODO: allow different gap symbol, also in align_graph
 # TODO: allow to use median instead of mean (or even mode?)
+# TODO: move to utility or scorer module
 def fill_scorer(alpha_a, alpha_b, scorer=None, defaults=None):
     """
     Fill an incomplete scorer for multiple alignment.
@@ -342,7 +343,7 @@ def build_align(path, seq_a, seq_b, gap="-"):
             alm_a.append(seq_a.pop(0))
             alm_b.append(seq_b.pop(0))
 
-    return {'a':alm_a, 'b':alm_b}
+    return {"a": alm_a, "b": alm_b}
 
 
 # TODO: different gap penalties at the borders? -- strip border gaps
@@ -358,7 +359,7 @@ def build_align(path, seq_a, seq_b, gap="-"):
 # TODO: should gap penalties be allowed to be functions?
 # TODO: allow to search for *all* paths?
 # TODO: do we really need to pass `seq_a` and `seq_b` again?
-def get_aligns(
+def align(
     graph,
     nodes,
     seq_a,
@@ -420,9 +421,10 @@ def get_aligns(
     # gap opening and gap extension, we first need to collect the `n`
     # shortest simple paths, build the alignments, and correct the scores
     # before yielding the top `k` alignments. The number of `n` paths
-    # to collect is difficult to determine beforehand, so wither the
+    # to collect is difficult to determine beforehand, so whether the
     # user is allowed to provide it or we determine it with this simple
     # operation.
+    # TODO: change to consider `k` (or just scale with K)
     if not n_paths:
         n_paths = min(len(seq_a), len(seq_b))
 
@@ -454,18 +456,29 @@ def get_aligns(
         # NOTE: as `groupby` returns an iterator, two subsequent list
         # comprehensions are needed in order not to consume it immediately,
         # thus casting to a list.
-        for aligned_seq in alignment:
-            # Get all the gap groups
-            gap_seqs = [list(g) for k, g in groupby(aligned_seq)]
-            gap_seqs = [g for g in gap_seqs if g[0] is gap]
+        gap_seqs_a = [list(g) for k, g in groupby(alignment["a"])]
+        gap_seqs_b = [list(g) for k, g in groupby(alignment["b"])]
+        gap_seqs_a = [g for g in gap_seqs_a if g[0] in gap]
+        gap_seqs_b = [g for g in gap_seqs_b if g[0] in gap]
 
-            # Add weights due to gap opening and extension
-            weight += gap_open * len(gap_seqs)
-            weight += sum([gap_ext * len(gap_seq) for gap_seq in gap_seqs])
+        # Update scores
+        # TODO: decide how to normalize, as this is a weight
+        alignment["score_a"] = weight + (gap_open * len(gap_seqs_a))
+        alignment["score_a"] += sum(
+            [gap_ext * len(gap_seq) for gap_seq in gap_seqs_a]
+        )
 
-        alignments.append([alignment, weight])
+        alignment["score_b"] = weight + (gap_open * len(gap_seqs_b))
+        alignment["score_b"] += sum(
+            [gap_ext * len(gap_seq) for gap_seq in gap_seqs_b]
+        )
+
+        alignment["score"] = alignment["score_a"] + alignment["score_b"]
+
+        alignments.append(alignment)
 
     # sort by weight
-    alignments = sorted(alignments, key=operator.itemgetter(1))
+    # TODO: improve sorting and make more reproducible
+    alignments = sorted(alignments, key=lambda a: a["score"])
 
     return alignments[:k]

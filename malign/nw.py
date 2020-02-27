@@ -173,6 +173,7 @@ def nw_backtrace(seq_a, seq_b, d_grid, i, j, i_stop=0, j_stop=0):
 # Score an alignment with standard NW method (symmetric, etc)
 # TODO: support for different scoring for gaps at extremeties
 # TODO: gap symbol, gap opening, gap penalty
+# TODO: rename to nw_add_scores to keep consisntency in namespace
 def add_nw_scores(alms):
     gap = "-"
     gap_pen = -1
