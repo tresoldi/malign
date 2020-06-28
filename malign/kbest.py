@@ -263,19 +263,19 @@ def compute_graph(seq_a, seq_b, scorer=None):
                 ver_score = scorer[symbol_a, "-"]
 
             # Add edges (and nodes automatically)
-            if dig_score:
+            if dig_score is not None:
                 graph.add_edge(
                     "%i:%i" % (i - 1, j - 1),
                     "%i:%i" % (i, j),
                     weight=max_score - dig_score,
                 )
-            if hor_score:
+            if hor_score is not None:
                 graph.add_edge(
                     "%i:%i" % (i - 1, j),
                     "%i:%i" % (i, j),
                     weight=max_score - hor_score,
                 )
-            if ver_score:
+            if ver_score is not None:
                 graph.add_edge(
                     "%i:%i" % (i, j - 1),
                     "%i:%i" % (i, j),
