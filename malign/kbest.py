@@ -271,15 +271,11 @@ def compute_graph(seq_a, seq_b, scorer=None):
                 )
             if hor_score is not None:
                 graph.add_edge(
-                    "%i:%i" % (i - 1, j),
-                    "%i:%i" % (i, j),
-                    weight=max_score - hor_score,
+                    "%i:%i" % (i - 1, j), "%i:%i" % (i, j), weight=max_score - hor_score
                 )
             if ver_score is not None:
                 graph.add_edge(
-                    "%i:%i" % (i, j - 1),
-                    "%i:%i" % (i, j),
-                    weight=max_score - ver_score,
+                    "%i:%i" % (i, j - 1), "%i:%i" % (i, j), weight=max_score - ver_score
                 )
 
     return graph
@@ -360,15 +356,7 @@ def build_align(path, seq_a, seq_b, gap="-"):
 # TODO: allow to search for *all* paths?
 # TODO: do we really need to pass `seq_a` and `seq_b` again?
 def align(
-    graph,
-    nodes,
-    seq_a,
-    seq_b,
-    k,
-    gap_open=1.0,
-    gap_ext=0.0,
-    gap="-",
-    n_paths=None,
+    graph, nodes, seq_a, seq_b, k, gap_open=1.0, gap_ext=0.0, gap="-", n_paths=None
 ):
     """
     Return the `k` best alignments in terms of costs.
@@ -430,9 +418,7 @@ def align(
 
     paths = list(
         islice(
-            nx.shortest_simple_paths(
-                graph, nodes[0], nodes[1], weight="weight"
-            ),
+            nx.shortest_simple_paths(graph, nodes[0], nodes[1], weight="weight"),
             n_paths,
         )
     )
@@ -443,10 +429,7 @@ def align(
     for path in paths:
         # Sum edge weights
         weight = sum(
-            [
-                graph.edges[edge[1], edge[0]]["weight"]
-                for edge in _pairwise_iter(path)
-            ]
+            [graph.edges[edge[1], edge[0]]["weight"] for edge in _pairwise_iter(path)]
         )
 
         # Build sequential representation of the alignment alignment
@@ -464,14 +447,10 @@ def align(
         # Update scores
         # TODO: decide how to normalize, as this is a weight
         alignment["score_a"] = weight + (gap_open * len(gap_seqs_a))
-        alignment["score_a"] += sum(
-            [gap_ext * len(gap_seq) for gap_seq in gap_seqs_a]
-        )
+        alignment["score_a"] += sum([gap_ext * len(gap_seq) for gap_seq in gap_seqs_a])
 
         alignment["score_b"] = weight + (gap_open * len(gap_seqs_b))
-        alignment["score_b"] += sum(
-            [gap_ext * len(gap_seq) for gap_seq in gap_seqs_b]
-        )
+        alignment["score_b"] += sum([gap_ext * len(gap_seq) for gap_seq in gap_seqs_b])
 
         alignment["score"] = alignment["score_a"] + alignment["score_b"]
 

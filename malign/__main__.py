@@ -19,12 +19,8 @@ def parse_arguments():
     """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "seq_a", type=str, help="The first string to be aligned"
-    )
-    parser.add_argument(
-        "seq_b", type=str, help="The second string to be aligned"
-    )
+    parser.add_argument("seq_a", type=str, help="The first string to be aligned")
+    parser.add_argument("seq_b", type=str, help="The second string to be aligned")
     parser.add_argument(
         "--dna",
         action="store_true",
@@ -59,9 +55,7 @@ def main():
     graph = malign.kbest.compute_graph(dna_seq1, dna_seq2, scorer)
 
     dest = "%i:%i" % (len(dna_seq1), len(dna_seq2))
-    aligns = malign.kbest.align(
-        graph, ("0:0", dest), dna_seq1, dna_seq2, args.k
-    )
+    aligns = malign.kbest.align(graph, ("0:0", dest), dna_seq1, dna_seq2, args.k)
 
     # Output
     for idx, align in enumerate(aligns):

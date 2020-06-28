@@ -57,13 +57,12 @@ def build_basic_scorer(alphabet_a, alphabet_b, match=1, mismatch=-1, gap=-1):
     return scorer
 
 
+# TODO: string alignment given negative numbers in score
 def print_alms(alms):
     for idx, alm in enumerate(alms):
         print(
-            "A %i (%i / %i):" % (idx, alm["score_a"], alm["score"]),
-            " ".join(alm["a"]),
+            "A %i (%i / %i):" % (idx, alm["score_a"], alm["score"]), " ".join(alm["a"])
         )
         print(
-            "B %i (%i / %i):" % (idx, alm["score_b"], alm["score"]),
-            " ".join(alm["b"]),
+            "B %i (%i / %i):" % (idx, alm["score_b"], alm["score"]), " ".join(alm["b"])
         )

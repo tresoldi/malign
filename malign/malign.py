@@ -31,23 +31,16 @@ def dumb_align(seq_a, seq_b, gap="-", **kwargs):
     score = 1.0 - (num_pad / max([len(seq_a), len(seq_b)]))
 
     return [
-        {
-            "a": alm_a,
-            "b": alm_b,
-            "score": score,
-            "score_a": score,
-            "score_b": score,
-        }
+        {"a": alm_a, "b": alm_b, "score": score, "score_a": score, "score_b": score}
     ]
 
 
-# TODO: treat kwargs, pass k
 def nw_align(seq_a, seq_b, gap="-", **kwargs):
     """
     Perform pairwise alignment with the `nw` method.
     """
 
-    alms = nw.nw_align(seq_a, seq_b, gap=gap)
+    alms = nw.nw_align(seq_a, seq_b, gap=gap, k=kwargs.get("k", 1))
 
     return alms
 

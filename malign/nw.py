@@ -200,7 +200,7 @@ def add_nw_scores(alms):
 
 
 # TODO: pass gap
-def nw_align(seq_a, seq_b, gap="-", scorer=None):
+def nw_align(seq_a, seq_b, gap="-", scorer=None, k=1):
     # Build normal scorer if not provided
     if not scorer:
         scorer = utils.build_basic_scorer(set(seq_a), set(seq_b))
@@ -234,4 +234,4 @@ def nw_align(seq_a, seq_b, gap="-", scorer=None):
         ),
     )
 
-    return alms
+    return alms[:k]
