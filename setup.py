@@ -13,28 +13,28 @@ with open("requirements.txt") as fp:
 
 # This call to setup() does all the work
 setup(
-    name="malign",
-    version="0.1.1",  # remember to sync with __init__.py
-    description="Library for multiple asymmetric alignments on different alphabets",
-    long_description=README_FILE,
-    long_description_content_type="text/x-rst",
-    url="https://github.com/tresoldi/malign",
-    project_urls={"Documentation": "https://malign.readthedocs.io"},
-    author="Tiago Tresoldi",
     author_email="tresoldi@shh.mpg.de",
-    license="MIT",
+    author="Tiago Tresoldi",
     classifiers=[
         "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3",
         "Topic :: Software Development :: Libraries",
     ],
-    packages=["malign", "resources"],
-    keywords=["alignment", "sequence alignment", "multiple alphabet"],
+    description="Library for multiple asymmetric alignments on different alphabets",
+    entry_points={"console_scripts": ["malign=malign.__main__:main"]},
     include_package_data=True,
     install_requires=install_requires,
-    entry_points={"console_scripts": ["malign=malign.__main__:main"]},
+    keywords=["alignment", "sequence alignment", "multiple alphabet"],
+    license="MIT",
+    long_description_content_type="text/x-rst",
+    long_description=README_FILE,
+    name="malign",
+    packages=["malign", "resources"],
+    project_urls={"Documentation": "https://malign.readthedocs.io"},
     test_suite="tests",
     tests_require=[],
+    url="https://github.com/tresoldi/malign",
+    version="0.1.1",  # remember to sync with __init__.py
     zip_safe=False,
 )
