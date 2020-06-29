@@ -16,4 +16,4 @@ from malign.malign import pw_align, multi_align
 # from malign.nw import *
 # from malign.graph import *
 
-from malign.utils import DNA_SCORER, print_alms, print_malms
+from malign.utils import print_alms, print_malms
