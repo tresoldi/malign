@@ -179,7 +179,7 @@ def compute_graph(seq_a, seq_b, scorer=None):
     meaning that all possible diagonal, vertical, and horizontal directions
     are computed.
 
-    As this alignment methods is designed as a building block for the
+    As this alignment method is designed as a building block for the
     alignment of sequences with different alphabets and with non symmetric
     transitions costs, the alignment and the scorer are intended to align
     the second sequence (`seq_b`) in terms of the first one (`seq_a`).

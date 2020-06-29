@@ -194,6 +194,7 @@ def add_nw_scores(alms):
         ]
 
         # Compute scores with gap opening and penalty
+        # TODO: mean of score_a and score_b?
         alm["score_a"] = (sum(gaps_a) * gap_pen) + (len(gaps_a) * gap_opn)
         alm["score_b"] = (sum(gaps_b) * gap_pen) + (len(gaps_b) * gap_opn)
         alm["score"] = alm["score_a"] + alm["score_b"]

@@ -4,6 +4,35 @@ import malign.kbest as kbest
 
 # TODO: score from 0 to 1 or from 1 to 0?
 
+
+def dumb_malign(seqs, gap="-", **kwargs):
+    # Obtain the longest sequence length
+    max_length = max([len(seq) for seq in seqs])
+
+    # Pad all sequences in `alm`
+    alm = []
+    for seq in seqs:
+        # Computer lengths and bads
+        num_pad = max_length - len(seq)
+        left_pad_len = int(num_pad / 2)
+        right_pad_len = num_pad - left_pad_len
+        left_pad = [gap] * left_pad_len
+        right_pad = [gap] * right_pad_len
+
+        # Append the padded sequence and the score, here computed from the
+        # number of gaps
+        alm.append(
+            {
+                "seq": [*left_pad, *list(seq), *right_pad],
+                "score": 1.0 - (num_pad / max_length),
+            }
+        )
+
+    # The `dumb` method will always return a single aligment, but we
+    # still return a list for compatibility with other methods
+    return [alm]
+
+
 # TODO: place gaps equally to borders
 def dumb_align(seq_a, seq_b, gap="-", **kwargs):
     """
@@ -35,6 +64,7 @@ def dumb_align(seq_a, seq_b, gap="-", **kwargs):
     ]
 
 
+# TODO: pass scorer
 def nw_align(seq_a, seq_b, gap="-", **kwargs):
     """
     Perform pairwise alignment with the `nw` method.
@@ -126,5 +156,30 @@ def pw_align(seq_a, seq_b, **kwargs):
         alms = kbest_align(seq_a, seq_b, k=k, gap=gap)
     else:
         alms = dumb_align(seq_a, seq_b, gap=gap)
+
+    return alms
+
+
+# TODO: add all arguments
+def multi_align(seqs, method, **kwargs):
+    # Get default parameters
+    gap = kwargs.get("gap", "-")
+    k = kwargs.get("k", 1)
+
+    # Validate parameters
+    if not gap:
+        raise ValueError("Gap symbol must be a non-empty string.")
+    if k < 1:
+        raise ValueError("At least one alignment must be returned.")
+    if method not in ["dumb", "nw", "kbest"]:
+        raise ValueError("Invalid alignment method `%s`." % method)
+
+    # Run alignment method
+    if method == "nw":
+        alms = None
+    elif method == "kbest":
+        alms = None
+    else:
+        alms = dumb_malign(seqs, gap=gap)
 
     return alms

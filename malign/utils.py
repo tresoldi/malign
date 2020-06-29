@@ -4,6 +4,7 @@ Utility data and functions for the library.
 
 # Import Python standard libraries
 import itertools
+from string import ascii_uppercase
 
 # TODO: Remove temporary DNA scorer holder in future versions
 DNA_SCORER = {
@@ -32,6 +33,13 @@ DNA_SCORER = {
     ("-", "C"): -5,
     ("-", "T"): -5,
 }
+
+
+def _label_iter():
+    for length in itertools.count(1):
+        for chars in itertools.product(ascii_uppercase, repeat=length):
+            yield "".join(chars)
+
 
 # TODO: gap symbol (and check if not in alphabet)
 # TODO: rename to indel?
@@ -66,3 +74,9 @@ def print_alms(alms):
         print(
             "B %i (%i / %i):" % (idx, alm["score_b"], alm["score"]), " ".join(alm["b"])
         )
+
+
+def print_malms(alms):
+    for idx, alm in enumerate(alms):
+        for label, entry in zip(_label_iter(), alm):
+            print(idx, label, entry)
