@@ -19,13 +19,13 @@ def main():
     malign.utils.print_alms(alms)
 
     # Fourth test, pwkbest, DNA scorer
-    scorer = malign.DNA_SCORER
+    scorer = malign.utils.DNA_MATRIX
     alms = malign.pw_align(dna_seq1, dna_seq2, k=4, method="kbest", scorer=scorer)
     print("Experiment #4")
     malign.utils.print_alms(alms)
 
     # Fifth test, kbest, DNA scorer
-    scorer = malign.DNA_SCORER.copy()
+    scorer = malign.utils.DNA_MATRIX.copy()
     graph = malign.kbest.compute_graph(dna_seq1, dna_seq2, scorer)
     dest = "%i:%i" % (len(dna_seq1), len(dna_seq2))
     alms = malign.kbest.align(graph, ("0:0", dest), dna_seq1, dna_seq2, 4, gap_open=5)

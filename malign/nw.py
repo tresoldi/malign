@@ -197,14 +197,18 @@ def add_nw_scores(alms):
         # TODO: mean of score_a and score_b?
         alm["score_a"] = (sum(gaps_a) * gap_pen) + (len(gaps_a) * gap_opn)
         alm["score_b"] = (sum(gaps_b) * gap_pen) + (len(gaps_b) * gap_opn)
-        alm["score"] = alm["score_a"] + alm["score_b"]
+        alm["score"] = (alm["score_a"] + alm["score_b"]) / 2.0
 
 
 # TODO: pass gap
-def nw_align(seq_a, seq_b, gap="-", scorer=None, k=1):
-    # Build normal scorer if not provided
-    if not scorer:
-        scorer = utils.build_basic_scorer(set(seq_a), set(seq_b))
+# TODO: note that K is *at most* K
+def nw_align(seq_a, seq_b, gap="-", matrix=None, k=1):
+    # Build normal matrix if not provided, make sure it is filled
+    # otherwise
+    if not matrix:
+        matrix = utils.build_basic_matrix(set(seq_a), set(seq_b))
+    else:
+        matrix = utils.fill_matrix(set(seq_a), set(seq_b), matrix)
 
     # Add initial gaps; note that this also makes a
     # copy of the contents of each sequence, so we preserve the original
@@ -213,7 +217,7 @@ def nw_align(seq_a, seq_b, gap="-", scorer=None, k=1):
     seq_b = [gap] + seq_b
 
     # Build nw grids
-    s_grid, d_grid = nw_grids(seq_a, seq_b, scorer)
+    s_grid, d_grid = nw_grids(seq_a, seq_b, matrix)
 
     # move in the direction grid, reversing sequences after it
     i, j = len(seq_a) - 1, len(seq_b) - 1

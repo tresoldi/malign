@@ -2,6 +2,9 @@
 import malign.nw as nw
 import malign.kbest as kbest
 
+# Import other modules
+import malign.utils as utils
+
 # TODO: score from 0 to 1 or from 1 to 0?
 
 
@@ -70,7 +73,8 @@ def nw_align(seq_a, seq_b, gap="-", **kwargs):
     Perform pairwise alignment with the `nw` method.
     """
 
-    alms = nw.nw_align(seq_a, seq_b, gap=gap, k=kwargs.get("k", 1))
+    alms = nw.nw_align(seq_a, seq_b, gap=gap, k=kwargs.get("k", 1),
+    matrix=kwargs.get('matrix', None))
 
     return alms
 
@@ -80,7 +84,7 @@ def nw_align(seq_a, seq_b, gap="-", **kwargs):
 def kbest_align(seq_a, seq_b, k=1, gap="-", scorer=None, **kwargs):
 
     if not scorer:
-        scorer = kbest.fill_scorer(set(seq_a), set(seq_b))
+        scorer = utils.fill_matrix(set(seq_a), set(seq_b))
 
     graph = kbest.compute_graph(seq_a, seq_b, scorer)
 
@@ -139,6 +143,7 @@ def pw_align(seq_a, seq_b, **kwargs):
     # Get default parameters
     gap = kwargs.get("gap", "-")
     k = kwargs.get("k", 1)
+    matrix = kwargs.get("matrix", None)
     method = kwargs.get("method", "nw")
 
     # Validate parameters
@@ -151,7 +156,7 @@ def pw_align(seq_a, seq_b, **kwargs):
 
     # Run alignment method
     if method == "nw":
-        alms = nw_align(seq_a, seq_b, k=k, gap=gap)
+        alms = nw_align(seq_a, seq_b, k=k, gap=gap, matrix=matrix)
     elif method == "kbest":
         alms = kbest_align(seq_a, seq_b, k=k, gap=gap)
     else:
