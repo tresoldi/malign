@@ -6,6 +6,8 @@ Utility data and functions for the library.
 import itertools
 from string import ascii_uppercase
 
+import numpy as np
+
 # TODO: Remove temporary DNA scorer holder in future versions
 DNA_MATRIX = {
     ("A", "A"): 10,
@@ -69,22 +71,27 @@ def build_basic_matrix(alphabet_a, alphabet_b, match=1, mismatch=-1, gap=-1):
 def print_alms(alms):
     for idx, alm in enumerate(alms):
         print(
-            "A %i (%.2f / %.2f):" % (idx, alm["score_a"], alm["score"]), " ".join(alm["a"])
+            "A %i (%.2f / %.2f):" % (idx, alm["score_a"], alm["score"]),
+            " ".join(alm["a"]),
         )
         print(
-            "B %i (%.2f / %.2f):" % (idx, alm["score_b"], alm["score"]), " ".join(alm["b"])
+            "B %i (%.2f / %.2f):" % (idx, alm["score_b"], alm["score"]),
+            " ".join(alm["b"]),
         )
 
 
+# TODO: implement sorting
 def print_malms(alms):
-    for idx, alm in enumerate(alms):
-        for label, entry in zip(_label_iter(), alm):
-            print(idx, label, entry)
+    for alm_idx, alm in enumerate(alms):
+        for label, seq in zip(_label_iter(), alm["seqs"]):
+            print(f"{alm_idx} {label} ({alm['score']:.2f}) : {seq}")
+
 
 # TODO: allow different gap symbol, also in align_graph
 # TODO: allow to use median instead of mean (or even mode?)
 # TODO: move to utility or scorer module
-def fill_matrix(alpha_a, alpha_b, scorer=None, defaults=None):
+# TODO: fix comment defaults->kwargs
+def fill_matrix(alpha_a, alpha_b, scorer=None, **kwargs):
     """
     Fill an incomplete scorer for multiple alignment.
 
@@ -158,7 +165,6 @@ def fill_matrix(alpha_a, alpha_b, scorer=None, defaults=None):
     # better to perform this computation earlier, even if not needed,
     # than making the logic more complex to potentially save some cycles.
     # TODO: move to separate, util function
-    defaults = defaults or {}
     matches, mismatches, gaps = [], [], []
     for key, value in scorer.items():
         if key[0] == key[1]:
@@ -168,21 +174,21 @@ def fill_matrix(alpha_a, alpha_b, scorer=None, defaults=None):
         else:
             mismatches.append(value)
 
-    match = defaults.get("match", None)
+    match = kwargs.get("match", None)
     if not match:
         if matches:
             match = sum(matches) / len(matches)
         else:
             match = 1.0
 
-    mismatch = defaults.get("mismatch", None)
+    mismatch = kwargs.get("mismatch", None)
     if not mismatch:
         if mismatches:
             mismatch = sum(mismatches) / len(mismatches)
         else:
             mismatch = -1.0
 
-    gap = defaults.get("gap", None)
+    gap = kwargs.get("gap", None)
     if not gap:
         if gaps:
             gap = sum(gaps) / len(gaps)
@@ -207,3 +213,49 @@ def fill_matrix(alpha_a, alpha_b, scorer=None, defaults=None):
             scorer[("-", symbol_b)] = gap
 
     return scorer
+
+
+# TODO: multiple matrices
+def combine_matrices(matrix_a, matrix_b):
+    # Collect the full alphabet in matrices A and B; assumes a[0] is the
+    # same domain as b[0]
+    alphabet_a = set([c[0] for c in matrix_a] + [c[0] for c in matrix_b])
+    alphabet_b = set([c[1] for c in matrix_a])
+    alphabet_c = set([c[1] for c in matrix_b])
+
+    # Make copies of the matrices, so we don't change them
+    matrix_a = matrix_a.copy()
+    matrix_b = matrix_b.copy()
+
+    def _add_missing_values(alphabet1, alphabet2, matrix):
+        # TODO: here using the mean value
+
+        for p in itertools.product(alphabet1, alphabet2):
+            # mean values for ? <-> b
+            value_b = {}
+            if p not in matrix:
+                # compute the value if missing
+                if p[1] not in value_b:
+                    values = [
+                        value for key, value in matrix_a.items() if key[1] == p[1]
+                    ]
+                    if not values:
+                        value_b[p[1]] = -1.0
+                    else:
+                        value_b[p[1]] = np.mean(values)
+
+                # Add value to matrix
+                matrix[p] = value_b[p[1]]
+
+    # Make sure alphabet_a is mapped to all values in Ma and Mb
+    _add_missing_values(alphabet_a, alphabet_b, matrix_a)
+    _add_missing_values(alphabet_a, alphabet_c, matrix_b)
+
+    # Build the new matrix as cleverly as it can
+    matrix = {}
+    for key in itertools.product(alphabet_a, alphabet_b, alphabet_c):
+        val_a = matrix_a[key[0], key[1]]
+        val_b = matrix_b[key[0], key[2]]
+        matrix[key] = (val_a + val_b) / 2.0
+
+    return matrix
