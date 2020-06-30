@@ -45,7 +45,7 @@ def pw_malign(seqs, matrix, gap="-", **kwargs):
     # TODO: extent to more than 3
     # TODO: decide on mean/median/top, second highest value
 
-    pairs = [(0, 1), (0, 2), (1, 2)]
+    pairs = list(itertools.combinations(range(len(seqs)), 2))
 
     # Collect/compute submatrices
     matrix_values = defaultdict(lambda: defaultdict(list))
@@ -82,25 +82,35 @@ def pw_malign(seqs, matrix, gap="-", **kwargs):
     # do so, we get all potentials with the longest alignment and align
     # again, this time using the gaps
     longest = max(potential)
+    has_longest = list(potential[longest])
 
-    if 0 not in potential[longest]:
-        pass
-    if 1 not in potential[longest]:
-        for seq0 in potential[longest][0]:
-            alms = nw_align(list(seq0), seqs[1], k=4, matrix=sub_matrix[0, 1])
-            for alm in alms:
-                potential[longest][1].add(tuple(alm["b"]))
-
-        for seq2 in potential[longest][2]:
-            alms = nw_align(seqs[1], list(seq2), k=4, matrix=sub_matrix[1, 2])
-            for alm in alms:
-                potential[longest][1].add(tuple(alm["a"]))
-
-    if 2 not in potential[longest]:
-        pass
+    for seq_idx in range(len(seqs)):
+        if seq_idx not in has_longest:
+            for long_idx in has_longest:
+                # aling the current one with all long_idx aligned sequences
+                for aligned in potential[longest][long_idx]:
+                    # make sure we get the correct order
+                    if seq_idx < long_idx:
+                        alms = nw_align(
+                            seqs[seq_idx],
+                            list(aligned),
+                            k=4,
+                            matrix=sub_matrix[seq_idx, long_idx],
+                        )
+                        for alm in alms:
+                            potential[longest][seq_idx].add(tuple(alm["a"]))
+                    else:
+                        alms = nw_align(
+                            list(aligned),
+                            seqs[seq_idx],
+                            k=4,
+                            matrix=sub_matrix[long_idx, seq_idx],
+                        )
+                        for alm in alms:
+                            potential[longest][seq_idx].add(tuple(alm["b"]))
 
     # Build all potential alignments and score them
-    cand = [potential[longest][0], potential[longest][1], potential[longest][2]]
+    cand = [potential[longest][idx] for idx in sorted(potential[longest])]
     alms = []
     for a in itertools.product(*cand):
         alm = {"seqs": []}
@@ -112,6 +122,9 @@ def pw_malign(seqs, matrix, gap="-", **kwargs):
         alm["score"] = np.mean([matrix[corr] for corr in zip(*alm["seqs"])])
 
         alms.append(alm)
+
+    # sort so that the best comes first
+    alms = sorted(alms, reverse=True, key=lambda e: e["score"])
 
     return alms
 
