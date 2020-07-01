@@ -82,6 +82,10 @@ def print_alms(alms):
 
 # TODO: implement sorting
 def print_malms(alms):
+    if not alms:
+        print("<No alignment>")
+        return
+
     for alm_idx, alm in enumerate(alms):
         for label, seq in zip(_label_iter(), alm["seqs"]):
             print(f"{alm_idx} {label} ({alm['score']:.2f}) : {seq}")
