@@ -94,6 +94,9 @@ def _malign(seqs, matrix, pw_func, gap="-", **kwargs):
     longest = max(potential)
     has_longest = list(potential[longest])
 
+    # TODO: what if the alignment sequence is longer than longest? decide
+    # whether to include the new one, realigning the top (most likely, but
+    # more complex to implmenet) or just drop
     for seq_idx in range(len(seqs)):
         if seq_idx not in has_longest:
             for long_idx in has_longest:
