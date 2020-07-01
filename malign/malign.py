@@ -41,12 +41,9 @@ def dumb_malign(seqs, gap="-", **kwargs):
     return [alm]
 
 
-def pw_malign(seqs, matrix, gap="-", **kwargs):
-    # TODO: extent to more than 3
-    # TODO: decide on mean/median/top, second highest value
-
-    pairs = list(itertools.combinations(range(len(seqs)), 2))
-
+# TODO: move to utils later?
+# TODO: decide on mean/median/top, second highest value
+def compute_submatrices(matrix, pairs):
     # Collect/compute submatrices
     matrix_values = defaultdict(lambda: defaultdict(list))
     for pair in pairs:
@@ -60,6 +57,19 @@ def pw_malign(seqs, matrix, gap="-", **kwargs):
             key: np.percentile(values, 80) for key, values in data.items()
         }
 
+    return sub_matrix
+
+
+def _malign(seqs, matrix, pw_func, gap="-", **kwargs):
+
+    k = kwargs.get("k", 1)
+
+    pairs = list(itertools.combinations(range(len(seqs)), 2))
+
+    # get submatrices
+    # TODO: needed when creating a Matrix class?
+    sub_matrix = compute_submatrices(matrix, pairs)
+
     # Run pairwise alignment on all pairs, collecting all potential
     # alignments for each sequence in `potential`, where they are already
     # grouped by length
@@ -69,7 +79,7 @@ def pw_malign(seqs, matrix, gap="-", **kwargs):
         x, y = pair
 
         # Run pairwise alignment
-        alms = nw_align(seqs[x], seqs[y], k=4, matrix=sub_matrix[pair])
+        alms = pw_func(seqs[x], seqs[y], k=k, matrix=sub_matrix[pair])
 
         # Add by length
         for alm in alms:
@@ -91,19 +101,19 @@ def pw_malign(seqs, matrix, gap="-", **kwargs):
                 for aligned in potential[longest][long_idx]:
                     # make sure we get the correct order
                     if seq_idx < long_idx:
-                        alms = nw_align(
+                        alms = pw_func(
                             seqs[seq_idx],
                             list(aligned),
-                            k=4,
+                            k=k,
                             matrix=sub_matrix[seq_idx, long_idx],
                         )
                         for alm in alms:
                             potential[longest][seq_idx].add(tuple(alm["a"]))
                     else:
-                        alms = nw_align(
+                        alms = pw_func(
                             list(aligned),
                             seqs[seq_idx],
-                            k=4,
+                            k=k,
                             matrix=sub_matrix[long_idx, seq_idx],
                         )
                         for alm in alms:
@@ -175,12 +185,12 @@ def nw_align(seq_a, seq_b, gap="-", **kwargs):
 
 # TODO: treat kwargs, etc
 # TODO: decide on n_paths
-def kbest_align(seq_a, seq_b, k=1, gap="-", scorer=None, **kwargs):
+def kbest_align(seq_a, seq_b, k=1, gap="-", matrix=None, **kwargs):
 
-    if not scorer:
-        scorer = utils.fill_matrix(set(seq_a), set(seq_b))
+    if not matrix:
+        matrix = utils.fill_matrix(set(seq_a), set(seq_b))
 
-    graph = kbest.compute_graph(seq_a, seq_b, scorer)
+    graph = kbest.compute_graph(seq_a, seq_b, matrix)
 
     dest = "%i:%i" % (len(seq_a), len(seq_b))
     alms = kbest.align(graph, ("0:0", dest), seq_a, seq_b, k, n_paths=k * 2)
@@ -274,14 +284,17 @@ def multi_align(seqs, method, **kwargs):
         raise ValueError("Gap symbol must be a non-empty string.")
     if k < 1:
         raise ValueError("At least one alignment must be returned.")
-    if method not in ["dumb", "nw", "kbest"]:
+    if method not in ["dumb", "nw", "yenksp"]:
         raise ValueError("Invalid alignment method `%s`." % method)
 
     # Run alignment method
+    # TODO: the cut for `k` should be performed by `_malign`, but in order
+    # to collect more stuff, yenksp should probably have a higher value,
+    # so we increase the serach space -- perhaps pass k*2 or k**2
     if method == "nw":
-        alms = pw_malign(seqs, kwargs["matrix"], gap=gap)
-    elif method == "kbest":
-        alms = None
+        alms = _malign(seqs, kwargs["matrix"], pw_func=nw_align, gap=gap)
+    elif method == "yenksp":
+        alms = _malign(seqs, kwargs["matrix"], pw_func=kbest_align, gap=gap)
     else:
         alms = dumb_malign(seqs, gap=gap)
 
