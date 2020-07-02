@@ -11,6 +11,8 @@ import numpy as np
 
 from . import utils
 
+# TODO: add functions for loading and storing the matrices
+
 
 class ScoringMatrix:
     """
@@ -95,14 +97,14 @@ class ScoringMatrix:
             fill = kwargs.get("fill", "standard")
             if fill:
                 if fill == "standard":
-                    self._fill_matrix(fill)
+                    self._fill_full_matrix(fill)
                 else:
                     raise ValueError("Unknown filling method.")
 
     # TODO: currently disregarding the `method`, as there is a single one
     # TODO: describe how the standard method can be considered a kind of MLE
     # TODO: use `self.domain_range`
-    def _fill_matrix(self, method):
+    def _fill_full_matrix(self, method):
         """
         Internal function for filling a matrix if there are missing values.
 
@@ -192,15 +194,57 @@ class ScoringMatrix:
                     ]
                 )
 
-    def __call__(self, key, domains=None):
+    def _fill_domain(self, domain):
         """
-        Return the score associated with a tuple of alignments.
+        Internal function for filling a sub-domain.
+
+        The function assumes the full domain matrix has already been
+        filled.
+
+        Parameters
+        ==========
+
+        domain : tuple of ints
+            Tuble of the sub-domain to be filled.
+        """
+
+        # Obtain the alphabets of the sub-domain
+        sub_alphabets = [self.alphabets[d_idx] for d_idx in domain]
+
+        # Fill keys
+        # TODO: investigate better subsetting, loops to unroll
+        # TODO: also what should not be collected like full gaps
+        self.scores[domain] = {}
+        for sub_key in itertools.product(*sub_alphabets):
+            # Collect all values in the main matrix that match the sub_key
+            idx_values = list(zip(domain, sub_key))
+            sub_scores = []
+            for key, score in self.scores[self._dr].items():
+                if all([key[idx] == v for idx, v in idx_values]):
+                    sub_scores.append(score)
+
+            # Add adjusted value
+            # TODO: allow other manipulations, here just the percentile
+            self.scores[domain][sub_key] = np.percentile(sub_scores, 75)
+
+        # Fill full gap
+        self.scores[domain][tuple(self.gap * len(domain))] = 0.0
+
+    def __call__(self, key, domain=None):
+        """
+        Return the score associated with a tuple of alignments per domain.
+
+        If a sub-domain is requested and it has not been computed so far,
+        it will be inferred and cached for reuse.
 
         Parameters
         ==========
 
         key : tuple of strings
             The element in the multidimensional matrix to be queried.
+        domain : tuple or list of integers
+            The domain where the key should be queried. Defaults to the
+            complete alignment site.
 
         Returns
         =======
@@ -209,7 +253,12 @@ class ScoringMatrix:
             The value associated with the element.
         """
 
-        if not domains:
+        if not domain:
             return self.scores[self._dr][tuple(key)]
 
-        return self.scores[domains][tuple(key)]
+        # Infer and cache the domain if not available
+        domain = tuple(domain)
+        if domain not in self.scores:
+            self._fill_domain(domain)
+
+        return self.scores[domain][tuple(key)]
