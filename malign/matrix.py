@@ -85,17 +85,24 @@ class ScoringMatrix:
         # item
         self.domains, = domains
         self._dr = tuple(range(self.domains))
-        self.scores = {self._dr: scores.copy()}
-        self.scores[self._dr][tuple([self.gap] * self.domains)] = 0.0
+        self.scores = scores.copy()
+        self.scores[tuple([self.gap] * self.domains)] = 0.0
 
         # Add submatrices, if provided
         for sub_domain, matrix in sub_matrices.items():
-            # We need to use the submatrix `._dr`, as the indexes we need are
-            # the ones in this matrix being initialized; this should never
-            # be a problem because (1) we expected the submatrix to be
-            # complete and (2) we are only using the full alignment site
-            # of the sub-matrix.
-            self.scores[sub_domain] = matrix.scores[matrix._dr].copy()
+            # We need to index the submatrix with its `._dr`, as the indexes
+            # we need are the ones in this matrix being initialized. Note
+            # how we keep a single dictionary, filling missing spots with
+            # `None`
+
+            for sub_key, score in matrix.scores.items():
+                mapper = {sub_idx: idx for sub_idx, idx in zip(sub_domain, matrix._dr)}
+                new_key = [
+                    sub_key[idx] if idx is not None else None
+                    for idx in [mapper.get(idx, None) for idx in self._dr]
+                ]
+
+                self.scores[tuple(new_key)] = score
 
         # Extract the alphabets, if they were not provided
         # TODO: check if the alphabets agree with the provided scores
@@ -140,9 +147,11 @@ class ScoringMatrix:
         """
 
         # Compute the expected size of the scorer, so we know if there are
-        # keys missing indeed
+        # keys missing indeed; we check for `all` to exclude submatrices
+        # that have `None` values
+        # TODO: deal with the new Nones (should just filter?), also below
         expected_size = np.prod([len(alphabet) for alphabet in self.alphabets])
-        if len(self.scores[self._dr]) == expected_size:
+        if len([key for key in self.scores if all(key)]) == expected_size:
             return
 
         # If we have sub-matrices, we will extend them as much as possible
@@ -161,7 +170,7 @@ class ScoringMatrix:
         for domain_idx in self._dr:
             # Collect all sub-keys and values
             sub_scores[domain_idx] = defaultdict(list)
-            for key, score in self.scores[self._dr].items():
+            for key, score in self.scores.items():
                 sub_key = tuple(
                     [value for idx, value in enumerate(key) if idx != domain_idx]
                 )
@@ -178,7 +187,7 @@ class ScoringMatrix:
         # apply them after the loop, not changing `self.scores` in-place.
         score_cache = {}
         for key in itertools.product(*self.alphabets):
-            if key not in self.scores[self._dr]:
+            if key not in self.scores:
                 # Collect all sub-scores
                 all_sub_scores = []
                 for domain_idx in self._dr:
@@ -190,17 +199,17 @@ class ScoringMatrix:
                     score_cache[key] = np.mean([v for v in all_sub_scores if v])
 
         # Update with the new values
-        self.scores[self._dr].update(score_cache)
+        self.scores.update(score_cache)
 
         # If there are still keys missing, collect the mean sub_score
         # by symbol in each domain and set to this value -- this is similar
         # to what we do above, but much less precise as we take all symbols
         # independently
-        if len(self.scores[self._dr]) == expected_size:
+        if len([key for key in self.scores if all(key)]) == expected_size:
             return
 
         symbol_score = defaultdict(lambda: defaultdict(list))
-        for key, score in self.scores[self._dr].items():
+        for key, score in self.scores.items():
             for domain_idx in self._dr:
                 symbol_score[domain_idx][key[domain_idx]].append(score)
 
@@ -211,8 +220,8 @@ class ScoringMatrix:
             }
 
         for key in itertools.product(*self.alphabets):
-            if key not in self.scores[self._dr]:
-                self.scores[self._dr][key] = np.mean(
+            if key not in self.scores:
+                self.scores[key] = np.mean(
                     [
                         symbol_score[domain_idx][symbol]
                         for domain_idx, symbol in enumerate(key)
@@ -234,26 +243,24 @@ class ScoringMatrix:
         """
 
         # Obtain the alphabets of the sub-domain
-        sub_alphabets = [self.alphabets[d_idx] for d_idx in domain]
+        sub_alphabets = [
+            self.alphabets[d_idx] if d_idx in domain else [None] for d_idx in self._dr
+        ]
 
         # Fill keys
         # TODO: investigate better subsetting, loops to unroll
         # TODO: also what should not be collected like full gaps
-        self.scores[domain] = {}
         for sub_key in itertools.product(*sub_alphabets):
-            # Collect all values in the main matrix that match the sub_key
-            idx_values = list(zip(domain, sub_key))
             sub_scores = []
-            for key, score in self.scores[self._dr].items():
-                if all([key[idx] == v for idx, v in idx_values]):
+            for key, score in self.scores.items():
+                if all(
+                    [key[idx] == v for idx, v in enumerate(sub_key) if v is not None]
+                ):
                     sub_scores.append(score)
 
             # Add adjusted value
             # TODO: allow other manipulations, here just the percentile
-            self.scores[domain][sub_key] = np.percentile(sub_scores, 75)
-
-        # Fill full gap
-        self.scores[domain][tuple(self.gap * len(domain))] = 0.0
+            self.scores[sub_key] = np.percentile(sub_scores, 75)
 
     def __call__(self, key, domain=None):
         """
@@ -278,12 +285,14 @@ class ScoringMatrix:
             The value associated with the element.
         """
 
-        if not domain:
-            return self.scores[self._dr][tuple(key)]
+        # If there is a domain, compute the new key
+        if domain:
+            mapper = {d: k for d, k in zip(domain, key)}
+            key = tuple([mapper.get(d, None) for d in self._dr])
 
-        # Infer and cache the domain if not available
-        domain = tuple(domain)
-        if domain not in self.scores:
-            self._fill_domain(domain)
+            # if the key is missing, the submatrix has not been computed yet;
+            # we do it now, effectively caching the results
+            if key not in self.scores:
+                self._fill_domain(domain)
 
-        return self.scores[domain][tuple(key)]
+        return self.scores[tuple(key)]
