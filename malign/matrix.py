@@ -9,7 +9,7 @@ import itertools
 # Import 3rd-party libraries
 import numpy as np
 
-import utils
+from . import utils
 
 
 class ScoringMatrix:
@@ -58,45 +58,54 @@ class ScoringMatrix:
         """
 
         # Store values
-        self.scores = scores
         self.gap = kwargs.get("gap", "-")
 
-        # Make sure all `scores` report the same number of domains, store
-        # the number of domains, an set (or override, if necessary) the
-        # value of exclusive-gap sites.
-        domains = set([len(key) for key in self.scores])
-        if len(domains) > 1:
-            raise ValueError("Different domain-lengths in `scores`.")
-        else:
+        # If `scores` is a dictionary, it is dictionary (potentially
+        # incomplete and which needs to be filled) of full alignment
+        # sites
+        if isinstance(scores, dict):
+            # Make sure all `scores` report the same number of domains, store
+            # the number of domains, an set (or override, if necessary) the
+            # value of exclusive-gap sites.
+            domains = set([len(key) for key in scores])
+            if len(domains) > 1:
+                raise ValueError("Different domain-lengths in `scores`.")
+
+            # Copy `domains` and define the global, full `domain range`
             # NOTE: the comma after `self.domains` is used to unpack the
-            # `domains` set, which at this point we know contains a single item
+            # `domains` set, which at this point we know contains a single
+            # item
             self.domains, = domains
-            self.scores[tuple([self.gap] * self.domains)] = 0.0
+            self._dr = tuple(range(self.domains))
+            self.scores = {self._dr: scores.copy()}
+            self.scores[self._dr][tuple([self.gap] * self.domains)] = 0.0
 
-        # Extract the alphabets, if they were not provided
-        # TODO: check if the alphabets agree with the provided scores
-        # TODO: check if the alphabets are list of lists, if provided
-        self.alphabets = kwargs.get("alphabets", None)
-        if self.alphabets:
-            self.alphabets = [sorted(alphabet) for alphabet in self.alphabets]
-        else:
-            self.alphabets = [sorted(set(alphabet)) for alphabet in zip(*scores.keys())]
-
-        # Fill the matrix with the appropriate method if requested
-        fill = kwargs.get("fill", "standard")
-        if fill:
-            if fill == "standard":
-                self._fill_matrix(fill)
+            # Extract the alphabets, if they were not provided
+            # TODO: check if the alphabets agree with the provided scores
+            # TODO: check if the alphabets are list of lists, if provided
+            self.alphabets = kwargs.get("alphabets", None)
+            if self.alphabets:
+                self.alphabets = [sorted(alphabet) for alphabet in self.alphabets]
             else:
-                raise ValueError("Unknown filling method.")
+                self.alphabets = [
+                    sorted(set(alphabet)) for alphabet in zip(*scores.keys())
+                ]
+
+            # Fill the matrix with the appropriate method if requested
+            fill = kwargs.get("fill", "standard")
+            if fill:
+                if fill == "standard":
+                    self._fill_matrix(fill)
+                else:
+                    raise ValueError("Unknown filling method.")
 
     # TODO: currently disregarding the `method`, as there is a single one
-    # TODO: replace the `enumerate(self.alphabets)` with a cached range
     # TODO: describe how the standard method can be considered a kind of MLE
+    # TODO: use `self.domain_range`
     def _fill_matrix(self, method):
         """
         Internal function for filling a matrix if there are missing values.
-        
+
         Parameters
         ==========
 
@@ -108,8 +117,11 @@ class ScoringMatrix:
         # Compute the expected size of the scorer, so we know if there are
         # keys missing indeed
         expected_size = np.prod([len(alphabet) for alphabet in self.alphabets])
-        if len(self.scores) == expected_size:
+        if len(self.scores[self._dr]) == expected_size:
             return
+
+        # Cache the range of domains
+        domains = list(range(len(self.alphabets)))
 
         # For each domain, we first collect all keys without considering
         # the symbol in the domain itself, and fill any missing spot with
@@ -118,10 +130,10 @@ class ScoringMatrix:
         # no ('c', 'A', '1'), this will set the latter to the mean value
         # of 5, as coming from (?, 'A', '1')
         sub_scores = {}
-        for domain_idx, alphabet in enumerate(self.alphabets):
+        for domain_idx in domains:
             # Collect all sub-keys and values
             sub_scores[domain_idx] = defaultdict(list)
-            for key, score in self.scores.items():
+            for key, score in self.scores[self._dr].items():
                 sub_key = tuple(
                     [value for idx, value in enumerate(key) if idx != domain_idx]
                 )
@@ -138,10 +150,10 @@ class ScoringMatrix:
         # apply them after the loop, not changing `self.scores` in-place.
         score_cache = {}
         for key in itertools.product(*self.alphabets):
-            if key not in self.scores:
+            if key not in self.scores[self._dr]:
                 # Collect all sub-scores
                 all_sub_scores = []
-                for domain_idx, alphabet in enumerate(self.alphabets):
+                for domain_idx in domains:
                     sub_key = key[:domain_idx] + key[domain_idx + 1 :]
                     all_sub_scores.append(sub_scores[domain_idx].get(sub_key, None))
 
@@ -150,39 +162,40 @@ class ScoringMatrix:
                     score_cache[key] = np.mean([v for v in all_sub_scores if v])
 
         # Update with the new values
-        self.scores.update(score_cache)
+        self.scores[self._dr].update(score_cache)
 
         # If there are still keys missing, collect the mean sub_score
         # by symbol in each domain and set to this value -- this is similar
         # to what we do above, but much less precise as we take all symbols
         # independently
-        if len(self.scores) == expected_size:
+        if len(self.scores[self._dr]) == expected_size:
             return
 
         symbol_score = defaultdict(lambda: defaultdict(list))
-        for key, score in self.scores.items():
-            for domain_idx, alphabet in enumerate(self.alphabets):
+        for key, score in self.scores[self._dr].items():
+            for domain_idx in domains:
                 symbol_score[domain_idx][key[domain_idx]].append(score)
 
-        for domain_idx, alphabet in enumerate(self.alphabets):
+        for domain_idx in domains:
             symbol_score[domain_idx] = {
                 symbol: np.mean(scores)
                 for symbol, scores in symbol_score[domain_idx].items()
             }
 
         for key in itertools.product(*self.alphabets):
-            if key not in self.scores:
-                self.scores[key] = np.mean(
+            if key not in self.scores[self._dr]:
+                print("!!!!", key)
+                self.scores[self._dr][key] = np.mean(
                     [
                         symbol_score[domain_idx][symbol]
                         for domain_idx, symbol in enumerate(key)
                     ]
                 )
 
-    def __getitem__(self, key):
+    def __call__(self, key, domains=None):
         """
         Return the score associated with a tuple of alignments.
-        
+
         Parameters
         ==========
 
@@ -196,31 +209,7 @@ class ScoringMatrix:
             The value associated with the element.
         """
 
-        return self.scores[key]
+        if not domains:
+            return self.scores[self._dr][tuple(key)]
 
-
-if __name__ == "__main__":
-    m = ScoringMatrix(utils.DNA_MATRIX)
-
-    s = {
-        ("a", "A", "1"): -1,
-        ("a", "A", "2"): 4,
-        ("a", "A", "3"): 3,
-        ("a", "B", "1"): 1,
-        ("b", "A", "1"): -10,
-        ("b", "A", "2"): 10,
-        ("b", "A", "3"): 10,
-        ("b", "A", "4"): 10,
-        ("c", "B", "1"): 2,
-        ("c", "B", "2"): 2,
-        ("a", "-", "-"): -2,
-        ("b", "-", "-"): -2,
-        ("-", "A", "-"): -20,
-        ("-", "B", "-"): -20,
-        ("-", "-", "1"): -3,
-        ("a", "B", "-"): -10,
-        ("-", "A", "1"): -100,
-        ("-", "A", "2"): -10,
-        ("-", "B", "3"): -5,
-    }
-    m = ScoringMatrix(s)
+        return self.scores[domains][tuple(key)]

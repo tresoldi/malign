@@ -17,3 +17,4 @@ from malign.malign import pw_align, multi_align
 # from malign.graph import *
 
 from malign.utils import print_alms, print_malms
+from malign.matrix import ScoringMatrix
