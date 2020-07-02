@@ -10,8 +10,6 @@ import malign.kbest as kbest
 # Import other modules
 import malign.utils as utils
 
-# TODO: score from 0 to 1 or from 1 to 0?
-
 
 def dumb_malign(seqs, gap="-", **kwargs):
     # Obtain the longest sequence length
