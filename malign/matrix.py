@@ -5,6 +5,7 @@ Module for scoring matrices.
 # Import Python standard libraries
 from collections import defaultdict
 import itertools
+import json
 
 # Import 3rd-party libraries
 import numpy as np
@@ -13,6 +14,8 @@ from . import utils
 
 # TODO: add methods for loading and storing the matrices
 # TODO: add auxiliary function to build a scoring matrix in a single pass from subs
+# TODO: add new method for inference using something like impurity/entropy
+# TODO: implement a __get__ method, related to __call__
 
 # TODO: `scores` can be empty if submatrices are provided
 # TODO: what if submatrices are not complete?
@@ -31,7 +34,7 @@ class ScoringMatrix:
       - gaps are full, normal "symbols"
     """
 
-    def __init__(self, scores, **kwargs):
+    def __init__(self, scores=None, filename=None, **kwargs):
         """
         Initialize a scoring matrix.
 
@@ -43,7 +46,11 @@ class ScoringMatrix:
             the order that will be used when using the matrix) and floating
             points as values. Exclusive-gap alignments (that is, keys
             composed only of gaps) will be overriden to a value of 0.0 if
-            provided.
+            provided. Either `scores` or `filename` must be provided when initializating
+            a matrix.
+        filename : str
+            A string with the path to a serialized matrix in JSON format. Either
+            `scores` or `filename` must be provided when initializing a matrix.
         sub_matrices : dict
             A dictionary with domains (tuples of ints) as scorers and
             ScoringMatrices as values. Assumes the sub-matrices are
@@ -65,11 +72,53 @@ class ScoringMatrix:
             the `"standard"` method.
         """
 
-        # Store values
-        self.gap = kwargs.get("gap", "-")
+        # Make sure either `filename` or `scores` were provided
+        if not filename and not scores:
+            raise ValueError(
+                "Matrix must be initialized with either `scores` or `filename`."
+            )
 
-        # Collect submatrices, if they were provided
-        sub_matrices = kwargs.get("sub_matrices", {})
+        # Fill the matrix with the appropriate method if requested
+        self._fill_method = kwargs.get("fill", "standard")
+
+        # If a filename was provided, load a serialized matrix; otherwise, initialize
+        # from user provided `scores`
+        if filename:
+            self._load(filename)
+        else:
+            # Store values
+            self.gap = kwargs.get("gap", "-")
+
+            # Collect submatrices, if they were provided
+            sub_matrices = kwargs.get("sub_matrices", {})
+
+            # Extract the alphabets, if they were not provided
+            # TODO: check if the alphabets agree with the provided scores
+            # TODO: check if the alphabets are list of lists, if provided
+            self.alphabets = kwargs.get("alphabets", None)
+            if self.alphabets:
+                self.alphabets = [sorted(alphabet) for alphabet in self.alphabets]
+            else:
+                # Collect alphabet from scores
+                self.alphabets = [alphabet for alphabet in zip(*scores.keys())]
+
+                # Extend with alphabets from submatrices, if they were provided
+                for sub_matrix, obj in sub_matrices.items():
+                    for dmn, alphabet in zip(sub_matrix, obj.alphabets):
+                        self.alphabets[dmn] += alphabet
+
+                # Make sorted lists
+                self.alphabets = [
+                    tuple(sorted(set(alphabet))) for alphabet in self.alphabets
+                ]
+
+            # Initialize from the scores
+            self._init_from_scores(scores, sub_matrices)
+
+    def _init_from_scores(self, scores, sub_matrices):
+        """
+        Internal function for initializing from user-provided scores.
+        """
 
         # Make sure all `scores` report the same number of domains, store
         # the number of domains, an set (or override, if necessary) the
@@ -104,31 +153,10 @@ class ScoringMatrix:
 
                 self.scores[tuple(new_key)] = score
 
-        # Extract the alphabets, if they were not provided
-        # TODO: check if the alphabets agree with the provided scores
-        # TODO: check if the alphabets are list of lists, if provided
-        self.alphabets = kwargs.get("alphabets", None)
-        if self.alphabets:
-            self.alphabets = [sorted(alphabet) for alphabet in self.alphabets]
-        else:
-            # Collect alphabet from scores
-            self.alphabets = [alphabet for alphabet in zip(*scores.keys())]
-
-            # Extend with alphabets from submatrices, if they were provided
-            for sub_matrix, obj in sub_matrices.items():
-                for dmn, alphabet in zip(sub_matrix, obj.alphabets):
-                    self.alphabets[dmn] += alphabet
-
-            # Make sorted lists
-            self.alphabets = [
-                tuple(sorted(set(alphabet))) for alphabet in self.alphabets
-            ]
-
         # Fill the matrix with the appropriate method if requested
-        fill = kwargs.get("fill", "standard")
-        if fill:
-            if fill == "standard":
-                self._fill_full_matrix(fill)
+        if self._fill_method:
+            if self._fill_method == "standard":
+                self._fill_full_matrix(self._fill_method)
             else:
                 raise ValueError("Unknown filling method.")
 
@@ -260,6 +288,46 @@ class ScoringMatrix:
             # Add adjusted value
             # TODO: allow other manipulations, here just the percentile
             self.scores[sub_key] = np.percentile(sub_scores, 75)
+
+    def _load(self, filename):
+        with open(filename) as json_handler:
+            serial_data = json.load(json_handler)
+
+            self.gap = serial_data["gap"]
+            self._dr = tuple(serial_data["domain_range"])
+            self.alphabets = [tuple(alphabet) for alphabet in serial_data["alphabets"]]
+
+            self.scores = {
+                tuple([None if k == "NULL" else k for k in key.split(" / ")]): value
+                for key, value in serial_data["scores"].items()
+            }
+
+    # TODO: note issues about " / " if in alphabets
+    def save(self, filename):
+        # Make a copy of `self.scores` replacing `None`s, which cannot be part
+        # of the key as per the JSON standard, with a custom element, which
+        # must be mapped back when loading.
+        # As we only operate on strings, to facilitate human edition/inspection
+        # we map the `None`s to numeric zero value. Note that we need our custom
+        # sorting function as we cannot otherwise sort keys with Nones and strings.
+        def _allow_none_key(obj):
+            return tuple(["0000000000" if k is None else k for k in obj])
+
+        _scores = {
+            " / ".join(["NULL" if k is None else k for k in key]): self.scores[key]
+            for key in sorted(self.scores, key=_allow_none_key)
+        }
+
+        # Build serialized data and write to disk
+        # TODO: also alphabets
+        serial_data = {
+            "gap": self.gap,
+            "scores": _scores,
+            "domain_range": list(self._dr),
+            "alphabets": self.alphabets,
+        }
+        with open(filename, "w") as json_handler:
+            json.dump(serial_data, json_handler, indent=4, ensure_ascii=False)
 
     def __call__(self, key, domain=None):
         """
