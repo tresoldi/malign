@@ -6,6 +6,7 @@ Module for scoring matrices.
 from collections import defaultdict
 import itertools
 import json
+import copy
 
 # Import 3rd-party libraries
 import numpy as np
@@ -321,17 +322,23 @@ class ScoringMatrix:
         # Build serialized data and write to disk
         # TODO: also alphabets
         serial_data = {
-            "gap": self.gap,
-            "scores": _scores,
-            "domain_range": list(self._dr),
             "alphabets": self.alphabets,
+            "gap": self.gap,
+            "domain_range": list(self._dr),
+            "scores": _scores,
         }
         with open(filename, "w") as json_handler:
             json.dump(serial_data, json_handler, indent=4, ensure_ascii=False)
 
-    def __call__(self, key, domain=None):
+    def copy(self):
+        return copy.deepcopy(self)
+
+    def __getitem__(self, key):
         """
         Return the score associated with a tuple of alignments per domain.
+
+        Sub-domains can be specified by passing a `None` to the positions the key
+        does not apply.
 
         If a sub-domain is requested and it has not been computed so far,
         it will be inferred and cached for reuse.
@@ -341,9 +348,6 @@ class ScoringMatrix:
 
         key : tuple of strings
             The element in the multidimensional matrix to be queried.
-        domain : tuple or list of integers
-            The domain where the key should be queried. Defaults to the
-            complete alignment site.
 
         Returns
         =======
@@ -352,14 +356,20 @@ class ScoringMatrix:
             The value associated with the element.
         """
 
-        # If there is a domain, compute the new key
-        if domain:
-            mapper = {d: k for d, k in zip(domain, key)}
-            key = tuple([mapper.get(d, None) for d in self._dr])
+        # If there are `None`s in the key, it is a subdomain, be sure to check
+        # if it needs to be computed
 
-            # if the key is missing, the submatrix has not been computed yet;
-            # we do it now, effectively caching the results
+        # If there are `None`s in the key (as observed from the domain), and the key
+        # is missing, it means the submatrix was not provided and has not been computed
+        # yet; we do it now, caching the results.
+        if None in key:
+            domain = tuple([idx for idx, value in enumerate(key) if value is not None])
+
             if key not in self.scores:
                 self._fill_domain(domain)
 
         return self.scores[tuple(key)]
+
+    # TODO: run checks, alphabet, etc.
+    def __setitem__(self, key, value):
+        self.scores[tuple(key)] = value
