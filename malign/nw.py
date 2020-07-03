@@ -202,13 +202,12 @@ def add_nw_scores(alms):
 
 # TODO: pass gap
 # TODO: note that K is *at most* K
+# TODO: note that it assumes the matrix has already been filled, when provided
 def nw_align(seq_a, seq_b, gap="-", matrix=None, k=1):
     # Build normal matrix if not provided, make sure it is filled
     # otherwise
     if not matrix:
         matrix = utils.build_basic_matrix(set(seq_a), set(seq_b))
-    else:
-        matrix = utils.fill_matrix(set(seq_a), set(seq_b), matrix)
 
     # Add initial gaps; note that this also makes a
     # copy of the contents of each sequence, so we preserve the original
