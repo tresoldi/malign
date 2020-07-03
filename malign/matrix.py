@@ -134,6 +134,8 @@ class ScoringMatrix:
 
     # TODO: currently disregarding the `method`, as there is a single one
     # TODO: describe how the standard method can be considered a kind of MLE
+    # TODO: change method to first look for the closest match, especially when
+    #       we have submatrices
     def _fill_full_matrix(self, method):
         """
         Internal function for filling a matrix if there are missing values.
@@ -154,12 +156,6 @@ class ScoringMatrix:
         if len([key for key in self.scores if all(key)]) == expected_size:
             return
 
-        # If we have sub-matrices, we will extend them as much as possible
-        # to fill the full alignment keys (without overriding any value
-        # provided by the user, of course)
-        print(self.scores.keys())
-        print("REIMPLEMENT WITH NONES")
-
         # For each domain, we first collect all keys without considering
         # the symbol in the domain itself, and fill any missing spot with
         # the mean value. No difference is made in terms of gaps.
@@ -174,7 +170,10 @@ class ScoringMatrix:
                 sub_key = tuple(
                     [value for idx, value in enumerate(key) if idx != domain_idx]
                 )
-                sub_scores[domain_idx][sub_key].append(score)
+
+                # We might have `None`s due to submatrices
+                if not None in sub_key:
+                    sub_scores[domain_idx][sub_key].append(score)
 
         # Take the mean value of all sub_scores
         for domain_idx, scores in sub_scores.items():
