@@ -95,6 +95,32 @@ def print_malms(alms):
             print(f"{alm_idx} {label} ({alm['score']:.2f}) : {seq}")
 
 
+# TODO: deal with potentially different gap symbols
+def identity_matrix(seqs, match, gap, gap_symbol="-"):
+    # build a simple identity matrix, like in the voldemort example
+
+    # Collect alphabet and build key space
+    alphabet = list(set(list(itertools.chain.from_iterable(seqs)) + [gap_symbol]))
+    space = [alphabet] * len(seqs)
+
+    # Build keys from all alphabets and fill scorer
+    scores = {}
+    for key in itertools.product(*space):
+        symbols = len(set(key))
+
+        # Compute the score as a power of the match score, detracting gaps (note that
+        # the gap score is supposed to be passed as a negative)
+        score = (match) ** (len(seqs) - symbols)
+        if key.count(gap_symbol):
+            score += (key.count(gap_symbol) + 1) * gap
+        scores[key] = score
+
+    # Build matrix and return
+    m = matrix.ScoringMatrix(scores)
+
+    return m
+
+
 # TODO: allow different gap symbol, also in align_graph
 # TODO: allow to use median instead of mean (or even mode?)
 # TODO: move to utility or scorer module
@@ -223,47 +249,24 @@ def fill_matrix(alpha_a, alpha_b, scorer=None, **kwargs):
     return scorer
 
 
-# TODO: multiple matrices
+# TODO: multiple matrices and domains, now defaulting to (0,1) and (0,2)
+# TODO: check if the gap symbols are the same
+# TODO: allow to combine giving filenames? perhaps in matrix itself?
 def combine_matrices(matrix_a, matrix_b):
-    # Collect the full alphabet in matrices A and B; assumes a[0] is the
-    # same domain as b[0]
-    alphabet_a = set([c[0] for c in matrix_a] + [c[0] for c in matrix_b])
-    alphabet_b = set([c[1] for c in matrix_a])
-    alphabet_c = set([c[1] for c in matrix_b])
+    # Collect alphabets
+    alphabets = [[], [], []]
+    alphabets[0] = sorted(set(matrix_a.alphabets[0] + matrix_b.alphabets[0]))
+    alphabets[1] = matrix_a.alphabets[1]
+    alphabets[2] = matrix_b.alphabets[1]
 
-    # Make copies of the matrices, so we don't change them
-    matrix_a = matrix_a.copy()
-    matrix_b = matrix_b.copy()
+    # we provide a single point ita/rus/grk
+    sub_matrices = {(0, 1): matrix_a, (0, 2): matrix_b}
 
-    def _add_missing_values(alphabet1, alphabet2, matrix):
-        # TODO: here using the mean value
+    # Initialize with an empty scorer and submatrices, besides alphabets
+    # TODO: have a solution so `scores` is not necessary -- if not provided, computation
+    #       of domain in `ScoringMatrix` will fail
+    new_matrix = matrix.ScoringMatrix(
+        scores={("-", "-", "-"): 0}, sub_matrices=sub_matrices, alphabets=alphabets
+    )
 
-        for p in itertools.product(alphabet1, alphabet2):
-            # mean values for ? <-> b
-            value_b = {}
-            if p not in matrix:
-                # compute the value if missing
-                if p[1] not in value_b:
-                    values = [
-                        value for key, value in matrix_a.items() if key[1] == p[1]
-                    ]
-                    if not values:
-                        value_b[p[1]] = -1.0
-                    else:
-                        value_b[p[1]] = np.mean(values)
-
-                # Add value to matrix
-                matrix[p] = value_b[p[1]]
-
-    # Make sure alphabet_a is mapped to all values in Ma and Mb
-    _add_missing_values(alphabet_a, alphabet_b, matrix_a)
-    _add_missing_values(alphabet_a, alphabet_c, matrix_b)
-
-    # Build the new matrix as cleverly as it can
-    matrix = {}
-    for key in itertools.product(alphabet_a, alphabet_b, alphabet_c):
-        val_a = matrix_a[key[0], key[1]]
-        val_b = matrix_b[key[0], key[2]]
-        matrix[key] = (val_a + val_b) / 2.0
-
-    return matrix
+    return new_matrix

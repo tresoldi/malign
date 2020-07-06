@@ -39,7 +39,7 @@ def _pairwise_iter(iterable):
 #       an object?)
 # TODO: allow to correct costs by some parameter, perhaps even non-linear?
 # TODO: investigate usage of tuples of integers as keys
-def compute_graph(seq_a, seq_b, scorer=None):
+def compute_graph(seq_a, seq_b, matrix=None):
     """
     Computes a weighted directed graph for alignment.
 
@@ -67,7 +67,7 @@ def compute_graph(seq_a, seq_b, scorer=None):
         is build in terms of this first sequence.
     seq_b : list
         A list of hasheable elements to be aligned.
-    scorer: dict
+    matrix: dict
         A dictionary of scoring weights for the alignments. Dictionary keys
         are tuples in the format (`seq_a character`, `seq_b character`),
         dictionary values are numbers holding the
@@ -90,8 +90,9 @@ def compute_graph(seq_a, seq_b, scorer=None):
     # natural, given our graph approach, to store *cost* values instead of
     # *score* vaues (also favoring smaller/negative ones), the "tradition" in
     # sequence alignment is to report scorer.
-    scorer = utils.fill_matrix(set(seq_a), set(seq_b), scorer)
-    max_score = max(scorer.values())
+    # TODO: assuming matrix is filled
+    #    scorer = utils.fill_matrix(set(seq_a), set(seq_b), scorer)
+    max_score = max(matrix.scores.values())
 
     # Add gaps to the beginning of both sequences, emulating the first row
     # and first column in NW.
@@ -126,15 +127,15 @@ def compute_graph(seq_a, seq_b, scorer=None):
             elif i == 0:
                 dig_score = None
                 hor_score = None
-                ver_score = scorer[symbol_a, "-"]
+                ver_score = matrix[symbol_a, "-"]
             elif j == 0:
                 dig_score = None
-                hor_score = scorer["-", symbol_b]
+                hor_score = matrix["-", symbol_b]
                 ver_score = None
             else:
-                dig_score = scorer[symbol_a, symbol_b]
-                hor_score = scorer["-", symbol_b]
-                ver_score = scorer[symbol_a, "-"]
+                dig_score = matrix[symbol_a, symbol_b]
+                hor_score = matrix["-", symbol_b]
+                ver_score = matrix[symbol_a, "-"]
 
             # Add edges (and nodes automatically)
             if dig_score is not None:

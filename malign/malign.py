@@ -62,18 +62,20 @@ def _malign(seqs, matrix, pw_func, gap="-", **kwargs):
 
     k = kwargs.get("k", 1)
 
-    pairs = list(itertools.combinations(range(len(seqs)), 2))
+    domains = list(itertools.combinations(range(len(seqs)), 2))  # was `pairs`
 
     # get submatrices
     # TODO: needed when creating a Matrix class?
-    sub_matrix = compute_submatrices(matrix, pairs)
+    # TODO: it is easier to create a new submatrix which can be passed around as
+    #       "the original" than to deal with the various `None`s
+    sub_matrix = matrix.compute_submatrices(domains)
 
     # Run pairwise alignment on all pairs, collecting all potential
     # alignments for each sequence in `potential`, where they are already
     # grouped by length
     # TODO: implement adding and removing gaps for +1/-1 offsets?
     potential = defaultdict(lambda: defaultdict(set))
-    for pair in pairs:
+    for pair in domains:  # TODO: rename, as might not be a pair
         x, y = pair
 
         # Run pairwise alignment
