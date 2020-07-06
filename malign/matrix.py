@@ -73,11 +73,7 @@ class ScoringMatrix:
             the `"standard"` method.
         """
 
-        # Make sure either `filename` or `scores` were provided
-        if not filename and not scores:
-            raise ValueError(
-                "Matrix must be initialized with either `scores` or `filename`."
-            )
+        # TODO: check precedence/interaction filename/scorer/submatirces
 
         # Fill the matrix with the appropriate method if requested
         self._fill_method = kwargs.get("fill", "standard")
@@ -97,8 +93,11 @@ class ScoringMatrix:
             # TODO: check if the alphabets agree with the provided scores
             # TODO: check if the alphabets are list of lists, if provided
             self.alphabets = kwargs.get("alphabets", None)
+
             if self.alphabets:
-                self.alphabets = [sorted(alphabet) for alphabet in self.alphabets]
+                self.alphabets = [
+                    tuple(sorted(alphabet)) for alphabet in self.alphabets
+                ]
             else:
                 # Collect alphabet from scores
                 self.alphabets = [alphabet for alphabet in zip(*scores.keys())]
@@ -144,7 +143,6 @@ class ScoringMatrix:
             # we need are the ones in this matrix being initialized. Note
             # how we keep a single dictionary, filling missing spots with
             # `None`
-
             for sub_key, score in matrix.scores.items():
                 mapper = {sub_idx: idx for sub_idx, idx in zip(sub_domain, matrix._dr)}
                 new_key = [
@@ -249,13 +247,21 @@ class ScoringMatrix:
 
         for key in itertools.product(*self.alphabets):
             if key not in self.scores:
+                # If the alphabet passed by the user has symbols not in the scorer,
+                # we will have a KeyError in symbol_score[domain_idx][symbol]; the
+                # `.get()` will default towards the `gap`, which is always necessary
+                # TODO: find a better solution
                 self.scores[key] = np.mean(
                     [
-                        symbol_score[domain_idx][symbol]
+                        symbol_score[domain_idx].get(
+                            symbol, symbol_score[domain_idx][self.gap]
+                        )
                         for domain_idx, symbol in enumerate(key)
                     ]
                 )
 
+    # TODO: if the alphabets are the same, we can save a lot of computation,
+    #       by caching, such as in identity matrices
     def _fill_domain(self, domain):
         """
         Internal function for filling a sub-domain.
@@ -279,16 +285,21 @@ class ScoringMatrix:
         # TODO: investigate better subsetting, loops to unroll
         # TODO: also what should not be collected like full gaps
         for sub_key in itertools.product(*sub_alphabets):
-            sub_scores = []
-            for key, score in self.scores.items():
-                if all(
-                    [key[idx] == v for idx, v in enumerate(sub_key) if v is not None]
-                ):
-                    sub_scores.append(score)
+            if sub_key not in self.scores:
+                sub_scores = []
+                for key, score in self.scores.items():
+                    if all(
+                        [
+                            key[idx] == v
+                            for idx, v in enumerate(sub_key)
+                            if v is not None
+                        ]
+                    ):
+                        sub_scores.append(score)
 
-            # Add adjusted value
-            # TODO: allow other manipulations, here just the percentile
-            self.scores[sub_key] = np.percentile(sub_scores, 75)
+                # Add adjusted value
+                # TODO: allow other manipulations? percentile perhaps?
+                self.scores[sub_key] = max(sub_scores)
 
     def _load(self, filename):
         with open(filename) as json_handler:
@@ -329,6 +340,31 @@ class ScoringMatrix:
         }
         with open(filename, "w") as json_handler:
             json.dump(serial_data, json_handler, indent=4, ensure_ascii=False)
+
+    # compute the submatrices as a dictionary of ScoringMatrix
+    def compute_submatrices(self, domains):
+        sub_matrix = {}
+
+        for domain in domains:
+            # Trigger the computation/completion of the domain
+            self._fill_domain(domain)
+
+            # Collect all scores for the given domain
+            sub_scores = {}
+            for key, value in self.scores.items():
+                # Make sure all entries of domain exist...
+                check = [key[idx] is not None for idx in domain]
+                # ...and all others don't
+                check += [key[idx] is None for idx in self._dr if idx not in domain]
+
+                if all(check):
+                    sub_key = tuple([k for k in key if k is not None])
+                    sub_scores[sub_key] = value
+
+            # Create the ScoringMatrix
+            sub_matrix[domain] = ScoringMatrix(sub_scores)
+
+        return sub_matrix
 
     def copy(self):
         return copy.deepcopy(self)
