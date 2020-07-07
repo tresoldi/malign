@@ -10,6 +10,7 @@ import copy
 
 # Import 3rd-party libraries
 import numpy as np
+from tabulate import tabulate
 
 from . import utils
 
@@ -171,6 +172,9 @@ class ScoringMatrix:
     # TODO: describe how the standard method can be considered a kind of MLE
     # TODO: change method to first look for the closest match, especially when
     #       we have submatrices
+    # TODO: check A Fill Estimation Algorithm for Sparse Matrices and Tensors in Blocked Formats
+    # TODO: another method could be a weighted avarage from the distance, which
+    #       can be computed in terms of neighbouts, involving the entire matrix
     def _fill_full_matrix(self, method):
         """
         Internal function for filling a matrix if there are missing values.
@@ -202,6 +206,10 @@ class ScoringMatrix:
             # Collect all sub-keys and values
             sub_scores[domain_idx] = defaultdict(list)
             for key, score in self.scores.items():
+                # Skip full gap
+                if all([v == self.gap for v in key]):
+                    continue
+
                 sub_key = tuple(
                     [value for idx, value in enumerate(key) if idx != domain_idx]
                 )
@@ -209,12 +217,6 @@ class ScoringMatrix:
                 # We might have `None`s due to submatrices
                 if not None in sub_key:
                     sub_scores[domain_idx][sub_key].append(score)
-
-        # Take the mean value of all sub_scores
-        for domain_idx, scores in sub_scores.items():
-            sub_scores[domain_idx] = {
-                sub_key: np.mean(values) for sub_key, values in scores.items()
-            }
 
         # Set the new score when possible, from the mean of the
         # available `sub_scores`. We cache the new values in order to only
@@ -226,11 +228,13 @@ class ScoringMatrix:
                 all_sub_scores = []
                 for domain_idx in self._dr:
                     sub_key = key[:domain_idx] + key[domain_idx + 1 :]
-                    all_sub_scores.append(sub_scores[domain_idx].get(sub_key, None))
+                    all_sub_scores += sub_scores[domain_idx].get(sub_key, [])
 
                 # Cache the new value if possible
                 if any(all_sub_scores):
-                    score_cache[key] = np.mean([v for v in all_sub_scores if v])
+                    print(key, all_sub_scores)
+                    # TODO: allow other methods, such as mean/median
+                    score_cache[key] = np.percentile(all_sub_scores, 50)
 
         # Update with the new values
         self.scores.update(score_cache)
@@ -375,6 +379,41 @@ class ScoringMatrix:
 
     def copy(self):
         return copy.deepcopy(self)
+
+    # TODO: currently only working for 2 or 3 domains
+    # TODO: use more options from tabulate
+    # TODO: check about identity matrix? from alphabets with a method?
+    def tabulate(self):
+        rows = []
+        if len(self._dr) == 2:
+
+            for symbol_a in self.alphabets[0]:
+                row = [symbol_a] + [
+                    self.scores[symbol_a, symbol_b] for symbol_b in self.alphabets[1]
+                ]
+                rows.append(row)
+
+            headers = [""] + list(self.alphabets[1])
+
+        elif len(self._dr) == 3:
+            rows = []
+            for symbol_a in self.alphabets[0]:
+                row = [symbol_a] + [
+                    self.scores[symbol_a, symbol_b, symbol_c]
+                    for symbol_b, symbol_c in itertools.product(
+                        self.alphabets[1], self.alphabets[2]
+                    )
+                ]
+                rows.append(row)
+
+            headers = [""] + [
+                "/" + "/".join(sub_key)
+                for sub_key in itertools.product(self.alphabets[1], self.alphabets[2])
+            ]
+        else:
+            raise ValueError("number of domains is not two or 3")
+
+        return tabulate(rows, headers=headers, tablefmt="github")
 
     def __getitem__(self, key):
         """

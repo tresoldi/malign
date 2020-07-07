@@ -81,9 +81,6 @@ def _malign(seqs, matrix, pw_func, gap="-", **kwargs):
         # Run pairwise alignment
         alms = pw_func(seqs[x], seqs[y], k=k, matrix=sub_matrix[pair])
 
-        print(pair, alms, len(alms[0]["a"]), len(alms[0]["b"]))
-        print(sub_matrix[pair].scores)
-
         # Add by length
         for alm in alms:
             potential[len(alm["a"])][x].add(tuple(alm["a"]))
