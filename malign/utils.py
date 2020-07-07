@@ -96,6 +96,7 @@ def print_malms(alms):
 
 
 # TODO: deal with potentially different gap symbols
+# TODO: do sub-matrices and matrices at the same pass?
 def identity_matrix(seqs, match, gap, gap_symbol="-"):
     # build a simple identity matrix, like in the voldemort example
 
@@ -103,8 +104,26 @@ def identity_matrix(seqs, match, gap, gap_symbol="-"):
     alphabet = list(set(list(itertools.chain.from_iterable(seqs)) + [gap_symbol]))
     space = [alphabet] * len(seqs)
 
-    # Build keys from all alphabets and fill scorer
+    # Build sub-matrices first, using the identity logic
     scores = {}
+    domains = list(itertools.combinations(range(len(seqs)), 2))
+    for domain in domains:
+        for symbols in itertools.product(alphabet, alphabet):
+            symbol_iter = iter(symbols)
+            key = tuple(
+                [
+                    next(symbol_iter) if idx in domain else None
+                    for idx in range(len(seqs))
+                ]
+            )
+            if gap_symbol in symbols:
+                scores[key] = gap
+            elif symbols[0] != symbols[1]:
+                scores[key] = (gap + match) / 2  # TODO: cache
+            else:
+                scores[key] = match
+
+    # Build keys from all alphabets and fill scorer
     for key in itertools.product(*space):
         symbols = len(set(key))
 
