@@ -89,7 +89,10 @@ class ScoringMatrix:
             # Collect submatrices, if they were provided
             sub_matrices = kwargs.get("sub_matrices", {})
 
-            # Extract the alphabets, if they were not provided
+            # Extract the alphabets, if they were not provided; during extraction,
+            # `None`s are removed as the user or the library might be passing
+            # sub-matrices as well (as when creating an identity matrix, when it
+            # makes more sense to provide the sub-matrix identities)
             # TODO: check if the alphabets agree with the provided scores
             # TODO: check if the alphabets are list of lists, if provided
             self.alphabets = kwargs.get("alphabets", None)
@@ -109,7 +112,12 @@ class ScoringMatrix:
 
                 # Make sorted lists
                 self.alphabets = [
-                    tuple(sorted(set(alphabet))) for alphabet in self.alphabets
+                    tuple(
+                        sorted(
+                            set([symbol for symbol in alphabet if symbol is not None])
+                        )
+                    )
+                    for alphabet in self.alphabets
                 ]
 
             # Initialize from the scores
@@ -331,7 +339,6 @@ class ScoringMatrix:
         }
 
         # Build serialized data and write to disk
-        # TODO: also alphabets
         serial_data = {
             "alphabets": self.alphabets,
             "gap": self.gap,
