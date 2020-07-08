@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# pylint: disable=no-self-use
 
 """
 test_malign
@@ -9,7 +10,7 @@ Tests for the scoring matrices of the `malign` package.
 
 # Import Python libraries
 import math
-import sys
+import tempfile
 import unittest
 
 # Impor the library itself
@@ -92,6 +93,10 @@ PAIRWISE_TEST_SPARSE_VECTOR_02 = {
 
 
 class TestMalign(unittest.TestCase):
+    """
+    Suite of tests for scoring matrices.
+    """
+
     def test_pairwise_from_full_vectors(self):
         """
         Test pairwise matrices built from complete vectors.
@@ -191,6 +196,37 @@ class TestMalign(unittest.TestCase):
         assert math.isclose(matrix["b", "-", "j"], 2.0)
         assert math.isclose(matrix["c", "Y", "j"], 5.5)
         assert math.isclose(matrix["-", "X", "-"], -1.5)
+
+    def test_subdomain_query(self):
+        """
+        Test querying of subdomains.
+        """
+
+        # Build matrices with the various filling methods
+        matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
+
+        assert math.isclose(matrix[None, "X", "i"], 4.0)
+        assert math.isclose(matrix["c", None, "i"], 7.0)
+        assert math.isclose(matrix["c", "X", None], 6.0)
+
+    def test_load_save(self):
+        """
+        Test load and saving matrices
+        """
+
+        # Build matrices with the various filling methods
+        matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
+
+        # Build a temporary file name and save
+        handler = tempfile.NamedTemporaryFile()
+        matrix.save(handler.name)
+
+        # Load and check
+        matrix2 = malign.ScoringMatrix(filename=handler.name)
+
+        # Assertions
+        assert matrix.scores == matrix2.scores
+        assert tuple(matrix.alphabets) == tuple(matrix2.alphabets)
 
 
 if __name__ == "__main__":
