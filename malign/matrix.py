@@ -451,6 +451,7 @@ class ScoringMatrix:
 
         return tabulate(rows, headers=headers, tablefmt="github")
 
+    # TODO: check if the key is asking for a symbol not in the alphabet
     def __getitem__(self, key):
         """
         Return the score associated with a tuple of alignments per domain.
