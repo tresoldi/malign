@@ -103,19 +103,28 @@ class ScoringMatrix:
                     tuple(sorted(alphabet)) for alphabet in self.alphabets
                 ]
             else:
-                # Collect alphabet from scores
-                self.alphabets = [alphabet for alphabet in zip(*scores.keys())]
+                # Collect alphabet from scores; if no `scores` were provided but
+                # only `sub_matrices`, we need to initialize `self.alphabets` to the
+                # length we can derive from the `sub_matrices` keys
+                if scores:
+                    self.alphabets = [alphabet for alphabet in zip(*scores.keys())]
+                else:
+                    num_alphabets = max([max(domain) for domain in sub_matrices])
+                    self.alphabets = [[] for _ in range(num_alphabets + 1)]
 
                 # Extend with alphabets from submatrices, if they were provided
                 for sub_matrix, obj in sub_matrices.items():
                     for dmn, alphabet in zip(sub_matrix, obj.alphabets):
                         self.alphabets[dmn] += alphabet
 
-                # Make sorted lists
+                # Make sorted lists, making sure the gap is there
                 self.alphabets = [
                     tuple(
                         sorted(
-                            set([symbol for symbol in alphabet if symbol is not None])
+                            set(
+                                [symbol for symbol in alphabet if symbol is not None]
+                                + [self.gap]
+                            )
                         )
                     )
                     for alphabet in self.alphabets
@@ -133,15 +142,20 @@ class ScoringMatrix:
         # the number of domains, an set (or override, if necessary) the
         # value of exclusive-gap sites.
         # TODO: check if in line with submatrices
-        domains = set([len(key) for key in scores])
-        if len(domains) > 1:
-            raise ValueError("Different domain-lengths in `scores`.")
+        if scores:
+            domains = set([len(key) for key in scores])
+            if len(domains) > 1:
+                raise ValueError("Different domain-lengths in `scores`.")
 
-        # Copy `domains` and define the global, full `domain range`
-        # NOTE: the comma after `self.domains` is used to unpack the
-        # `domains` set, which at this point we know contains a single
-        # item
-        self.domains, = domains
+            # Copy `domains` and define the global, full `domain range`
+            # NOTE: the comma after `self.domains` is used to unpack the
+            # `domains` set, which at this point we know contains a single
+            # item
+            self.domains, = domains
+        else:
+            self.domains = 1 + max([max(domain) for domain in sub_matrices])
+
+        #
         self._dr = tuple(range(self.domains))
         self.scores = scores.copy()
         self.scores[tuple([self.gap] * self.domains)] = 0.0
@@ -209,7 +223,7 @@ class ScoringMatrix:
 
             # Update an return
             # TODO: check if it fails when we have no info (extreme case), just
-            # setting a mean value should be enough
+            # setting a mean value should be enough (this could be for all methods)
             self.scores.update(score_cache)
             return
 
