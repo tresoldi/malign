@@ -8,6 +8,8 @@ test_malign
 Tests for the scoring matrices of the `malign` package.
 """
 
+# TODO: add test for identity matrix
+
 # Import Python libraries
 import math
 import tempfile
