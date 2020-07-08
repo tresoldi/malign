@@ -14,10 +14,7 @@ from tabulate import tabulate
 
 from . import utils
 
-# TODO: add methods for loading and storing the matrices
-# TODO: add auxiliary function to build a scoring matrix in a single pass from subs
 # TODO: add new method for inference using something like impurity/entropy
-# TODO: implement a __get__ method, related to __call__
 
 # TODO: `scores` can be empty if submatrices are provided
 # TODO: what if submatrices are not complete?
