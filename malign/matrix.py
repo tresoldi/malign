@@ -67,17 +67,17 @@ class ScoringMatrix:
             domain does not allow gaps).
         gap : str
             The string to use as a gap symbol. Defaults to `-`.
-        fill : string or None
+        fill_method : string or None
             The method used to fill empty elements in the matrix, using
             values computed from the ones provided. If set to `None`, the
-            matrix will not be filled. Choices are `"standard"`. Defaults to
-            the `"standard"` method.
+            matrix will not be filled. Choices are `"standard"` and `"distance"`.
+            Defaults to the `"standard"` method.
         """
 
         # TODO: check precedence/interaction filename/scorer/submatirces
 
         # Fill the matrix with the appropriate method if requested
-        self._fill_method = kwargs.get("fill", "standard")
+        self._fill_method = kwargs.get("fill_method", "standard")
 
         # If a filename was provided, load a serialized matrix; otherwise, initialize
         # from user provided `scores`
@@ -163,7 +163,7 @@ class ScoringMatrix:
 
         # Fill the matrix with the appropriate method if requested
         if self._fill_method:
-            if self._fill_method == "standard":
+            if self._fill_method in ["standard", "distance"]:
                 self._fill_full_matrix(self._fill_method)
             else:
                 raise ValueError("Unknown filling method.")
@@ -186,6 +186,32 @@ class ScoringMatrix:
             The method to be used for filling the matrix. Choices are
             `"standard"`.
         """
+
+        # TODO: describe distance method
+        if self._fill_method == "distance":
+            score_cache = {}
+            for cur_key in itertools.product(*self.alphabets):
+                if cur_key not in self.scores:
+
+                    # Collect all weighted distances
+                    x = []
+                    for ref_key, score in self.scores.items():
+                        match = sum(
+                            [
+                                symbol_key == symbol_ref
+                                for symbol_key, symbol_ref in zip(ref_key, cur_key)
+                            ]
+                        )
+                        x += [score] * match
+
+                    # TODO: allow mean
+                    score_cache[cur_key] = np.mean(x)
+
+            # Update an return
+            # TODO: check if it fails when we have no info (extreme case), just
+            # setting a mean value should be enough
+            self.scores.update(score_cache)
+            return
 
         # Compute the expected size of the scorer, so we know if there are
         # keys missing indeed; we check for `all` to exclude submatrices
@@ -232,7 +258,6 @@ class ScoringMatrix:
 
                 # Cache the new value if possible
                 if any(all_sub_scores):
-                    print(key, all_sub_scores)
                     # TODO: allow other methods, such as mean/median
                     score_cache[key] = np.percentile(all_sub_scores, 50)
 
@@ -399,7 +424,7 @@ class ScoringMatrix:
             rows = []
             for symbol_a in self.alphabets[0]:
                 row = [symbol_a] + [
-                    self.scores[symbol_a, symbol_b, symbol_c]
+                    self.scores.get((symbol_a, symbol_b, symbol_c), "-")
                     for symbol_b, symbol_c in itertools.product(
                         self.alphabets[1], self.alphabets[2]
                     )
