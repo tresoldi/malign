@@ -62,10 +62,10 @@ def compute_graph(seq_a, seq_b, matrix=None):
     Parameters
     ==========
 
-    seq_a : list
+    seq_a : list or iterable
         A list of hasheable elements to be aligned. The pairwise alignment
         is build in terms of this first sequence.
-    seq_b : list
+    seq_b : list or iterable
         A list of hasheable elements to be aligned.
     matrix: dict
         A dictionary of scoring weights for the alignments. Dictionary keys
@@ -99,8 +99,8 @@ def compute_graph(seq_a, seq_b, matrix=None):
     # NOTE: the "+" operation on lists here allows us to, in a single step,
     # add the necessary alignment gap and make an in-memory copy of both
     # sequences, preserving the original ones.
-    seq_a = ["-"] + seq_a
-    seq_b = ["-"] + seq_b
+    seq_a = ["-"] + list(seq_a)
+    seq_b = ["-"] + list(seq_b)
 
     # Build the directional graph and add edges iterating from the bottom
     # right to the top left corner (as in NW).
@@ -194,8 +194,8 @@ def build_align(path, seq_a, seq_b, gap="-"):
     # consuming the original value. This also simplifies the code, as
     # we can slice from the original point in the path (allowing a starting
     # path different from (0,0).
-    seq_a = seq_a[path[0][0] :]
-    seq_b = seq_b[path[0][1] :]
+    seq_a = list(seq_a[path[0][0] :])
+    seq_b = list(seq_b[path[0][1] :])
 
     # Build the alignment sequences, adding (more) gaps if necessary
     alm_a = []

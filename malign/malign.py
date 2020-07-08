@@ -191,7 +191,7 @@ def nw_align(seq_a, seq_b, gap="-", **kwargs):
 def kbest_align(seq_a, seq_b, k=1, gap="-", matrix=None, **kwargs):
 
     if not matrix:
-        matrix = utils.fill_matrix(set(seq_a), set(seq_b))
+        matrix = utils.identity_matrix([seq_a, seq_b], 2, -2)
 
     graph = kbest.compute_graph(seq_a, seq_b, matrix)
 
