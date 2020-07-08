@@ -424,7 +424,7 @@ class ScoringMatrix:
     # TODO: check about identity matrix? from alphabets with a method?
     def tabulate(self):
         rows = []
-        if len(self._dr) == 2:
+        if self.domains == 2:
 
             for symbol_a in self.alphabets[0]:
                 row = [symbol_a] + [
@@ -434,7 +434,7 @@ class ScoringMatrix:
 
             headers = [""] + list(self.alphabets[1])
 
-        elif len(self._dr) == 3:
+        elif self.domains == 3:
             rows = []
             for symbol_a in self.alphabets[0]:
                 row = [symbol_a] + [

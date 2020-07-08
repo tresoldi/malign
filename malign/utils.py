@@ -97,6 +97,7 @@ def print_malms(alms):
 
 # TODO: deal with potentially different gap symbols
 # TODO: do sub-matrices and matrices at the same pass?
+# TODO: add mismatch
 def identity_matrix(seqs, match, gap, gap_symbol="-"):
     # build a simple identity matrix, like in the voldemort example
 
