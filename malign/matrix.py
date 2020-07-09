@@ -540,7 +540,10 @@ class ScoringMatrix:
         return self.scores[tuple(key)]
 
     def __setitem__(self, key, value):
-        if not all([k in alphabet for k, alphabet in zip(key, self.alphabets)]):
+        # We need to treat `None`, as usual
+        if not all(
+            [k in alphabet for k, alphabet in zip(key, self.alphabets) if k is not None]
+        ):
             raise ValueError("`key` uses symbol(s) not in alphabet.")
 
         self.scores[tuple(key)] = value
