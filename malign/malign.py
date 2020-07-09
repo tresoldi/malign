@@ -1,16 +1,21 @@
+"""
+Main module with code for alignment methods.
+"""
+
+# Import Python standard libraries
 from collections import defaultdict
 import itertools
 
+# Import 3rd-party libraries
 import numpy as np
 
 # Import other modules
 import malign.nw as nw
-import malign.kbest as kbest
-
-# Import other modules
+import malign.kbest as kbest  # TODO: rename to yenksp
 import malign.utils as utils
 
-
+# TODO: move to its own file, for simmetry
+# TODO: expand dumb_malign by adding random gaps, call this pad_align?
 def dumb_malign(seqs, gap="-", **kwargs):
     # Obtain the longest sequence length
     max_length = max([len(seq) for seq in seqs])
@@ -39,26 +44,12 @@ def dumb_malign(seqs, gap="-", **kwargs):
     return [alm]
 
 
-# TODO: move to utils later?
-# TODO: decide on mean/median/top, second highest value
-def compute_submatrices(matrix, pairs):
-    # Collect/compute submatrices
-    matrix_values = defaultdict(lambda: defaultdict(list))
-    for pair in pairs:
-        x, y = pair
-        for key, value in matrix.items():
-            matrix_values[x, y][key[x], key[y]].append(value)
-
-    sub_matrix = {}
-    for pair, data in matrix_values.items():
-        sub_matrix[pair] = {
-            key: np.percentile(values, 80) for key, values in data.items()
-        }
-
-    return sub_matrix
-
-
+# TODO: is the `gap` even needed? only in case we have no scorer?
 def _malign(seqs, matrix, pw_func, gap="-", **kwargs):
+
+    # If no matrix is provided, build an identity one
+    if not matrix:
+        matrix = utils.identity_matrix(seqs, match=+1, gap=-1)
 
     k = kwargs.get("k", 1)
 
@@ -66,37 +57,39 @@ def _malign(seqs, matrix, pw_func, gap="-", **kwargs):
 
     # get submatrices
     # TODO: needed when creating a Matrix class?
-    # TODO: it is easier to create a new submatrix which can be passed around as
-    #       "the original" than to deal with the various `None`s
+    # TODO: only compute if needed -- for pairwise it is ready
     sub_matrix = matrix.compute_submatrices(domains)
 
     # Run pairwise alignment on all pairs, collecting all potential
     # alignments for each sequence in `potential`, where they are already
     # grouped by length
-    # TODO: implement adding and removing gaps for +1/-1 offsets?
+    # TODO: implement adding and removing gaps for +1/-1 offsets? -- this is related
+    #       with the "do as many as possible" (replacing `longest`) below
     potential = defaultdict(lambda: defaultdict(set))
-    for pair in domains:  # TODO: rename, as might not be a pair
-        x, y = pair
-
+    for idx_x, idx_y in domains:
         # Run pairwise alignment
-        alms = pw_func(seqs[x], seqs[y], k=k, matrix=sub_matrix[pair])
+        alms = pw_func(seqs[idx_x], seqs[idx_y], k=k, matrix=sub_matrix[idx_x, idx_y])
 
         # Add by length
         for alm in alms:
-            potential[len(alm["a"])][x].add(tuple(alm["a"]))
-            potential[len(alm["b"])][y].add(tuple(alm["b"]))
+            potential[len(alm["a"])][idx_x].add(tuple(alm["a"]))
+            potential[len(alm["b"])][idx_y].add(tuple(alm["b"]))
 
     # Before taking the product of all potential alignments with longest
     # lenght, we need to make sure that all sequences have such length,
     # as there might be cases where all alignments were shorter; in order to
     # do so, we get all potentials with the longest alignment and align
     # again, this time using the gaps
+    # TODO: don't consider only the longest -- as long as it is possible, do it,
+    #       and score normally; this should also help guarantee we get as many
+    #       alignments as requested as long as it is possible
     longest = max(potential)
     has_longest = list(potential[longest])
 
     # TODO: what if the alignment sequence is longer than longest? decide
     # whether to include the new one, realigning the top (most likely, but
     # more complex to implmenet) or just drop
+    # TODO: make into its own function, perhaps in `utils`
     for seq_idx in range(len(seqs)):
         if seq_idx not in has_longest:
             for long_idx in has_longest:
@@ -125,10 +118,10 @@ def _malign(seqs, matrix, pw_func, gap="-", **kwargs):
     # Build all potential alignments and score them
     cand = [potential[longest][idx] for idx in sorted(potential[longest])]
     alms = []
-    for a in itertools.product(*cand):
+    for aligns in itertools.product(*cand):
         alm = {"seqs": []}
 
-        for entry in a:
+        for entry in aligns:
             alm["seqs"].append(entry)
 
         # compute alignment score using matrix and gap opening/ext
@@ -142,11 +135,13 @@ def _malign(seqs, matrix, pw_func, gap="-", **kwargs):
     return alms
 
 
-# TODO: place gaps equally to borders
 def dumb_align(seq_a, seq_b, gap="-", **kwargs):
     """
     Perform pairwise alignment with the `dumb` method (for testing purposes).
     """
+
+    # TODO: remove when possible
+    seq_a, seq_b = list(seq_a), list(seq_b)
 
     # Pre-compute padding character from lengths
     num_pad = abs(len(seq_a) - len(seq_b))
@@ -156,16 +151,18 @@ def dumb_align(seq_a, seq_b, gap="-", **kwargs):
     right_pad = [gap] * right_pad
 
     # Compute alignment vectors and extend the right one with gaps (if needed)
-    # TODO: what if sequence is already a list by definition, from align()?
-    alm_a = [token for token in seq_a]
-    alm_b = [token for token in seq_b]
-
     if len(seq_a) < len(seq_b):
-        alm_a = [*left_pad, *alm_a, *right_pad]
+        alm_a = [*left_pad, *seq_a, *right_pad]
+        alm_b = seq_b[:]
+    elif len(seq_b) < len(seq_a):
+        alm_a = seq_a[:]
+        alm_b = [*left_pad, *seq_b, *right_pad]
     else:
-        alm_b = [*left_pad, *alm_b, *right_pad]
+        alm_a = seq_a[:]
+        alm_b = seq_b[:]
 
     # Compute alignment from number of gaps
+    # TODO: run actual scoring -- method is dumb, not scoring
     score = 1.0 - (num_pad / max([len(seq_a), len(seq_b)]))
 
     return [
@@ -173,25 +170,28 @@ def dumb_align(seq_a, seq_b, gap="-", **kwargs):
     ]
 
 
-# TODO: pass scorer
-def nw_align(seq_a, seq_b, gap="-", **kwargs):
+def nw_align(seq_a, seq_b, **kwargs):
     """
     Perform pairwise alignment with the `nw` method.
     """
 
-    alms = nw.nw_align(
-        seq_a, seq_b, gap=gap, k=kwargs.get("k", 1), matrix=kwargs.get("matrix", None)
-    )
+    # Get arguments
+    k = kwargs.get("k", 1)
+    m = kwargs.get("matrix", None)
+    gap = kwargs.get("gap", "-")
+
+    # Perform alignment
+    alms = nw.nw_align(seq_a, seq_b, gap=gap, k=k, matrix=m)
 
     return alms
 
 
 # TODO: treat kwargs, etc
-# TODO: decide on n_paths
+# TODO: decide on n_paths -- pass more than `k`, but how much?
 def kbest_align(seq_a, seq_b, k=1, gap="-", matrix=None, **kwargs):
 
     if not matrix:
-        matrix = utils.identity_matrix([seq_a, seq_b], 2, -2)
+        matrix = utils.identity_matrix([seq_a, seq_b])  # , 2, -2)
 
     graph = kbest.compute_graph(seq_a, seq_b, matrix)
 
@@ -201,8 +201,6 @@ def kbest_align(seq_a, seq_b, k=1, gap="-", matrix=None, **kwargs):
     return alms
 
 
-# TODO: normalize/scale score
-# TODO: have a partial function for the single best alignment?
 def pw_align(seq_a, seq_b, **kwargs):
     """
     Return a sorted list of pairwise alignments with scores.
@@ -244,8 +242,8 @@ def pw_align(seq_a, seq_b, **kwargs):
 
     # TODO: remove need for this in future
     if isinstance(seq_a, str):
-        seq_a = [c for c in seq_a]
-        seq_b = [c for c in seq_b]
+        seq_a = list(seq_a)
+        seq_b = list(seq_b)
 
     # Get default parameters
     gap = kwargs.get("gap", "-")
@@ -272,15 +270,17 @@ def pw_align(seq_a, seq_b, **kwargs):
     return alms
 
 
-# TODO: add all arguments
+# TODO: have a partial function for the single best alignment?
 def multi_align(seqs, method, **kwargs):
-    # TODO: remove need for this in future
-    if isinstance(seqs[0], str):
-        seqs = [[c for c in seq] for seq in seqs]
+    # Make sure all sequences are lists, as it facilitates manipulation later.
+    # Note that, while not recommended, this even allows to mix different iterable
+    # types in `seqs`.
+    seqs = [list(seq) for seq in seqs]
 
     # Get default parameters
     gap = kwargs.get("gap", "-")
     k = kwargs.get("k", 1)
+    matrix = kwargs.get("matrix", None)
 
     # Validate parameters
     if not gap:
@@ -291,14 +291,17 @@ def multi_align(seqs, method, **kwargs):
         raise ValueError("Invalid alignment method `%s`." % method)
 
     # Run alignment method
-    # TODO: the cut for `k` should be performed by `_malign`, but in order
-    # to collect more stuff, yenksp should probably have a higher value,
-    # so we increase the serach space -- perhaps pass k*2 or k**2
     if method == "nw":
-        alms = _malign(seqs, kwargs["matrix"], pw_func=nw_align, gap=gap)
+        pairwise_func = nw_align
+        alms = _malign(seqs, matrix, pw_func=pairwise_func, gap=gap, k=k)
+        # alms = _malign(seqs, kwargs["matrix"], pw_func=nw_align, gap=gap)
     elif method == "yenksp":
-        alms = _malign(seqs, kwargs["matrix"], pw_func=kbest_align, gap=gap)
+        pairwise_func = kbest_align
+        alms = _malign(seqs, matrix, pw_func=pairwise_func, gap=gap, k=k)
+        # alms = _malign(seqs, kwargs["matrix"], pw_func=kbest_align, gap=gap)
     else:
         alms = dumb_malign(seqs, gap=gap)
+
+    #    alms = _malign(seqs, kwargs["matrix"], pw_func=pairwise_func, gap=gap)
 
     return alms

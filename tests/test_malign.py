@@ -26,36 +26,36 @@ class TestMalign(unittest.TestCase):
         Test `dumb` pairwise alignment.
         """
 
-        alms = malign.pw_align("tra", "fatata", method="dumb")
+        alms = malign.multi_align(["tra", "fatata"], method="dumb")
         assert len(alms) == 1
-        assert tuple(alms[0]["a"]) == ("-", "t", "r", "a", "-", "-")
-        assert tuple(alms[0]["b"]) == ("f", "a", "t", "a", "t", "a")
-        assert math.isclose(alms[0]["score"], 0.5)
+        assert tuple(alms[0]["seqs"][0]) == ("-", "t", "r", "a", "-", "-")
+        assert tuple(alms[0]["seqs"][1]) == ("f", "a", "t", "a", "t", "a")
+        assert math.isclose(alms[0]["score"], 0.75)
 
     def test_nw_pw_align(self):
         """
         Test `nw` pairwise alignment.
         """
 
-        alms = malign.pw_align("tra", "fata", k=2, method="nw")
+        alms = malign.multi_align(["tra", "fata"], k=2, method="nw")
         assert len(alms) == 1
-        assert tuple(alms[0]["a"]) == ("-", "-", "t", "r", "a")
-        assert tuple(alms[0]["b"]) == ("f", "a", "t", "-", "a")
-        assert math.isclose(alms[0]["score"], -3.5)
+        assert tuple(alms[0]["seqs"][0]) == ("-", "-", "t", "r", "a")
+        assert tuple(alms[0]["seqs"][1]) == ("f", "a", "t", "-", "a")
+        assert math.isclose(alms[0]["score"], -0.2)
 
+    # TODO: rename to yenksp
+    # TODO: fix code so it computes the graph by itself, even in pairwise
     def test_kbest_pw_align(self):
         """
         Test `kbest` pairwise alignment.
         """
 
         # Test with basic alignment, no scorer
-        alms = malign.pw_align("tra", "fata", k=4, method="kbest")
-        assert len(alms) == 4
-        assert tuple(alms[0]["a"]) == ("-", "t", "r", "a")
-        assert tuple(alms[0]["b"]) == ("f", "a", "t", "a")
-        assert math.isclose(alms[0]["score"], 9.0)
-        assert math.isclose(alms[0]["score_a"], 5.0)
-        assert math.isclose(alms[0]["score_b"], 4.0)
+        alms = malign.multi_align(["tra", "fata"], k=4, method="yenksp")
+        #        assert len(alms) == 1
+        assert tuple(alms[0]["seqs"][0]) == ("-", "-", "t", "r", "a")
+        assert tuple(alms[0]["seqs"][1]) == ("f", "a", "t", "-", "a")
+        assert math.isclose(alms[0]["score"], -0.2)
 
         # More complex test with DNA scorer
         dna_seq1 = "TGGACCCGGGAAGGTGACCCAC"
