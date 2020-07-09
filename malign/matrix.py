@@ -117,7 +117,9 @@ class ScoringMatrix:
                 # only `sub_matrices`, we need to initialize `self.alphabets` to the
                 # length we can derive from the `sub_matrices` keys
                 if scores:
-                    self.alphabets = list(zip(*scores.keys()))
+                    self.alphabets = [
+                        list(alphabet) for alphabet in zip(*scores.keys())
+                    ]
                 else:
                     num_alphabets = max([max(domain) for domain in sub_matrices])
                     self.alphabets = [[] for _ in range(num_alphabets + 1)]

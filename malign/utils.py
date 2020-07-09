@@ -5,6 +5,7 @@ Utility data and functions for the library.
 # Import Python standard libraries
 import itertools
 from string import ascii_uppercase
+from collections import Counter
 
 import numpy as np
 
@@ -98,14 +99,21 @@ def print_malms(alms):
 # TODO: deal with potentially different gap symbols
 # TODO: do sub-matrices and matrices at the same pass?
 # TODO: add mismatch
-def identity_matrix(seqs, match, gap, gap_symbol="-"):
+def identity_matrix(seqs, **kwargs):
     # build a simple identity matrix, like in the voldemort example
+
+    # Collect scores
+    # TODO: rename to `xxx_scores`
+    match = kwargs.get("match", 1)
+    gap = kwargs.get("gap", -1)
+    mismatch = kwargs.get("mismatch", gap)
+    gap_symbol = kwargs.get("gap_symbol", "-")
 
     # Collect alphabet and build key space
     alphabet = list(set(list(itertools.chain.from_iterable(seqs)) + [gap_symbol]))
     space = [alphabet] * len(seqs)
 
-    # Build sub-matrices first, using the identity logic
+    # Build pairwise sub-matrices first, using the identity logic
     scores = {}
     domains = list(itertools.combinations(range(len(seqs)), 2))
     for domain in domains:
@@ -117,23 +125,34 @@ def identity_matrix(seqs, match, gap, gap_symbol="-"):
                     for idx in range(len(seqs))
                 ]
             )
+
             if gap_symbol in symbols:
                 scores[key] = gap
             elif symbols[0] != symbols[1]:
-                scores[key] = (gap + match) / 2  # TODO: cache
+                scores[key] = mismatch
             else:
                 scores[key] = match
 
     # Build keys from all alphabets and fill scorer
     for key in itertools.product(*space):
-        symbols = len(set(key))
+        score = 0
+        for symbol, count in Counter(key).items():
+            # NOTE: remember that `gap` is a negative number
+            if symbol == gap_symbol:
+                score += count * gap
+            elif count == 1:
+                score += mismatch
+            else:
+                score += (count - 1) * match
 
-        # Compute the score as a power of the match score, detracting gaps (note that
-        # the gap score is supposed to be passed as a negative)
-        score = (match) ** (len(seqs) - symbols)
-        if key.count(gap_symbol):
-            score += (key.count(gap_symbol) + 1) * gap
-        scores[key] = score
+    #        symbols = len(set(key))
+
+    # Compute the score as a power of the match score, detracting gaps (note that
+    # the gap score is supposed to be passed as a negative)
+    #        score = (match) ** (len(seqs) - symbols)
+    #        if key.count(gap_symbol):
+    #            score += (key.count(gap_symbol) + 1) * gap
+    #        scores[key] = score
 
     # Build matrix and return
     m = matrix.ScoringMatrix(scores)
