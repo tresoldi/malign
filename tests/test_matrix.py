@@ -259,6 +259,51 @@ class TestMalign(unittest.TestCase):
         assert matrix.scores == matrix2.scores
         assert tuple(matrix.alphabets) == tuple(matrix2.alphabets)
 
+    def test_copy(self):
+        """
+        Test method for matrix copy.
+        """
+
+        # Build reference matrix
+        ref_matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
+
+        # Get copy
+        cpy_matrix = ref_matrix.copy()
+
+        # Perform manual comparison
+        assert ref_matrix.scores == cpy_matrix.scores
+        assert ref_matrix.alphabets == cpy_matrix.alphabets
+
+    def test_set_item(self):
+        """
+        Test matrix __setitem__.
+        """
+
+        # Build reference matrix
+        matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
+
+        # Various sets and tests
+        matrix["a", "X", "i"] = -111
+        matrix[None, "X", "i"] = -222
+        with self.assertRaises(ValueError):
+            matrix["<", "X", "i"] = -333
+
+        assert matrix["a", "X", "i"] == -111
+        assert matrix[None, "X", "i"] == -222
+
+    def test_tabulate(self):
+        """
+        Test matrix tabulation.
+        """
+
+        # Build reference matrix
+        matrix_a = malign.ScoringMatrix(PAIRWISE_TEST_VECTORS)
+        matrix_b = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
+
+        # NOTE: currently only building it, to get coverage
+        assert len(matrix_a.tabulate()) > 0
+        assert len(matrix_b.tabulate()) > 0
+
 
 if __name__ == "__main__":
     # Explicitly creating and running a test suite allows to profile it
