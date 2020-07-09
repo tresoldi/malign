@@ -85,6 +85,11 @@ Version 0.2:
   - Implement single-pass function with defaults, with scorer, graph,
     destnation, etc.
 
+Version 0.3:
+  - Add new inference method to sparse matrices using impurity/entropy
+  - Describe in more detail the filling methods, for example how they (especially
+    `standard`) are kinds of MLE
+
 ## Community guidelines
 
 While the author can be contacted directly for support, it is recommended

@@ -4,20 +4,15 @@ Module for scoring matrices.
 
 # Import Python standard libraries
 from collections import defaultdict
+import copy
 import itertools
 import json
-import copy
 
 # Import 3rd-party libraries
 import numpy as np
 from tabulate import tabulate
 
-from . import utils
 
-# TODO: add new method for inference using something like impurity/entropy
-
-# TODO: `scores` can be empty if submatrices are provided
-# TODO: what if submatrices are not complete?
 class ScoringMatrix:
     """
     Class for sequence alignment scoring matrices.
@@ -31,11 +26,19 @@ class ScoringMatrix:
       - a unique alphabet for each sequence
       - asymmetric information
       - gaps are full, normal "symbols"
+
+    The object especially facilitates dealing with sparse matrices/vectors and
+    with submatrices (i.e., not full domains), both for querying and for
+    building.
     """
 
-    def __init__(self, scores=None, filename=None, **kwargs):
+    def __init__(self, scores=None, **kwargs):
         """
         Initialize a scoring matrix.
+
+        Either the `filename` or a combination of `scores` and `submatrices` must be
+        provided. At least one of the values of `scores` and `submatrices` must be
+        provided.
 
         Parameters
         ==========
@@ -45,8 +48,8 @@ class ScoringMatrix:
             the order that will be used when using the matrix) and floating
             points as values. Exclusive-gap alignments (that is, keys
             composed only of gaps) will be overriden to a value of 0.0 if
-            provided. Either `scores` or `filename` must be provided when initializating
-            a matrix.
+            provided. Subdomains are indicated by `None` valus in the keys.
+            Defaults to `None`.
         filename : str
             A string with the path to a serialized matrix in JSON format. Either
             `scores` or `filename` must be provided when initializing a matrix.
@@ -71,40 +74,41 @@ class ScoringMatrix:
             Defaults to the `"standard"` method.
         """
 
-        # TODO: check precedence/interaction filename/scorer/submatirces
-
-        # Fill the matrix with the appropriate method if requested
-        self._fill_method = kwargs.get("fill_method", "standard")
+        # Extract `scores`, `filename`, and `submatrices`, if provided
+        filename = kwargs.get("filename", None)
+        sub_matrices = kwargs.get("sub_matrices", {})
 
         # If a filename was provided, load a serialized matrix; otherwise, initialize
         # from user provided `scores`
         if filename:
             self._load(filename)
         else:
+            # Extract additional values; note that these, as everything else, are
+            # not considered when loading from disk
+
             # Store values
+            self._fill_method = kwargs.get("fill_method", "standard")
             self.gap = kwargs.get("gap", "-")
 
-            # Collect submatrices, if they were provided
-            sub_matrices = kwargs.get("sub_matrices", {})
-
-            # Extract the alphabets, if they were not provided; during extraction,
-            # `None`s are removed as the user or the library might be passing
-            # sub-matrices as well (as when creating an identity matrix, when it
-            # makes more sense to provide the sub-matrix identities)
-            # TODO: check if the alphabets agree with the provided scores
-            # TODO: check if the alphabets are list of lists, if provided
+            # Extract the alphabets or build them, if they were not provided;
+            # during extraction, `None`s are removed as the user or the library might
+            # be passing sub-matrices as well (as when creating an identity matrix,
+            # when it makes more sense to provide the sub-matrix identities)
             self.alphabets = kwargs.get("alphabets", None)
 
             if self.alphabets:
-                self.alphabets = [
-                    tuple(sorted(alphabet)) for alphabet in self.alphabets
-                ]
+                # Organize provided alphabets
+                self.alphabets = [sorted(alphabet) for alphabet in self.alphabets]
+
+                # TODO:Make sure the alphabets contain all symbols used in `scores`
+                # TODO: add check for submatrices' symbols, if provided
+                # scores_alphabets = list(zip(*scores.keys()))
             else:
                 # Collect alphabet from scores; if no `scores` were provided but
                 # only `sub_matrices`, we need to initialize `self.alphabets` to the
                 # length we can derive from the `sub_matrices` keys
                 if scores:
-                    self.alphabets = [alphabet for alphabet in zip(*scores.keys())]
+                    self.alphabets = list(zip(*scores.keys()))
                 else:
                     num_alphabets = max([max(domain) for domain in sub_matrices])
                     self.alphabets = [[] for _ in range(num_alphabets + 1)]
@@ -116,12 +120,10 @@ class ScoringMatrix:
 
                 # Make sorted lists, making sure the gap is there
                 self.alphabets = [
-                    tuple(
-                        sorted(
-                            set(
-                                [symbol for symbol in alphabet if symbol is not None]
-                                + [self.gap]
-                            )
+                    sorted(
+                        set(
+                            [symbol for symbol in alphabet if symbol is not None]
+                            + [self.gap]
                         )
                     )
                     for alphabet in self.alphabets
@@ -136,11 +138,9 @@ class ScoringMatrix:
         """
 
         # Make sure all `scores` report the same number of domains, store
-        # the number of domains, an set (or override, if necessary) the
-        # value of exclusive-gap sites.
-        # TODO: check if in line with submatrices
+        # the number of domains
         if scores:
-            domains = set([len(key) for key in scores])
+            domains = {len(key) for key in scores}
             if len(domains) > 1:
                 raise ValueError("Different domain-lengths in `scores`.")
 
@@ -152,19 +152,25 @@ class ScoringMatrix:
         else:
             self.domains = 1 + max([max(domain) for domain in sub_matrices])
 
-        #
-        self._dr = tuple(range(self.domains))
+        # Store a copy of the `scores` and cache the `domain_range` as an internal
+        # variable (as it will be used repeated times -- the one facing the user
+        # is `self.domains`)
         self.scores = scores.copy()
+        self._dr = tuple(range(self.domains))
+
+        # Set (or override) the value of all-gap vector
         self.scores[tuple([self.gap] * self.domains)] = 0.0
 
         # Add submatrices, if provided
         for sub_domain, matrix in sub_matrices.items():
             # We need to index the submatrix with its `._dr`, as the indexes
             # we need are the ones in this matrix being initialized. Note
-            # how we keep a single dictionary, filling missing spots with
-            # `None`
+            # how we keep a single dictionary, filling missing spots with `None`
+            mapper = dict(zip(sub_domain, matrix._dr))
             for sub_key, score in matrix.scores.items():
-                mapper = {sub_idx: idx for sub_idx, idx in zip(sub_domain, matrix._dr)}
+                # sub_key ('b', 'X') -> new_key ['b', 'X', None]
+                # sub_key ('c', '-') -> new_key ['c', '-', None]
+                # sub_key ('a', '-') -> new_key ['a', None, '-']
                 new_key = [
                     sub_key[idx] if idx is not None else None
                     for idx in [mapper.get(idx, None) for idx in self._dr]
@@ -173,69 +179,31 @@ class ScoringMatrix:
                 self.scores[tuple(new_key)] = score
 
         # Fill the matrix with the appropriate method if requested
+        # TODO: check if we need to fill somehow? needs to consider only full vectors?
+        # expected_size = np.prod([len(alphabet) for alphabet in self.alphabets])
+        # if len([key for key in self.scores if all(key)]) == expected_size:
+        #     return
         if self._fill_method:
-            if self._fill_method in ["standard", "distance"]:
-                self._fill_full_matrix(self._fill_method)
+            if self._fill_method == "standard":
+                self._fill_matrix_standard()
+            elif self._fill_method == "distance":
+                self._fill_matrix_distance()
             else:
                 raise ValueError("Unknown filling method.")
 
-    # TODO: currently disregarding the `method`, as there is a single one
-    # TODO: describe how the standard method can be considered a kind of MLE
-    # TODO: change method to first look for the closest match, especially when
-    #       we have submatrices
-    # TODO: check A Fill Estimation Algorithm for Sparse Matrices and Tensors in Blocked Formats
-    # TODO: another method could be a weighted avarage from the distance, which
-    #       can be computed in terms of neighbouts, involving the entire matrix
-    def _fill_full_matrix(self, method):
+            # Run the fallback for cells we could not fit, if any
+            self._fill_matrix_fallback()
+
+    def _fill_matrix_standard(self):
         """
-        Internal function for filling a matrix if there are missing values.
-
-        Parameters
-        ==========
-
-        method : string
-            The method to be used for filling the matrix. Choices are
-            `"standard"`.
+        Internal function for filling a matrix with the `standard` method.
         """
-
-        # TODO: describe distance method
-        if self._fill_method == "distance":
-            score_cache = {}
-            for cur_key in itertools.product(*self.alphabets):
-                if cur_key not in self.scores:
-
-                    # Collect all weighted distances
-                    x = []
-                    for ref_key, score in self.scores.items():
-                        match = sum(
-                            [
-                                symbol_key == symbol_ref
-                                for symbol_key, symbol_ref in zip(ref_key, cur_key)
-                            ]
-                        )
-                        x += [score] * match
-
-                    # TODO: allow mean
-                    score_cache[cur_key] = np.mean(x)
-
-            # Update an return
-            # TODO: check if it fails when we have no info (extreme case), just
-            # setting a mean value should be enough (this could be for all methods)
-            self.scores.update(score_cache)
-            return
-
-        # Compute the expected size of the scorer, so we know if there are
-        # keys missing indeed; we check for `all` to exclude submatrices
-        # that have `None` values
-        # TODO: deal with the new Nones (should just filter?), also below
-        expected_size = np.prod([len(alphabet) for alphabet in self.alphabets])
-        if len([key for key in self.scores if all(key)]) == expected_size:
-            return
 
         # For each domain, we first collect all keys without considering
         # the symbol in the domain itself, and fill any missing spot with
-        # the mean value. No difference is made in terms of gaps.
-        # Example: if we have ('a', 'A', '1')=10 and ('b', 'A', '1')=0, but
+        # the some descriptive value (mean, median, percentile, etc.).
+        # No difference is made in terms of treatment of gaps.
+        # Example: if we have ('a', 'A', '1')==10 and ('b', 'A', '1')==0, but
         # no ('c', 'A', '1'), this will set the latter to the mean value
         # of 5, as coming from (?, 'A', '1')
         sub_scores = {}
@@ -243,7 +211,7 @@ class ScoringMatrix:
             # Collect all sub-keys and values
             sub_scores[domain_idx] = defaultdict(list)
             for key, score in self.scores.items():
-                # Skip full gap
+                # Don't account for the full gap vector
                 if all([v == self.gap for v in key]):
                     continue
 
@@ -275,35 +243,67 @@ class ScoringMatrix:
         # Update with the new values
         self.scores.update(score_cache)
 
-        # If there are still keys missing, collect the mean sub_score
-        # by symbol in each domain and set to this value -- this is similar
-        # to what we do above, but much less precise as we take all symbols
-        # independently
-        if len([key for key in self.scores if all(key)]) == expected_size:
-            return
+    def _fill_matrix_distance(self):
+        """
+        Internal function for filling a matrix with the `distance` method.
+        """
 
-        symbol_score = defaultdict(lambda: defaultdict(list))
+        score_cache = {}
+        for cur_key in itertools.product(*self.alphabets):
+            if cur_key not in self.scores:
+
+                _scores = []
+                for ref_key, score in self.scores.items():
+                    match_sites = sum(
+                        [
+                            symbol_key == symbol_ref
+                            for symbol_key, symbol_ref in zip(ref_key, cur_key)
+                        ]
+                    )
+                    _scores += [score] * match_sites
+
+                # TODO: allow measures other than mean
+                score_cache[cur_key] = np.mean(_scores)
+
+        # Update with the new values
+        self.scores.update(score_cache)
+
+    def _fill_matrix_fallback(self):
+        """
+        Internal function for last resource on matrix feeling.
+
+        This function will be used when there are still empty cells in cell and
+        the method for filling it was unable to account for. As a last resource,
+        it is intended as a common method.
+        """
+
+        # Holder for temporary scores
+        symbol_score = defaultdict(list)
+        gap_scores = []
+
+        # Collect a dictionary of all scores for all symbols in each domain, plus
+        # the mean score overall for gaps
+        # NOTE: this is collecting also full-gap alignment
         for key, score in self.scores.items():
             for domain_idx in self._dr:
-                symbol_score[domain_idx][key[domain_idx]].append(score)
+                # Collect cell score
+                symbol_score[domain_idx, key[domain_idx]].append(score)
 
-        for domain_idx in self._dr:
-            symbol_score[domain_idx] = {
-                symbol: np.mean(scores)
-                for symbol, scores in symbol_score[domain_idx].items()
-            }
+                # Collect score if a gap
+                if key[domain_idx] == self.gap:
+                    gap_scores.append(score)
+
+        symbol_score = {key: np.mean(scores) for key, scores in symbol_score.items()}
+        gap_scores = np.mean(gap_scores)
 
         for key in itertools.product(*self.alphabets):
             if key not in self.scores:
                 # If the alphabet passed by the user has symbols not in the scorer,
                 # we will have a KeyError in symbol_score[domain_idx][symbol]; the
                 # `.get()` will default towards the `gap`, which is always necessary
-                # TODO: find a better solution
                 self.scores[key] = np.mean(
                     [
-                        symbol_score[domain_idx].get(
-                            symbol, symbol_score[domain_idx][self.gap]
-                        )
+                        symbol_score.get((domain_idx, symbol), gap_scores)
                         for domain_idx, symbol in enumerate(key)
                     ]
                 )
@@ -350,20 +350,42 @@ class ScoringMatrix:
                 self.scores[sub_key] = max(sub_scores)
 
     def _load(self, filename):
+        """
+        Internal function for loading a serialized matrix from file.
+
+        This function is not supposed to be used directly by the user, but called
+        by `__init__()`.
+        """
+
         with open(filename) as json_handler:
             serial_data = json.load(json_handler)
 
             self.gap = serial_data["gap"]
             self._dr = tuple(serial_data["domain_range"])
-            self.alphabets = [tuple(alphabet) for alphabet in serial_data["alphabets"]]
+            self.alphabets = serial_data["alphabets"].copy()
 
             self.scores = {
                 tuple([None if k == "NULL" else k for k in key.split(" / ")]): value
                 for key, value in serial_data["scores"].items()
             }
 
-    # TODO: note issues about " / " if in alphabets
     def save(self, filename):
+        """
+        Serialize a matrix to disk.
+
+        Note that, due limits in serializing with JSON, which do not allow lists
+        as keys, the `" / "` symbol (note the spaces) is not allowed.
+
+        Parameters
+        ==========
+        filename : str
+            Path where to write serialized data.
+        """
+
+        # Make sure the reserved symbol is not used
+        if any([" / " in alphabet for alphabet in self.alphabets]):
+            raise ValueError("At least one alphabet uses reserved symbols.")
+
         # Make a copy of `self.scores` replacing `None`s, which cannot be part
         # of the key as per the JSON standard, with a custom element, which
         # must be mapped back when loading.
@@ -378,13 +400,15 @@ class ScoringMatrix:
             for key in sorted(self.scores, key=_allow_none_key)
         }
 
-        # Build serialized data and write to disk
+        # Build serialized data
         serial_data = {
             "alphabets": self.alphabets,
             "gap": self.gap,
             "domain_range": list(self._dr),
             "scores": _scores,
         }
+
+        # Open handler and write to disk
         with open(filename, "w") as json_handler:
             json.dump(serial_data, json_handler, indent=4, ensure_ascii=False)
 
@@ -414,12 +438,30 @@ class ScoringMatrix:
         return sub_matrix
 
     def copy(self):
+        """
+        Return a copy of the current matrix object.
+
+        Returns
+        =======
+        matrix : ScoringMatrix
+            A copy of the current ScoringMatrix.
+        """
         return copy.deepcopy(self)
 
     # TODO: currently only working for 2 or 3 domains
     # TODO: use more options from tabulate
     # TODO: check about identity matrix? from alphabets with a method?
     def tabulate(self):
+        """
+        Build a string with a tabulated representation of the matrix.
+
+        Returns
+        =======
+        table : str
+            A string with the representation of the matrix, intended for human
+            consuption.
+        """
+
         rows = []
         if self.domains == 2:
 
@@ -451,7 +493,6 @@ class ScoringMatrix:
 
         return tabulate(rows, headers=headers, tablefmt="github")
 
-    # TODO: check if the key is asking for a symbol not in the alphabet
     def __getitem__(self, key):
         """
         Return the score associated with a tuple of alignments per domain.
@@ -489,6 +530,8 @@ class ScoringMatrix:
 
         return self.scores[tuple(key)]
 
-    # TODO: run checks, alphabet, etc.
     def __setitem__(self, key, value):
+        if not all([k in alphabet for k, alphabet in zip(key, self.alphabets)]):
+            raise ValueError("`key` uses symbol(s) not in alphabet.")
+
         self.scores[tuple(key)] = value

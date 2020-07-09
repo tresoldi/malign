@@ -9,6 +9,9 @@ Tests for the scoring matrices of the `malign` package.
 """
 
 # TODO: add test for identity matrix
+# TODO: add test for initialization only from sparse subdomain
+# TODO: add test providing alphabets
+# TODO: add, in general, tests where there is disagreement between scores/subm/alphabet
 
 # Import Python libraries
 import math
@@ -114,7 +117,7 @@ class TestMalign(unittest.TestCase):
         assert matrix["-", "-"] == 0.0
         assert matrix["a", "Y"] == 8.0
         assert len(matrix.alphabets) == 2
-        assert matrix.alphabets[1] == ("-", "X", "Y")
+        assert tuple(matrix.alphabets[1]) == ("-", "X", "Y")
 
     def test_multiwise_from_full_vectors(self):
         """
@@ -129,7 +132,7 @@ class TestMalign(unittest.TestCase):
         assert matrix.gap == "-"
         assert len(matrix.scores) == 36
         assert len(matrix.alphabets) == 3
-        assert matrix.alphabets[2] == ("-", "i", "j")
+        assert tuple(matrix.alphabets[2]) == ("-", "i", "j")
         assert matrix["-", "-", "-"] == 0.0
         assert math.isclose(matrix["a", "Y", "j"], 8.0)
 
@@ -154,7 +157,7 @@ class TestMalign(unittest.TestCase):
         assert matrix_default.gap == "-"
         assert len(matrix_default.scores) == 36
         assert len(matrix_default.alphabets) == 3
-        assert matrix_default.alphabets[2] == ("-", "i", "j")
+        assert tuple(matrix_default.alphabets[2]) == ("-", "i", "j")
 
         assert matrix_default["-", "-", "-"] == 0.0
         assert math.isclose(matrix_default["a", "Y", "j"], 8.0)
