@@ -119,6 +119,32 @@ class TestMalign(unittest.TestCase):
         assert len(matrix.alphabets) == 2
         assert tuple(matrix.alphabets[1]) == ("-", "X", "Y")
 
+    def test_pairwise_from_full_vectors_with_alphabets(self):
+        """
+        Test pairwise matrices built from complete vectors with alphabets.
+        """
+
+        # Build matrix with "correct" alphabets
+        matrix_a = malign.ScoringMatrix(
+            PAIRWISE_TEST_VECTORS, alphabets=[["-", "a", "b", "c"], ["-", "X", "Y"]]
+        )
+
+        # Build matrix with "expanded" alphabets
+        matrix_b = malign.ScoringMatrix(
+            PAIRWISE_TEST_VECTORS,
+            alphabets=[["-", "a", "b", "c", "d"], ["-", "X", "Y", "Z"]],
+        )
+
+        # Build matrix with "insufficient" alphabets
+        with self.assertRaises(ValueError):
+            malign.ScoringMatrix(
+                PAIRWISE_TEST_VECTORS, alphabets=[["-", "a", "b"], ["-", "Y", "Z"]]
+            )
+
+        # Assertions
+        assert tuple(matrix_a.alphabets[1]) == ("-", "X", "Y")
+        assert tuple(matrix_b.alphabets[1]) == ("-", "X", "Y", "Z")
+
     def test_multiwise_from_full_vectors(self):
         """
         Test multiwise matrices built from complete vectors.

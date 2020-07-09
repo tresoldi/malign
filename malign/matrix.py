@@ -100,9 +100,18 @@ class ScoringMatrix:
                 # Organize provided alphabets
                 self.alphabets = [sorted(alphabet) for alphabet in self.alphabets]
 
-                # TODO:Make sure the alphabets contain all symbols used in `scores`
+                # Make sure the alphabets contain all symbols used in `scores`
                 # TODO: add check for submatrices' symbols, if provided
-                # scores_alphabets = list(zip(*scores.keys()))
+                scores_alphabets = list(zip(*scores.keys()))
+                available = [
+                    all([symbol in ref_alphabet for symbol in scores_alphabet])
+                    for scores_alphabet, ref_alphabet in zip(
+                        scores_alphabets, self.alphabets
+                    )
+                ]
+                if not all(available):
+                    raise ValueError("`scores` has symbols not in alphabets.")
+
             else:
                 # Collect alphabet from scores; if no `scores` were provided but
                 # only `sub_matrices`, we need to initialize `self.alphabets` to the
