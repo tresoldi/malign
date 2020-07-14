@@ -26,17 +26,17 @@ def main():
 
     # Fifth test, kbest, DNA scorer
     scorer = malign.utils.DNA_MATRIX.copy()
-    graph = malign.kbest.compute_graph(dna_seq1, dna_seq2, scorer)
+    graph = malign.yenksp.compute_graph(dna_seq1, dna_seq2, scorer)
     dest = "%i:%i" % (len(dna_seq1), len(dna_seq2))
-    alms = malign.kbest.align(graph, ("0:0", dest), dna_seq1, dna_seq2, 4, gap_open=5)
+    alms = malign.yenksp.align(graph, ("0:0", dest), dna_seq1, dna_seq2, 4, gap_open=5)
     print("Experiment #5")
     malign.utils.print_alms(alms)
 
     # Sixth test, kbest, bad DNA scorer
     scorer[('T', 'T')] = -50
-    graph = malign.kbest.compute_graph(dna_seq1, dna_seq2, scorer)
+    graph = malign.yenksp.compute_graph(dna_seq1, dna_seq2, scorer)
     dest = "%i:%i" % (len(dna_seq1), len(dna_seq2))
-    alms = malign.kbest.align(graph, ("0:0", dest), dna_seq1, dna_seq2, 4, gap_open=5)
+    alms = malign.yenksp.align(graph, ("0:0", dest), dna_seq1, dna_seq2, 4, gap_open=5)
     print("Experiment #6")
     malign.utils.print_alms(alms)
 

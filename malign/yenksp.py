@@ -340,7 +340,7 @@ def align(
 
 # TODO: treat kwargs, etc
 # TODO: decide on n_paths -- pass more than `k`, but how much?
-def kbest_align(seq_a, seq_b, k=1, gap="-", matrix=None, **kwargs):
+def yenksp_align(seq_a, seq_b, k=1, gap="-", matrix=None, **kwargs):
 
     if not matrix:
         matrix = utils.identity_matrix([seq_a, seq_b])
