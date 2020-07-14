@@ -11,37 +11,9 @@ import numpy as np
 
 # Import other modules
 import malign.nw as nw
+import malign.dumb as dumb
 import malign.kbest as kbest  # TODO: rename to yenksp
 import malign.utils as utils
-
-# TODO: move to its own file, for simmetry
-# TODO: expand dumb_malign by adding random gaps, call this pad_align?
-def dumb_malign(seqs, gap="-", **kwargs):
-    # Obtain the longest sequence length
-    max_length = max([len(seq) for seq in seqs])
-
-    # Pad all sequences in `alm`
-    alm = {"seqs": []}
-    scores = []
-    for seq in seqs:
-        # Computer lengths and bads
-        num_pad = max_length - len(seq)
-        left_pad_len = int(num_pad / 2)
-        right_pad_len = num_pad - left_pad_len
-        left_pad = [gap] * left_pad_len
-        right_pad = [gap] * right_pad_len
-
-        # Append the padded sequence and the score, here computed from the
-        # number of gaps
-        alm["seqs"].append([*left_pad, *list(seq), *right_pad])
-        scores.append(1.0 - (num_pad / max_length))
-
-    # Add overall score
-    alm["score"] = np.mean(scores)
-
-    # The `dumb` method will always return a single aligment, but we
-    # still return a list for compatibility with other methods
-    return [alm]
 
 
 # TODO: is the `gap` even needed? only in case we have no scorer?
@@ -167,6 +139,7 @@ def kbest_align(seq_a, seq_b, k=1, gap="-", matrix=None, **kwargs):
 
 
 # TODO: have a partial function for the single best alignment?
+# TODO: gap opening/gap extension
 def multi_align(seqs, method, **kwargs):
     # Make sure all sequences are lists, as it facilitates manipulation later.
     # Note that, while not recommended, this even allows to mix different iterable
@@ -186,18 +159,16 @@ def multi_align(seqs, method, **kwargs):
     if method not in ["dumb", "nw", "yenksp"]:
         raise ValueError("Invalid alignment method `%s`." % method)
 
-    # Run alignment method
-    if method == "nw":
-        pairwise_func = nw_align
-        alms = _malign(seqs, matrix, pw_func=pairwise_func, gap=gap, k=k)
-        # alms = _malign(seqs, kwargs["matrix"], pw_func=nw_align, gap=gap)
-    elif method == "yenksp":
-        pairwise_func = kbest_align
-        alms = _malign(seqs, matrix, pw_func=pairwise_func, gap=gap, k=k)
-        # alms = _malign(seqs, kwargs["matrix"], pw_func=kbest_align, gap=gap)
+    # Run alignment method; note that the `dumb` method does not rely in expansion
+    # from pairwise alingments with `_malign` as others
+    if method == "dumb":
+        alms = dumb.dumb_malign(seqs, gap=gap)
     else:
-        alms = dumb_malign(seqs, gap=gap)
+        if method == "nw":
+            pairwise_func = nw_align
+        elif method == "yenksp":
+            pairwise_func = kbest_align
 
-    #    alms = _malign(seqs, kwargs["matrix"], pw_func=pairwise_func, gap=gap)
+        alms = _malign(seqs, matrix, pw_func=pairwise_func, gap=gap, k=k)
 
     return alms
