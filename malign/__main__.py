@@ -54,8 +54,8 @@ def main():
         scorer = malign.kbest.fill_scorer("ACGT", "ACGT")
     graph = malign.kbest.compute_graph(dna_seq1, dna_seq2, scorer)
 
-    dest = "%i:%i" % (len(dna_seq1), len(dna_seq2))
-    aligns = malign.kbest.align(graph, ("0:0", dest), dna_seq1, dna_seq2, args.k)
+    dest = (len(dna_seq1), len(dna_seq2))
+    aligns = malign.kbest.align(graph, ((0, 0), dest), dna_seq1, dna_seq2, args.k)
 
     # Output
     for idx, align in enumerate(aligns):

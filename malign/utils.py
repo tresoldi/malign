@@ -63,6 +63,34 @@ def pairwise_iter(iterable):
     return zip(item_a, item_b)
 
 
+# TODO: gap extension as a function?
+def score_alignment(seqs, matrix, **kwargs):
+    """
+    Returns the score of an alignment according to a matrix.
+    """
+
+    # Get parameters
+    gap = kwargs.get("gap", "-")
+    gap_ext = kwargs.get("gap_ext", -1)
+    gap_open = kwargs.get("gap_open", -1.5)
+
+    # Collect the scores for pure alignment sites
+    site_score = [matrix[corr] for corr in zip(*seqs)]
+
+    # Collect the gap sub-sequences for each sequence
+    # 1st pass ->  [[['A'], ['T', 'T'], ['-'], ['C'], ['G', 'G'], ['A'], ['-', '-'] ...
+    # 2nd pass ->  [[1, 2], [2]...] (if no gaps, `[ [], [] ]`)
+    gap_seqs = [[list(g) for k, g in itertools.groupby(seq)] for seq in seqs]
+    gap_seqs = [[len(g) for g in gap_seq if g[0] == gap] for gap_seq in gap_seqs]
+
+    # Compute the penalty per sequence based on `gap_seqs`, and correct `site_score`
+    seq_penalty = [
+        sum(gap_seq) * gap_ext + len(gap_seq) * gap_open for gap_seq in gap_seqs
+    ]
+
+    return sum(site_score) + sum(seq_penalty)
+
+
 # TODO: gap symbol (and check if not in alphabet)
 # TODO: rename to indel?
 # TODO: assume alphabet_b equal to alphabet_a if not provided?
