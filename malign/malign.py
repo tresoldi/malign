@@ -13,7 +13,7 @@ import itertools
 import numpy as np
 
 # Import other modules
-import malign.nw as nw  # rename to anw for asymmetric
+import malign.nw as nw  # TODO: rename to `anw` for asymmetric
 import malign.dumb as dumb
 import malign.yenksp as yenksp
 import malign.utils as utils
@@ -59,6 +59,7 @@ def _malign_longest_product(seqs, matrix, pw_func, **kwargs):
     expand it to full multiwise alignment for a single-scoring round.
     """
 
+    gap = kwargs.get("gap", "-")
     k = kwargs.get("k", 1)
 
     # Build a list of all paired domains
@@ -78,7 +79,9 @@ def _malign_longest_product(seqs, matrix, pw_func, **kwargs):
     potential = defaultdict(lambda: defaultdict(set))
     for idx_x, idx_y in domains:
         # Run pairwise alignment
-        alms = pw_func(seqs[idx_x], seqs[idx_y], k=k, matrix=sub_matrix[idx_x, idx_y])
+        alms = pw_func(
+            seqs[idx_x], seqs[idx_y], k=k, gap=gap, matrix=sub_matrix[idx_x, idx_y]
+        )
 
         # Store in `potential` by length
         for alm in alms:

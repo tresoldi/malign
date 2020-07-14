@@ -8,9 +8,6 @@ import itertools
 # Import third-party libraries
 import numpy as np
 
-# Import other modules
-import malign.utils as utils
-
 # Defines the map for directions; keys are tuples of three booleans,
 # resulting from comparison of direction scores with the best scores,
 # being, in order, (1) diagonal, (2) horizontal, (3) vertical
@@ -25,14 +22,17 @@ DIRECTION_MAP = {
     (False, True, True): 7,  # horizonta and vertical
 }
 
-# NOTE seq_a and seq_b must already have the initial gap
-# TODO: pass gap symbol
-def nw_grids(seq_a, seq_b, scorer):
-    gap = "-"
+
+def nw_grids(seq_a, seq_b, scorer, gap):
+    """
+    Build the Needleman-Wunsch grids
+
+    Note that the sequences must already have the initial gap added to them at this
+    point.
+    """
 
     # cache lengths
-    len_a = len(seq_a)
-    len_b = len(seq_b)
+    len_a, len_b = len(seq_a), len(seq_b)
 
     # Initialize (seq_a x seq_b) grids, one for the scores (`s_grid`) and one
     # for the directions (`d_grid`). Note that `seq_a` is modelled at the top
@@ -41,7 +41,7 @@ def nw_grids(seq_a, seq_b, scorer):
     d_grid = np.empty([len_b, len_a])
 
     # Fill first row and column of both grids
-    s_grid[0][0] = scorer["-", "-"]
+    s_grid[0][0] = scorer[gap, gap]
     d_grid[0][0] = DIRECTION_MAP[False, False, False]  # no movement
     for i in range(1, len_a):
         s_grid[0][i] = -i
@@ -70,17 +70,21 @@ def nw_grids(seq_a, seq_b, scorer):
     return s_grid, d_grid
 
 
-# TODO: implement blocks
-# TODO: allows collections of i_stop, j_stop?
-# TODO: default starting i/j to the bottom right
-# TODO: add gap
-# TODO: note that the alignments will be returned in reverse order; as
-#       the function is called recursively, it is up to the fuctional call
-#       ing it to reverse it back (if desired)
-# NOTE: allowing all combinations of directions, even those theoretically
-#       impossible with NW, because we will allow for manual changes
-def nw_backtrace(seq_a, seq_b, d_grid, i, j, i_stop=0, j_stop=0):
-    gap = "-"
+# pylint: disable=too-many-branches
+def nw_backtrace(seq_a, seq_b, d_grid, i=None, j=None, **kwargs):
+    """
+    Run the Needleman-Wunsch backtrace operation.
+
+    Note that the alignments are returned in reverse order, from the bottom right to the
+    top left; as the function is called recursively, it is up to the function
+    caller to reverse it (if so desired).
+    """
+
+    # Get parameters, and default to the full alignment, if (i, j) is not provided
+    gap = kwargs.get("gap", "-")
+    if not i and not j:
+        i = len(seq_a) - 1
+        j = len(seq_b) - 1
 
     # Define empty, initial alignment collection with a single alignment
     alms = [{"a": [], "b": []}]
@@ -158,13 +162,13 @@ def nw_backtrace(seq_a, seq_b, d_grid, i, j, i_stop=0, j_stop=0):
 
             return ret_alms
         else:
-            # TODO: make sure code never gets stationary and remove this
-            # TODO: note that loop could actually reach this if manually set
-            #       -- deal by just returning
-            err = "missing_dir %i at (i=%i, j=%i)" % (d_grid[j][i], i, j)
-            raise ValueError(err)
+            # NOTE: this exception would never be reached in normal and "correct"
+            # operation, but it is needed here as the user manipulation of the grids
+            # and/or matrices, which is intentional for advanced cases, could mean
+            # stationary cells
+            raise ValueError(f"Missing direction {d_grid[j][i]} at (i={i}, j={j})")
 
-        if i == i_stop and j == j_stop:
+        if i == 0 and j == 0:
             break
 
     return alms
@@ -173,7 +177,6 @@ def nw_backtrace(seq_a, seq_b, d_grid, i, j, i_stop=0, j_stop=0):
 # Score an alignment with standard NW method (symmetric, etc)
 # TODO: support for different scoring for gaps at extremeties
 # TODO: gap symbol, gap opening, gap penalty
-# TODO: rename to nw_add_scores to keep consisntency in namespace
 def add_nw_scores(alms):
     gap = "-"
     gap_pen = -1
@@ -194,20 +197,46 @@ def add_nw_scores(alms):
         ]
 
         # Compute scores with gap opening and penalty
-        # TODO: mean of score_a and score_b?
         alm["score_a"] = (sum(gaps_a) * gap_pen) + (len(gaps_a) * gap_opn)
         alm["score_b"] = (sum(gaps_b) * gap_pen) + (len(gaps_b) * gap_opn)
         alm["score"] = (alm["score_a"] + alm["score_b"]) / 2.0
 
 
-# TODO: pass gap
-# TODO: note that K is *at most* K
-# TODO: note that it assumes the matrix has already been filled, when provided
-def nw_align(seq_a, seq_b, gap="-", matrix=None, k=1):
-    # Build normal matrix if not provided, make sure it is filled
-    # otherwise
-    if not matrix:
-        matrix = utils.build_basic_matrix(set(seq_a), set(seq_b))
+def nw_align(seq_a, seq_b, matrix, gap="-", k=1):
+    """
+    Perform pairwise alignment with the Asymmetric Needleman-Wunsch method.
+
+    Parameters
+    ==========
+    seq_a : list
+        The first sequence to be aligned.
+    seq_b : list
+        The second sequence to be aligned.
+    matrix : dict or ScoringMatrix
+        The matrix for the asymmetric scoring. Note that the order of the domains must
+        follow the order of the sequences provided, that is, the matrix should be
+        addressed with [seq_a_symbol, seq_b_symbol]. The implementation assumes the
+        matrix has already been filled or will be automatically filled if
+        necessary (with inference of missing values).
+    gap : string
+        The symbol to be used for gap representation. If `matrix` is a ScoringMatrix,
+        it must match the gap symbol specified in it. Defaults to `"-"`.
+    k : int
+        Number of alignments to include in return. Note that is the upper limit, as it
+        impossible to guarantee that there will be as many alignments as requested (due
+        to both the sequences and the scoring matrix) and that this implementation of
+        the Needleman-Wunsch algorithm is not intended for collection of as many
+        k-best alignments as possible (if so desired, the `yenksp` method is
+        recommended). Defaults to `1`; if equal to `None`, all the collected alignments
+        will be returned.
+    """
+
+    # Validate parameters
+    if not gap:
+        raise ValueError("Gap symbol must be a non-empty string.")
+    if not isinstance(matrix, dict):  # ScoringMatrix
+        if gap != matrix.gap:
+            raise ValueError("Different gap symbols.")
 
     # Add initial gaps; note that this also makes a
     # copy of the contents of each sequence, so we preserve the original
@@ -215,18 +244,20 @@ def nw_align(seq_a, seq_b, gap="-", matrix=None, k=1):
     seq_a = [gap] + seq_a
     seq_b = [gap] + seq_b
 
-    # Build nw grids
-    s_grid, d_grid = nw_grids(seq_a, seq_b, matrix)
+    # Build Needleman-Wunsch grids; note that the scoring grid is not used in this
+    # implementation.
+    # pylint: disable=unused-variable
+    s_grid, d_grid = nw_grids(seq_a, seq_b, matrix, gap)
 
-    # move in the direction grid, reversing sequences after it
-    i, j = len(seq_a) - 1, len(seq_b) - 1
-    alms = nw_backtrace(seq_a, seq_b, d_grid, i, j)
+    # move in the direction grid, reversing sequences after it with `[::-1]`
+    alms = nw_backtrace(seq_a, seq_b, d_grid)
     alms = [{"a": alm["a"][::-1], "b": alm["b"][::-1]} for alm in alms]
+
+    # TODO: use matrix
     add_nw_scores(alms)
 
     # Sort and return
     # TODO: checks, test, better order, etc.
-    # TODO: make general utils function
     alms = sorted(
         alms,
         key=lambda alm: (
