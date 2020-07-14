@@ -61,8 +61,8 @@ class TestMalign(unittest.TestCase):
         dna_seq2 = "TTACCACCGGCGCGAACCCCCCCCC"
         graph = malign.yenksp.compute_graph(dna_seq1, dna_seq2, malign.utils.DNA_MATRIX)
 
-        dest = "%i:%i" % (len(dna_seq1), len(dna_seq2))
-        aligns = malign.yenksp.align(graph, ("0:0", dest), dna_seq1, dna_seq2, 3)
+        dest = (len(dna_seq1), len(dna_seq2))
+        aligns = malign.yenksp.align(graph, ((0, 0), dest), dna_seq1, dna_seq2, 3)
 
         assert "".join(aligns[0]["a"]) == "TGGAC-CCGG-G-AAGGTGACCCAC"
         assert "".join(aligns[0]["b"]) == "TTACCACCGGCGCGAACCCCCCCCC"
@@ -81,8 +81,8 @@ class TestMalign(unittest.TestCase):
 
         assert len(graph.nodes) == 56
         assert len(graph.edges) == 139
-        assert graph.edges["0:0", "1:1"]["weight"] == 2
-        assert graph.edges["6:5", "7:6"]["weight"] == 1
+        assert graph.edges[(0, 0), (1, 1)]["weight"] == 2
+        assert graph.edges[(6, 5), (7, 6)]["weight"] == 1
 
 
 if __name__ == "__main__":

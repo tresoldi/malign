@@ -32,21 +32,22 @@ def read_wiktionary_data(languages):
             if sentinel:
                 data.append([row[lang].split(" ") for lang in languages])
 
-#    # Remove entries without enough data
-#    data = [entry for entry in data if len([seq for seq in entry if seq]) >= 2]
+    #    # Remove entries without enough data
+    #    data = [entry for entry in data if len([seq for seq in entry if seq]) >= 2]
 
     return data
+
 
 def main():
     wikt = read_wiktionary_data(["Italian", "Russian"])
 
-#    for x in wikt:
-#        print(x, "".join(x[0]), "".join(x[1]))
-#    return
+    #    for x in wikt:
+    #        print(x, "".join(x[0]), "".join(x[1]))
+    #    return
 
     cooccs = catcoocc.collect_cooccs(wikt)
     scorer = catcoocc.scorer.CatScorer(cooccs)
-    matrix = scorer.tresoldi() # theil_u()
+    matrix = scorer.tresoldi()  # theil_u()
     matrix = catcoocc.scorer.scale_scorer(matrix, nrange=(0, 10))
     matrix = catcoocc.scorer.invert_scorer(matrix)
 
