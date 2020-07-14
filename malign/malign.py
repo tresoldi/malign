@@ -2,6 +2,8 @@
 Main module with code for alignment methods.
 """
 
+# TODO: rename `matrix` to `scorer`?
+
 # Import Python standard libraries
 from collections import defaultdict
 import itertools
@@ -10,31 +12,69 @@ import itertools
 import numpy as np
 
 # Import other modules
-import malign.nw as nw
+import malign.nw as nw  # rename to anw for asymmetric
 import malign.dumb as dumb
 import malign.yenksp as yenksp
 import malign.utils as utils
 
 
+def _build_candidates(potential, matrix):
+    """
+    Internal function used by `_maling()`.
+
+    This function takes a collection of individual sequence alignments, grouped by
+    lengths, and returns actual alignments with scores.
+    """
+
+    # Build all potential alignments and score them
+    longest = max(potential)
+    cand = [potential[longest][idx] for idx in sorted(potential[longest])]
+    alms = []
+    for aligns in itertools.product(*cand):
+        alm = {"seqs": []}
+
+        for entry in aligns:
+            alm["seqs"].append(entry)
+
+        # compute alignment score using matrix and gap opening/ext
+        alm["score"] = np.mean([matrix[corr] for corr in zip(*alm["seqs"])])
+
+        alms.append(alm)
+
+    # sort so that the best comes first
+    alms = sorted(alms, reverse=True, key=lambda e: e["score"])
+
+    return alms
+
+
 # TODO: is the `gap` even needed? only in case we have no scorer?
+# TODO: do all potential lengths, not only the longest
 def _malign(seqs, matrix, pw_func, gap="-", **kwargs):
+    """
+    Internal function for multiwise alignment.
+
+    This function is used to perform the multiwise alignment with different
+    pairwise methods. It follows a procedure different from the more common
+    UPGMA/NJ guiding trees, as it computes all potential pairwise alignments and
+    expand it to full multiwise alignment for a single-scoring round.
+    """
 
     k = kwargs.get("k", 1)
 
     # Build a list of all paired domains
+    # -> (0, 1), (0, 2), (1, 2)...
     domains = list(itertools.combinations(range(len(seqs)), 2))
 
     # Compute all the submatrices; while the same scores could be accessed directly
     # via the `matrix` (by using `None`s in the positions where the domain does not
-    # apply) it makes debugging easier to pretend these are pairwise comparisons
-    # with their own, non-multiwise aware, scorers
+    # apply) it makes debugging easier to "pretend" these are pairwise comparisons
+    # with their own, non-multiwise aware, scorers.
     sub_matrix = matrix.compute_submatrices(domains)
 
     # Run pairwise alignment on all pairs, collecting all potential
     # alignments for each sequence in `potential`, where they are already
-    # grouped by length
-    # TODO: implement adding and removing gaps for +1/-1 offsets? -- this is related
-    #       with the "do as many as possible" (replacing `longest`) below
+    # grouped by length. Note that the alignments must be converted to tuples in
+    # order to be added to the `potential` sets (as lists are non-hasheable).
     potential = defaultdict(lambda: defaultdict(set))
     for idx_x, idx_y in domains:
         # Run pairwise alignment
@@ -60,47 +100,31 @@ def _malign(seqs, matrix, pw_func, gap="-", **kwargs):
     # whether to include the new one, realigning the top (most likely, but
     # more complex to implmenet) or just drop
     # TODO: make into its own function, perhaps in `utils`
-    for seq_idx in range(len(seqs)):
-        if seq_idx not in has_longest:
-            for long_idx in has_longest:
-                # aling the current one with all long_idx aligned sequences
-                for aligned in potential[longest][long_idx]:
-                    # make sure we get the correct order
-                    if seq_idx < long_idx:
-                        alms = pw_func(
-                            seqs[seq_idx],
-                            list(aligned),
-                            k=k,
-                            matrix=sub_matrix[seq_idx, long_idx],
-                        )
-                        for alm in alms:
-                            potential[longest][seq_idx].add(tuple(alm["a"]))
-                    else:
-                        alms = pw_func(
-                            list(aligned),
-                            seqs[seq_idx],
-                            k=k,
-                            matrix=sub_matrix[long_idx, seq_idx],
-                        )
-                        for alm in alms:
-                            potential[longest][seq_idx].add(tuple(alm["b"]))
+    idx_to_compute = [idx for idx in range(len(seqs)) if idx not in has_longest]
+    for seq_idx in idx_to_compute:
+        for long_idx in has_longest:
+            # aling the current one with all long_idx aligned sequences
+            for aligned in potential[longest][long_idx]:
+                # Make sure we get the correct order; note that the calling is
+                # more complex than it would be expected as we need to account
+                # for the asymmetry in `sub_matrix` indexing
+                if seq_idx < long_idx:
+                    seq_a = seqs[seq_idx]
+                    seq_b = list(aligned)
+                    mtx = sub_matrix[seq_idx, long_idx]
+                    alm_key = "a"  # seqs[seq_idx] is the first element
+                else:
+                    seq_a = list(aligned)
+                    seq_b = seqs[seq_idx]
+                    mtx = sub_matrix[long_idx, seq_idx]
+                    alm_key = "b"  # seqs[seq_idx] is the second element
+
+                # Align and add
+                for alm in pw_func(seq_a, seq_b, k=k, matrix=mtx):
+                    potential[longest][seq_idx].add(tuple(alm[alm_key]))
 
     # Build all potential alignments and score them
-    cand = [potential[longest][idx] for idx in sorted(potential[longest])]
-    alms = []
-    for aligns in itertools.product(*cand):
-        alm = {"seqs": []}
-
-        for entry in aligns:
-            alm["seqs"].append(entry)
-
-        # compute alignment score using matrix and gap opening/ext
-        alm["score"] = np.mean([matrix[corr] for corr in zip(*alm["seqs"])])
-
-        alms.append(alm)
-
-    # sort so that the best comes first
-    alms = sorted(alms, reverse=True, key=lambda e: e["score"])
+    alms = _build_candidates(potential, matrix)
 
     # TODO: cut following `k`?
 
@@ -108,21 +132,51 @@ def _malign(seqs, matrix, pw_func, gap="-", **kwargs):
 
 
 # TODO: have a partial function for the single best alignment?
-# TODO: gap opening/gap extension
+# TODO: gap opening/gap extension for scoring
 def multi_align(seqs, method, **kwargs):
-    # Make sure all sequences are lists, as it facilitates manipulation later.
+    """
+    Compute multiple alignments for a list of sequences.
+
+    The function will return a sorted list of the `k` best alignments, as long as they
+    can be computed.
+
+    Parameters
+    ==========
+    seqs : list of iterables
+        A list of iterables (lists, tuples, or strings) representing the sequences to
+        be aligned.
+    method : str
+        The method to be used for alignment computation. Currently supported methods are
+        `"dumb"`, `"nw"` (for "asymmetric Needleman–Wunsch"), and `"yenksp"` (for
+        the graph-alignment based on Yen's k-shortest paths algorithm).
+    matrix :  dict or ScoringMatrix
+        The matrix used for scoring the alignment. If provided, must match in length the
+        number of sequences in `seq`. If not provided, an identity matrix will be used.
+    k : int
+        The maximum number of alignments to return. As there is no guarantee that the
+        method being used or the sequences provided allow for `k` different alignments,
+        the actual number might be less than `k`. Defaults to 1.
+    gap : string
+        The symbol to be used for gap representation. If `matrix` is a ScoringMatrix,
+        it must match the gap symbol specified in it. Defaults to `"-"`.
+    """
+
+    # Make sure all sequences are lists, as it facilitates later manipulation.
     # Note that, while not recommended, this even allows to mix different iterable
-    # types in `seqs`.
+    # types in `seqs`. The conversion also guarantees that a copy is made, for
+    # immutability.
     seqs = [list(seq) for seq in seqs]
 
     # Get default parameters
     gap = kwargs.get("gap", "-")
     k = kwargs.get("k", 1)
-    matrix = kwargs.get("matrix", None)
 
-    # If no matrix was provided, build an identity one
+    # Get the user-provided matrix, or compute an identity one
+    matrix = kwargs.get("matrix", None)
     if not matrix:
         matrix = utils.identity_matrix(seqs, match=+1, gap=-1)
+
+    # TODO: confirm this `gap` is the same as `matrix.gap`
 
     # Validate parameters
     if not gap:
@@ -140,7 +194,6 @@ def multi_align(seqs, method, **kwargs):
         if method == "nw":
             pairwise_func = nw.nw_align
         elif method == "yenksp":
-            # NOTE: This function also takes care of building graph, etc.
             pairwise_func = yenksp.yenksp_align
 
         alms = _malign(seqs, matrix, pw_func=pairwise_func, gap=gap, k=k)
