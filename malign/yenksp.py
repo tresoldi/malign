@@ -18,7 +18,6 @@ import malign.utils as utils
 #       graph, as we can't have loops for Yen's -- maybe this also implies
 #       adding gaps to the end, in a mirrored needleman-wunsch
 # TODO: allow to correct costs by some parameter, perhaps even non-linear?
-# TODO: investigate usage of tuples of integers as keys
 def compute_graph(seq_a, seq_b, matrix=None, gap="-"):
     """
     Computes a weighted directed graph for alignment.
@@ -119,19 +118,11 @@ def compute_graph(seq_a, seq_b, matrix=None, gap="-"):
 
             # Add edges (and nodes automatically)
             if dig_score is not None:
-                graph.add_edge(
-                    "%i:%i" % (i - 1, j - 1),
-                    "%i:%i" % (i, j),
-                    weight=max_score - dig_score,
-                )
+                graph.add_edge((i - 1, j - 1), (i, j), weight=max_score - dig_score)
             if hor_score is not None:
-                graph.add_edge(
-                    "%i:%i" % (i - 1, j), "%i:%i" % (i, j), weight=max_score - hor_score
-                )
+                graph.add_edge((i - 1, j), (i, j), weight=max_score - hor_score)
             if ver_score is not None:
-                graph.add_edge(
-                    "%i:%i" % (i, j - 1), "%i:%i" % (i, j), weight=max_score - ver_score
-                )
+                graph.add_edge((i, j - 1), (i, j), weight=max_score - ver_score)
 
     return graph
 
@@ -163,12 +154,6 @@ def build_align(path, seq_a, seq_b, gap="-"):
     alm_a, alm_b : lists
         The alignments for sequence A and B.
     """
-
-    # Transform `path`, which is a list of string labels in the format
-    # `"seq_a_idx:seq_b_idx"`, into an easily iterable list of tuples
-    # in the format (seq_a_idx, seq_b_idx). We can then extract the
-    # initial values of `prev_i` and `prev_j`.
-    path = [[int(v) for v in cell.split(":")] for cell in path]
 
     # We make a copy of the sequences so that we can pop from them without
     # consuming the original value. This also simplifies the code, as
@@ -325,7 +310,7 @@ def yenksp_align(seq_a, seq_b, k=1, matrix=None, **kwargs):
 
     graph = compute_graph(seq_a, seq_b, matrix, gap)
 
-    dest = "%i:%i" % (len(seq_a), len(seq_b))
-    alms = align(graph, ("0:0", dest), seq_a, seq_b, k, n_paths=k * 2)
+    dest = (len(seq_a), len(seq_b))
+    alms = align(graph, ((0, 0), dest), seq_a, seq_b, k, n_paths=k * 2)
 
     return alms
