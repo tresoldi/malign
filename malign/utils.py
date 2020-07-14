@@ -48,6 +48,21 @@ def _label_iter():
             yield "".join(chars)
 
 
+def pairwise_iter(iterable):
+    """
+    Internal function for sequential pairwise iteration.
+
+    The function follows the recipe in Python's itertools documentation.
+    [https://docs.python.org/3/library/itertools.html]
+    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+    """
+
+    item_a, item_b = itertools.tee(iterable)
+    next(item_a, None)
+
+    return zip(item_a, item_b)
+
+
 # TODO: gap symbol (and check if not in alphabet)
 # TODO: rename to indel?
 # TODO: assume alphabet_b equal to alphabet_a if not provided?

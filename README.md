@@ -97,6 +97,9 @@ Version 0.3:
   - Check where it is worth to remove/reimplement numpy
   - Implement blocks and local search in Needleman-Wunsch, with different
     starting/ending positions?
+  - Add function/method to represent graphically the graph used for `yenksp`
+  - Allow excluding nodes/groups of nodes/ranges in yenksp.align (nodes in the
+    graph that should be made unreachable by very high costs/weights)
 
 ## Community guidelines
 
