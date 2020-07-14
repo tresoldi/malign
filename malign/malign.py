@@ -25,11 +25,13 @@ def _malign(seqs, matrix, pw_func, gap="-", **kwargs):
 
     k = kwargs.get("k", 1)
 
-    domains = list(itertools.combinations(range(len(seqs)), 2))  # was `pairs`
+    # Build a list of all paired domains
+    domains = list(itertools.combinations(range(len(seqs)), 2))
 
-    # get submatrices
-    # TODO: needed when creating a Matrix class?
-    # TODO: only compute if needed -- for pairwise it is ready
+    # Compute all the submatrices; while the same scores could be accessed directly
+    # via the `matrix` (by using `None`s in the positions where the domain does not
+    # apply) it makes debugging easier to pretend these are pairwise comparisons
+    # with their own, non-multiwise aware, scorers
     sub_matrix = matrix.compute_submatrices(domains)
 
     # Run pairwise alignment on all pairs, collecting all potential
@@ -42,7 +44,7 @@ def _malign(seqs, matrix, pw_func, gap="-", **kwargs):
         # Run pairwise alignment
         alms = pw_func(seqs[idx_x], seqs[idx_y], k=k, matrix=sub_matrix[idx_x, idx_y])
 
-        # Add by length
+        # Store in `potential` by length
         for alm in alms:
             potential[len(alm["a"])][idx_x].add(tuple(alm["a"]))
             potential[len(alm["b"])][idx_y].add(tuple(alm["b"]))
@@ -104,36 +106,7 @@ def _malign(seqs, matrix, pw_func, gap="-", **kwargs):
     # sort so that the best comes first
     alms = sorted(alms, reverse=True, key=lambda e: e["score"])
 
-    return alms
-
-
-def nw_align(seq_a, seq_b, **kwargs):
-    """
-    Perform pairwise alignment with the `nw` method.
-    """
-
-    # Get arguments
-    k = kwargs.get("k", 1)
-    m = kwargs.get("matrix", None)
-    gap = kwargs.get("gap", "-")
-
-    # Perform alignment
-    alms = nw.nw_align(seq_a, seq_b, gap=gap, k=k, matrix=m)
-
-    return alms
-
-
-# TODO: treat kwargs, etc
-# TODO: decide on n_paths -- pass more than `k`, but how much?
-def kbest_align(seq_a, seq_b, k=1, gap="-", matrix=None, **kwargs):
-
-    if not matrix:
-        matrix = utils.identity_matrix([seq_a, seq_b])  # , 2, -2)
-
-    graph = kbest.compute_graph(seq_a, seq_b, matrix)
-
-    dest = "%i:%i" % (len(seq_a), len(seq_b))
-    alms = kbest.align(graph, ("0:0", dest), seq_a, seq_b, k, n_paths=k * 2)
+    # TODO: cut following `k`?
 
     return alms
 
@@ -165,9 +138,10 @@ def multi_align(seqs, method, **kwargs):
         alms = dumb.dumb_malign(seqs, gap=gap)
     else:
         if method == "nw":
-            pairwise_func = nw_align
+            pairwise_func = nw.nw_align
         elif method == "yenksp":
-            pairwise_func = kbest_align
+            # NOTE: This function also takes care of building graph, etc.
+            pairwise_func = kbest.kbest_align
 
         alms = _malign(seqs, matrix, pw_func=pairwise_func, gap=gap, k=k)
 
