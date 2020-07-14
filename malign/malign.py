@@ -12,16 +12,12 @@ import numpy as np
 # Import other modules
 import malign.nw as nw
 import malign.dumb as dumb
-import malign.kbest as kbest  # TODO: rename to yenksp
+import malign.yenksp as yenksp
 import malign.utils as utils
 
 
 # TODO: is the `gap` even needed? only in case we have no scorer?
 def _malign(seqs, matrix, pw_func, gap="-", **kwargs):
-
-    # If no matrix is provided, build an identity one
-    if not matrix:
-        matrix = utils.identity_matrix(seqs, match=+1, gap=-1)
 
     k = kwargs.get("k", 1)
 
@@ -124,6 +120,10 @@ def multi_align(seqs, method, **kwargs):
     k = kwargs.get("k", 1)
     matrix = kwargs.get("matrix", None)
 
+    # If no matrix was provided, build an identity one
+    if not matrix:
+        matrix = utils.identity_matrix(seqs, match=+1, gap=-1)
+
     # Validate parameters
     if not gap:
         raise ValueError("Gap symbol must be a non-empty string.")
@@ -141,7 +141,7 @@ def multi_align(seqs, method, **kwargs):
             pairwise_func = nw.nw_align
         elif method == "yenksp":
             # NOTE: This function also takes care of building graph, etc.
-            pairwise_func = kbest.kbest_align
+            pairwise_func = yenksp.yenksp_align
 
         alms = _malign(seqs, matrix, pw_func=pairwise_func, gap=gap, k=k)
 

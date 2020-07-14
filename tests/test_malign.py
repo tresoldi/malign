@@ -43,9 +43,8 @@ class TestMalign(unittest.TestCase):
         assert tuple(alms[0]["seqs"][1]) == ("f", "a", "t", "-", "a")
         assert math.isclose(alms[0]["score"], -0.2)
 
-    # TODO: rename to yenksp
     # TODO: fix code so it computes the graph by itself, even in pairwise
-    def test_kbest_pw_align(self):
+    def test_yenksp_pw_align(self):
         """
         Test `kbest` pairwise alignment.
         """
@@ -60,10 +59,10 @@ class TestMalign(unittest.TestCase):
         # More complex test with DNA scorer
         dna_seq1 = "TGGACCCGGGAAGGTGACCCAC"
         dna_seq2 = "TTACCACCGGCGCGAACCCCCCCCC"
-        graph = malign.kbest.compute_graph(dna_seq1, dna_seq2, malign.utils.DNA_MATRIX)
+        graph = malign.yenksp.compute_graph(dna_seq1, dna_seq2, malign.utils.DNA_MATRIX)
 
         dest = "%i:%i" % (len(dna_seq1), len(dna_seq2))
-        aligns = malign.kbest.align(graph, ("0:0", dest), dna_seq1, dna_seq2, 3)
+        aligns = malign.yenksp.align(graph, ("0:0", dest), dna_seq1, dna_seq2, 3)
 
         assert "".join(aligns[0]["a"]) == "TGGAC-CCGG-G-AAGGTGACCCAC"
         assert "".join(aligns[0]["b"]) == "TTACCACCGGCGCGAACCCCCCCCC"
@@ -78,7 +77,7 @@ class TestMalign(unittest.TestCase):
 
         dna_seq1 = "TGGAACC"
         dna_seq2 = "TAGACC"
-        graph = malign.kbest.compute_graph(dna_seq1, dna_seq2, malign.utils.DNA_MATRIX)
+        graph = malign.yenksp.compute_graph(dna_seq1, dna_seq2, malign.utils.DNA_MATRIX)
 
         assert len(graph.nodes) == 56
         assert len(graph.edges) == 139
