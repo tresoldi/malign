@@ -135,41 +135,6 @@ def _malign(seqs, matrix, pw_func, gap="-", **kwargs):
     return alms
 
 
-def dumb_align(seq_a, seq_b, gap="-", **kwargs):
-    """
-    Perform pairwise alignment with the `dumb` method (for testing purposes).
-    """
-
-    # TODO: remove when possible
-    seq_a, seq_b = list(seq_a), list(seq_b)
-
-    # Pre-compute padding character from lengths
-    num_pad = abs(len(seq_a) - len(seq_b))
-    left_pad = int(num_pad / 2)
-    right_pad = num_pad - left_pad
-    left_pad = [gap] * left_pad
-    right_pad = [gap] * right_pad
-
-    # Compute alignment vectors and extend the right one with gaps (if needed)
-    if len(seq_a) < len(seq_b):
-        alm_a = [*left_pad, *seq_a, *right_pad]
-        alm_b = seq_b[:]
-    elif len(seq_b) < len(seq_a):
-        alm_a = seq_a[:]
-        alm_b = [*left_pad, *seq_b, *right_pad]
-    else:
-        alm_a = seq_a[:]
-        alm_b = seq_b[:]
-
-    # Compute alignment from number of gaps
-    # TODO: run actual scoring -- method is dumb, not scoring
-    score = 1.0 - (num_pad / max([len(seq_a), len(seq_b)]))
-
-    return [
-        {"a": alm_a, "b": alm_b, "score": score, "score_a": score, "score_b": score}
-    ]
-
-
 def nw_align(seq_a, seq_b, **kwargs):
     """
     Perform pairwise alignment with the `nw` method.
@@ -197,75 +162,6 @@ def kbest_align(seq_a, seq_b, k=1, gap="-", matrix=None, **kwargs):
 
     dest = "%i:%i" % (len(seq_a), len(seq_b))
     alms = kbest.align(graph, ("0:0", dest), seq_a, seq_b, k, n_paths=k * 2)
-
-    return alms
-
-
-def pw_align(seq_a, seq_b, **kwargs):
-    """
-    Return a sorted list of pairwise alignments with scores.
-
-    The function takes two sequences `seq_a` and `seq_b` and returns
-    a sorted list of the top `k` best alignments. An alignment is
-    a dictionary with fields:
-
-        - `a`, with the alignment of the first sequence
-        - `b`, with the alignment of the second sequence
-        - `score`, with the alignment overall score
-        - `score_a`, with the alignment scored in terms of A to B
-        - `score_b`, with the alignment scored in terms of B to A
-
-    Parameters
-    ==========
-    seq_a : list
-        The first sequence to be aligned.
-    seq_b : list
-        The second sequence to be aligned.
-    k : int
-        The maximum number of best alignments to be returned. Note that the
-        returned value will be a list even if `k` is equal to one (that is,
-        the single best alignment). Defaults to one.
-    method : str
-        The alignment method to be used; choices are are `"dumb"` (position
-        based, intended for development and prototyping and always
-        returning a single alignment), `"nw"` (asymmetric
-        Needleman–Wunsch), and `kbest` (asymmetric graph k-best path).
-    gap : str
-        Gap symbol. Defaults to `"-"`.
-
-    Returns
-    =======
-    alms : list
-        A list of dictionaries with the top `k` alignments, as described
-        above.
-    """
-
-    # TODO: remove need for this in future
-    if isinstance(seq_a, str):
-        seq_a = list(seq_a)
-        seq_b = list(seq_b)
-
-    # Get default parameters
-    gap = kwargs.get("gap", "-")
-    k = kwargs.get("k", 1)
-    matrix = kwargs.get("matrix", None)
-    method = kwargs.get("method", "nw")
-
-    # Validate parameters
-    if not gap:
-        raise ValueError("Gap symbol must be a non-empty string.")
-    if k < 1:
-        raise ValueError("At least one alignment must be returned.")
-    if method not in ["dumb", "nw", "kbest"]:
-        raise ValueError("Invalid alignment method `%s`." % method)
-
-    # Run alignment method
-    if method == "nw":
-        alms = nw_align(seq_a, seq_b, k=k, gap=gap, matrix=matrix)
-    elif method == "kbest":
-        alms = kbest_align(seq_a, seq_b, k=k, gap=gap)
-    else:
-        alms = dumb_align(seq_a, seq_b, gap=gap)
 
     return alms
 

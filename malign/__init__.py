@@ -11,7 +11,7 @@ __email__ = "tresoldi@shh.mpg.de"
 
 # Build the namespace
 # TODO: be consistent in importing
-from malign.malign import pw_align, multi_align
+from malign.malign import multi_align
 
 # from malign.nw import *
 # from malign.graph import *

@@ -4,25 +4,25 @@ def main():
     # First test, pwdumb, with no scorer
     dna_seq1 = [c for c in "GATTACA"]
     dna_seq2 = [c for c in "ATAC"]
-    alms = malign.pw_align(dna_seq1, dna_seq2, method="dumb")
+    alms = malign.multi_align([dna_seq1, dna_seq2], method="dumb")
     print("Experiment #1")
-    malign.utils.print_alms(alms)
+    malign.utils.print_malms(alms)
 
     # Second test, pwnw, default scorer
-    alms = malign.pw_align(dna_seq1, dna_seq2, method="nw")
+    alms = malign.multi_align([dna_seq1, dna_seq2], method="nw")
     print("Experiment #2")
-    malign.utils.print_alms(alms)
+    malign.utils.print_malms(alms)
 
     # Third test, pwkbest, default scorer
-    alms = malign.pw_align(dna_seq1, dna_seq2, k=4, method="kbest")
+    alms = malign.multi_align([dna_seq1, dna_seq2], k=4, method="yenksp")
     print("Experiment #3")
-    malign.utils.print_alms(alms)
+    malign.utils.print_malms(alms)
 
     # Fourth test, pwkbest, DNA scorer
     scorer = malign.utils.DNA_MATRIX
-    alms = malign.pw_align(dna_seq1, dna_seq2, k=4, method="kbest", scorer=scorer)
+    alms = malign.multi_align([dna_seq1, dna_seq2], k=4, method="yenksp", scorer=scorer)
     print("Experiment #4")
-    malign.utils.print_alms(alms)
+    malign.utils.print_malms(alms)
 
     # Fifth test, kbest, DNA scorer
     scorer = malign.utils.DNA_MATRIX.copy()
