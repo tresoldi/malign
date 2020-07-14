@@ -89,6 +89,7 @@ Version 0.3:
   - Add new inference method to sparse matrices using impurity/entropy
   - Describe in more detail the filling methods, for example how they (especially
     `standard`) are kinds of MLE
+  - Implement UPGMA/NJ multialignment?
 
 ## Community guidelines
 
