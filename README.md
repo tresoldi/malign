@@ -94,6 +94,9 @@ Version 0.3:
     the longest (which will probably score lower), as long as they are computable,
     and b. potentially use the dumb alignment method and just add gaps
   - Add a partial function for only the best alignment (k=1)
+  - Check where it is worth to remove/reimplement numpy
+  - Implement blocks and local search in Needleman-Wunsch, with different
+    starting/ending positions?
 
 ## Community guidelines
 
