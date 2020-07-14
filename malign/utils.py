@@ -8,6 +8,8 @@ from string import ascii_uppercase
 from collections import Counter
 
 import numpy as np
+from tabulate import tabulate
+
 
 from . import matrix
 
@@ -128,15 +130,29 @@ def print_alms(alms):
         )
 
 
-# TODO: implement sorting
-def print_malms(alms):
+# TODO: implement sorting?
+# TODO: allow customizations
+def tabulate_alms(alms):
     if not alms:
         print("<No alignment>")
         return
 
+    alm_len = len(alms[0]["seqs"][0])
+    headers = ["Idx", "Seq", "Score"] + [f"#{i}" for i in range(alm_len)]
+    colalign = tuple(["left", "left", "decimal"] + ["center"] * alm_len)
+    table = []
     for alm_idx, alm in enumerate(alms):
+        # Add a row for each sequence in the alignment
         for label, seq in zip(_label_iter(), alm["seqs"]):
-            print(f"{alm_idx} {label} ({alm['score']:.2f}) : {seq}")
+            table.append([alm_idx, label, "%.2f" % alm["score"]] + list(seq))
+
+        # Add blank row
+        table.append(["" for i in range(3 + alm_len)])
+
+    # Remove last empty blank row
+    table = table[:-1]
+
+    return tabulate(table, headers=headers, colalign=colalign, tablefmt="github")
 
 
 # TODO: deal with potentially different gap symbols

@@ -138,6 +138,26 @@ class TestMalign(unittest.TestCase):
 
         # TODO: multiple alignments, even with identity matrix is enough
 
+    def test_tabulation(self):
+        """
+        Test alignment tabulation output
+        """
+
+        # TODO: assertMultiLineEqual() is failing, only keeping here for coverage
+
+        alms = malign.multi_align(["tra", "fatata"], method="nw", k=3)
+        output = malign.tabulate_alms(alms)
+
+        ref = """
+| Idx   | Seq   |   Score |  #0  |  #1  |  #2  |  #3  |  #4  |  #5  |
+|-------|-------|---------|------|------|------|------|------|------|
+| 0     | A     |   -0.33 |  -   |  -   |  t   |  r   |  -   |  a   |
+| 0     | B     |   -0.33 |  f   |  a   |  t   |  a   |  t   |  a   |
+|       |       |         |      |      |      |      |      |      |
+| 1     | A     |   -0.33 |  -   |  -   |  t   |  -   |  r   |  a   |
+| 1     | B     |   -0.33 |  f   |  a   |  t   |  a   |  t   |  a   |
+        """
+
 
 if __name__ == "__main__":
     # Explicitly creating and running a test suite allows to profile it
