@@ -71,6 +71,7 @@ def compute_graph(seq_a, seq_b, matrix=None, gap="-"):
     # natural, given our graph approach, to store *cost* values instead of
     # *score* vaues (also favoring smaller/negative ones), the "tradition" in
     # sequence alignment is to report scorer.
+    # TODO: what if it is a dictionary?
     max_score = max(matrix.scores.values())
 
     # Add gaps to the beginning of both sequences, emulating the first row
