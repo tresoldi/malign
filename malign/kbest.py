@@ -332,7 +332,22 @@ def align(
         alignments.append(alignment)
 
     # sort by weight
-    # TODO: improve sorting and make more reproducible
+    # TODO: improve sorting and make more reproducible (for same score)
     alignments = sorted(alignments, key=lambda a: a["score"])
 
     return alignments[:k]
+
+
+# TODO: treat kwargs, etc
+# TODO: decide on n_paths -- pass more than `k`, but how much?
+def kbest_align(seq_a, seq_b, k=1, gap="-", matrix=None, **kwargs):
+
+    if not matrix:
+        matrix = utils.identity_matrix([seq_a, seq_b])
+
+    graph = compute_graph(seq_a, seq_b, matrix)
+
+    dest = "%i:%i" % (len(seq_a), len(seq_b))
+    alms = align(graph, ("0:0", dest), seq_a, seq_b, k, n_paths=k * 2)
+
+    return alms
