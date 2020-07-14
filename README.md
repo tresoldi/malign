@@ -90,6 +90,10 @@ Version 0.3:
   - Describe in more detail the filling methods, for example how they (especially
     `standard`) are kinds of MLE
   - Implement UPGMA/NJ multialignment?
+  - Expand the "longest product" multiwise method to a. include lengths other than
+    the longest (which will probably score lower), as long as they are computable,
+    and b. potentially use the dumb alignment method and just add gaps
+  - Add a partial function for only the best alignment (k=1)
 
 ## Community guidelines
 

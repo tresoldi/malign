@@ -3,6 +3,7 @@ Main module with code for alignment methods.
 """
 
 # TODO: rename `matrix` to `scorer`?
+# TODO: check expansion of `k`
 
 # Import Python standard libraries
 from collections import defaultdict
@@ -20,7 +21,7 @@ import malign.utils as utils
 
 def _build_candidates(potential, matrix):
     """
-    Internal function used by `_maling()`.
+    Internal function used by `_malign()`.
 
     This function takes a collection of individual sequence alignments, grouped by
     lengths, and returns actual alignments with scores.
@@ -47,9 +48,8 @@ def _build_candidates(potential, matrix):
     return alms
 
 
-# TODO: is the `gap` even needed? only in case we have no scorer?
-# TODO: do all potential lengths, not only the longest
-def _malign(seqs, matrix, pw_func, gap="-", **kwargs):
+# pylint: disable=too-many-locals
+def _malign_longest_product(seqs, matrix, pw_func, **kwargs):
     """
     Internal function for multiwise alignment.
 
@@ -90,16 +90,8 @@ def _malign(seqs, matrix, pw_func, gap="-", **kwargs):
     # as there might be cases where all alignments were shorter; in order to
     # do so, we get all potentials with the longest alignment and align
     # again, this time using the gaps
-    # TODO: don't consider only the longest -- as long as it is possible, do it,
-    #       and score normally; this should also help guarantee we get as many
-    #       alignments as requested as long as it is possible
     longest = max(potential)
     has_longest = list(potential[longest])
-
-    # TODO: what if the alignment sequence is longer than longest? decide
-    # whether to include the new one, realigning the top (most likely, but
-    # more complex to implmenet) or just drop
-    # TODO: make into its own function, perhaps in `utils`
     idx_to_compute = [idx for idx in range(len(seqs)) if idx not in has_longest]
     for seq_idx in idx_to_compute:
         for long_idx in has_longest:
@@ -126,12 +118,9 @@ def _malign(seqs, matrix, pw_func, gap="-", **kwargs):
     # Build all potential alignments and score them
     alms = _build_candidates(potential, matrix)
 
-    # TODO: cut following `k`?
-
     return alms
 
 
-# TODO: have a partial function for the single best alignment?
 # TODO: gap opening/gap extension for scoring
 def multi_align(seqs, method, **kwargs):
     """
@@ -167,20 +156,21 @@ def multi_align(seqs, method, **kwargs):
     # immutability.
     seqs = [list(seq) for seq in seqs]
 
-    # Get default parameters
-    gap = kwargs.get("gap", "-")
-    k = kwargs.get("k", 1)
-
     # Get the user-provided matrix, or compute an identity one
     matrix = kwargs.get("matrix", None)
     if not matrix:
         matrix = utils.identity_matrix(seqs, match=+1, gap=-1)
 
-    # TODO: confirm this `gap` is the same as `matrix.gap`
+    # Get default parameters
+    gap = kwargs.get("gap", "-")
+    k = kwargs.get("k", 1)
 
     # Validate parameters
     if not gap:
         raise ValueError("Gap symbol must be a non-empty string.")
+    if not isinstance(matrix, dict):  # ScoringMatrix
+        if gap != matrix.gap:
+            raise ValueError("Different gap symbols.")
     if k < 1:
         raise ValueError("At least one alignment must be returned.")
     if method not in ["dumb", "nw", "yenksp"]:
@@ -196,6 +186,8 @@ def multi_align(seqs, method, **kwargs):
         elif method == "yenksp":
             pairwise_func = yenksp.yenksp_align
 
-        alms = _malign(seqs, matrix, pw_func=pairwise_func, gap=gap, k=k)
+        alms = _malign_longest_product(
+            seqs, matrix, pw_func=pairwise_func, gap=gap, k=k
+        )
 
-    return alms
+    return alms[:k]
