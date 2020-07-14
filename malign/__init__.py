@@ -12,5 +12,5 @@ __email__ = "tresoldi@shh.mpg.de"
 # Build the namespace
 from malign.malign import multi_align
 
-from malign.utils import print_alms, print_malms
+from malign.utils import tabulate_alms
 from malign.matrix import ScoringMatrix
