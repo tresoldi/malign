@@ -2,12 +2,16 @@
 Module for computing Needleman–Wunsch alignments.
 """
 
+# TODO: write/fix function documentation
+# TODO: general rename of `gap` to `gap_symbol` depending on scoring?
+
 # Import Python standard libraries
 import itertools
 
 # Import third-party libraries
 import numpy as np
 
+# Import from package
 import malign.utils as utils
 
 # Defines the map for directions; keys are tuples of three booleans,
@@ -63,11 +67,11 @@ def nw_grids(seq_a, seq_b, scorer, gap):
 
         # get best score and matching tuple
         best_score = max([diag, horz, vert])
-        match_dir = [score == best_score for score in [diag, horz, vert]]
+        match_dir = (diag == best_score, horz == best_score, vert == best_score)
 
         # set values
         s_grid[j][i] = best_score
-        d_grid[j][i] = DIRECTION_MAP[tuple(match_dir)]
+        d_grid[j][i] = DIRECTION_MAP[match_dir]
 
     return s_grid, d_grid
 
@@ -80,6 +84,10 @@ def nw_backtrace(seq_a, seq_b, d_grid, i=None, j=None, **kwargs):
     Note that the alignments are returned in reverse order, from the bottom right to the
     top left; as the function is called recursively, it is up to the function
     caller to reverse it (if so desired).
+
+    As this function will only operate pairwise, for easiness of debugging and
+    inspection the returned structure does not follow the approach used alsewhere of
+    a list of sequences, but it is a dictionary with `a` and `b` keys.
     """
 
     # Get parameters, and default to the full alignment, if (i, j) is not provided
@@ -170,13 +178,15 @@ def nw_backtrace(seq_a, seq_b, d_grid, i=None, j=None, **kwargs):
             # stationary cells
             raise ValueError(f"Missing direction {d_grid[j][i]} at (i={i}, j={j})")
 
+        # Break when reaching the top left corner
         if i == 0 and j == 0:
             break
 
     return alms
 
 
-def nw_align(seq_a, seq_b, matrix, gap="-", k=1):
+# Note that we implement **kwargs also for having a common interface
+def nw_align(seq_a, seq_b, matrix, gap="-", **kwargs):
     """
     Perform pairwise alignment with the Asymmetric Needleman-Wunsch method.
 
@@ -218,16 +228,15 @@ def nw_align(seq_a, seq_b, matrix, gap="-", k=1):
     seq_a = [gap] + seq_a
     seq_b = [gap] + seq_b
 
-    # Build Needleman-Wunsch grids; note that the scoring grid is not used in this
-    # implementation.
-    # pylint: disable=unused-variable
-    s_grid, d_grid = nw_grids(seq_a, seq_b, matrix, gap)
+    # Build Needleman-Wunsch grids; note that the scoring grid (the first value returned
+    # by `nw_grids()`) is not used in this routine, as the scoring is performed with the
+    # more complete `score_alignment()` function.
+    _, d_grid = nw_grids(seq_a, seq_b, matrix, gap)
 
     # Obtain the alignments from backtrace, and them along with a score;
     # sequences are reversed after it with `[::-1]`, as NW follows a northwest-direction;
     # this is not necessary for computing the score, as it is performed per site and
     # thus the mirrored sequences have no effect
-    # TODO: have backtrace return `seqs` already?
     alms = [
         {
             "seqs": [alm["a"][::-1], alm["b"][::-1]],
@@ -237,6 +246,5 @@ def nw_align(seq_a, seq_b, matrix, gap="-", k=1):
     ]
 
     # Sort and return
-    # TODO: should the `k` cut be performed here?
-    alms = utils.sort_alignments(alms)
-    return alms[:k]
+    # TODO: should the `k` cut be performed here? i.e. `alms[:k]`? if so, do we need it?
+    return utils.sort_alignments(alms)

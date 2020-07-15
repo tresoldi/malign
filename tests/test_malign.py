@@ -64,7 +64,7 @@ class TestMalign(unittest.TestCase):
 
         dest = (len(dna_seq1), len(dna_seq2))
         aligns = malign.yenksp.align(
-            graph, ((0, 0), dest), dna_seq1, dna_seq2, malign.utils.DNA_MATRIX, 3
+            graph, ((0, 0), dest), dna_seq1, dna_seq2, malign.utils.DNA_MATRIX
         )
 
         assert "".join(aligns[0]["seqs"][0]) == "TGGACC--CGG-G-AAGGTGACCCAC"

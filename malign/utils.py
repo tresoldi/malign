@@ -79,6 +79,10 @@ def sort_alignments(alms):
 # TODO: in this case, we don't expect full gap vectors (that are really only
 #       used for scoring), which here should be heavily penalized (or make
 #       sure they are never colleted at all)
+# TODO: add option to normalize score by length, which should probably be the default
+#       given that we are going to compare and sort alignments of different lengths
+# TODO: different gap penalties at the borders? -- strip border gaps
+# TODO: (related) benefit for longer non-gaps?
 def score_alignment(seqs, scorer, **kwargs):
     """
     Returns the score of an alignment according to a matrix.
