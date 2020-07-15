@@ -21,7 +21,7 @@ DIRECTION_MAP = {
     (False, False, True): 4,  # vertical
     (True, True, False): 5,  # diagonal and horizontal
     (True, False, True): 6,  # diagonal and vertical
-    (False, True, True): 7,  # horizonta and vertical
+    (False, True, True): 7,  # horizontal and vertical
 }
 
 
@@ -176,34 +176,6 @@ def nw_backtrace(seq_a, seq_b, d_grid, i=None, j=None, **kwargs):
     return alms
 
 
-# Score an alignment with standard NW method (symmetric, etc)
-# TODO: support for different scoring for gaps at extremeties
-# TODO: gap symbol, gap opening, gap penalty
-def add_nw_scores(alms):
-    gap = "-"
-    gap_pen = -1
-    gap_opn = -2
-
-    # Add score to each alignment in `alms`
-    for alm in alms:
-        # Get the gap groups
-        gaps_a = [
-            len(list(group))
-            for char, group in itertools.groupby(alm["a"])
-            if char == gap
-        ]
-        gaps_b = [
-            len(list(group))
-            for char, group in itertools.groupby(alm["b"])
-            if char == gap
-        ]
-
-        # Compute scores with gap opening and penalty
-        alm["score_a"] = (sum(gaps_a) * gap_pen) + (len(gaps_a) * gap_opn)
-        alm["score_b"] = (sum(gaps_b) * gap_pen) + (len(gaps_b) * gap_opn)
-        alm["score"] = (alm["score_a"] + alm["score_b"]) / 2.0
-
-
 def nw_align(seq_a, seq_b, matrix, gap="-", k=1):
     """
     Perform pairwise alignment with the Asymmetric Needleman-Wunsch method.
@@ -251,30 +223,20 @@ def nw_align(seq_a, seq_b, matrix, gap="-", k=1):
     # pylint: disable=unused-variable
     s_grid, d_grid = nw_grids(seq_a, seq_b, matrix, gap)
 
-    # move in the direction grid, reversing sequences after it with `[::-1]`
+    # Obtain the alignments from backtrace, and them along with a score;
+    # sequences are reversed after it with `[::-1]`, as NW follows a northwest-direction;
+    # this is not necessary for computing the score, as it is performed per site and
+    # thus the mirrored sequences have no effect
     # TODO: have backtrace return `seqs` already?
-    alms = nw_backtrace(seq_a, seq_b, d_grid)
-    #    alms = [{"a": alm["a"][::-1], "b": alm["b"][::-1]} for alm in alms]
-    alms = [{"seqs": [alm["a"][::-1], alm["b"][::-1]]} for alm in alms]
-
-    # TODO: use matrix
-    #    add_nw_scores(alms)
-    for alm in alms:
-        alm["score"] = utils.score_alignment(alm["seqs"], matrix)
+    alms = [
+        {
+            "seqs": [alm["a"][::-1], alm["b"][::-1]],
+            "score": utils.score_alignment([alm["a"], alm["b"]], matrix),
+        }
+        for alm in nw_backtrace(seq_a, seq_b, d_grid)
+    ]
 
     # Sort and return
-    # TODO: checks, test, better order, etc.
-    #    alms = sorted(
-    #        alms,
-    #        key=lambda alm: (
-    #            -alm["score"],
-    #            -alm["score_a"],
-    #            -alm["score_b"],
-    #            alm["a"],
-    #            alm["b"],
-    #        ),
-    #    )
-
+    # TODO: should the `k` cut be performed here?
     alms = utils.sort_alignments(alms)
-
     return alms[:k]
