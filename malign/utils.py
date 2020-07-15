@@ -66,6 +66,9 @@ def pairwise_iter(iterable):
 
 
 # TODO: gap extension as a function?
+# TODO: in this case, we don't expect full gap vectors (that are really only
+#       used for scoring), which here should be heavily penalized (or make
+#       sure they are never colleted at all)
 def score_alignment(seqs, matrix, **kwargs):
     """
     Returns the score of an alignment according to a matrix.
@@ -350,6 +353,7 @@ def fill_matrix(alpha_a, alpha_b, scorer=None, **kwargs):
 # TODO: multiple matrices and domains, now defaulting to (0,1) and (0,2)
 # TODO: check if the gap symbols are the same
 # TODO: allow to combine giving filenames? perhaps in matrix itself?
+# TODO: can this be moved to inside ScoringMatrix? is it already there?
 def combine_matrices(matrix_a, matrix_b):
     # Collect alphabets
     alphabets = [[], [], []]
