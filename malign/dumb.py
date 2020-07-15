@@ -1,6 +1,5 @@
 import numpy as np
 
-# TODO: move to its own file, for simmetry
 # TODO: expand dumb_malign by adding random gaps, call this pad_align? maybe with swaps?
 # TODO: receive scorer
 def dumb_malign(seqs, gap="-", **kwargs):

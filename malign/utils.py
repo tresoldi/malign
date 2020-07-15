@@ -5,13 +5,12 @@ Utility data and functions for the library.
 # Import Python standard libraries
 import itertools
 from string import ascii_uppercase
-from collections import Counter
 
-import numpy as np
+# Import 3rd party tools
 from tabulate import tabulate
 
-
-from . import matrix
+# Import from the package
+import malign.matrix as matrix
 
 # TODO: Remove temporary DNA scorer holder in future versions
 DNA_MATRIX = matrix.ScoringMatrix(
@@ -80,7 +79,7 @@ def sort_alignments(alms):
 # TODO: in this case, we don't expect full gap vectors (that are really only
 #       used for scoring), which here should be heavily penalized (or make
 #       sure they are never colleted at all)
-def score_alignment(seqs, matrix, **kwargs):
+def score_alignment(seqs, scorer, **kwargs):
     """
     Returns the score of an alignment according to a matrix.
     """
@@ -91,7 +90,7 @@ def score_alignment(seqs, matrix, **kwargs):
     gap_open = kwargs.get("gap_open", -1.5)
 
     # Collect the scores for pure alignment sites
-    site_score = [matrix[corr] for corr in zip(*seqs)]
+    site_score = [scorer[corr] for corr in zip(*seqs)]
 
     # Collect the gap sub-sequences for each sequence
     # 1st pass ->  [[['A'], ['T', 'T'], ['-'], ['C'], ['G', 'G'], ['A'], ['-', '-'] ...
@@ -107,12 +106,11 @@ def score_alignment(seqs, matrix, **kwargs):
     return sum(site_score) + sum(seq_penalty)
 
 
-# TODO: implement sorting?
 # TODO: allow customizations
 def tabulate_alms(alms):
-    if not alms:
-        print("<No alignment>")
-        return
+    """
+    Return a tabulated textual representation of alignments.
+    """
 
     alm_len = len(alms[0]["seqs"][0])
     headers = ["Idx", "Seq", "Score"] + [f"#{i}" for i in range(alm_len)]
@@ -132,14 +130,17 @@ def tabulate_alms(alms):
     return tabulate(table, headers=headers, colalign=colalign, tablefmt="github")
 
 
-# TODO: deal with potentially different gap symbols
 # TODO: do sub-matrices and matrices at the same pass?
 # TODO: add mismatch
 def identity_matrix(seqs, **kwargs):
-    # build a simple identity matrix, like in the voldemort example
+    """
+    Build an identity matrix from a list of sequences.
+
+    The function assumes, as expected, that the domains of all sequences are
+    equal, even if symbols don't appear in all sequences.
+    """
 
     # Collect scores
-    # TODO: rename to `xxx_scores`
     match = kwargs.get("match", 1)
     gap = kwargs.get("gap", -1)
     mismatch = kwargs.get("mismatch", gap)
@@ -147,7 +148,6 @@ def identity_matrix(seqs, **kwargs):
 
     # Collect alphabet and build key space
     alphabet = list(set(list(itertools.chain.from_iterable(seqs)) + [gap_symbol]))
-    space = [alphabet] * len(seqs)
 
     # Build pairwise sub-matrices first, using the identity logic
     scores = {}
@@ -169,28 +169,5 @@ def identity_matrix(seqs, **kwargs):
             else:
                 scores[key] = match
 
-    # Build keys from all alphabets and fill scorer
-    for key in itertools.product(*space):
-        score = 0
-        for symbol, count in Counter(key).items():
-            # NOTE: remember that `gap` is a negative number
-            if symbol == gap_symbol:
-                score += count * gap
-            elif count == 1:
-                score += mismatch
-            else:
-                score += (count - 1) * match
-
-    #        symbols = len(set(key))
-
-    # Compute the score as a power of the match score, detracting gaps (note that
-    # the gap score is supposed to be passed as a negative)
-    #        score = (match) ** (len(seqs) - symbols)
-    #        if key.count(gap_symbol):
-    #            score += (key.count(gap_symbol) + 1) * gap
-    #        scores[key] = score
-
     # Build matrix and return
-    m = matrix.ScoringMatrix(scores)
-
-    return m
+    return matrix.ScoringMatrix(scores)
