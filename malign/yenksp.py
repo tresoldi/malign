@@ -180,7 +180,9 @@ def build_align(path, seq_a, seq_b, gap="-"):
             alm_a.append(seq_a.pop(0))
             alm_b.append(seq_b.pop(0))
 
-    return {"a": alm_a, "b": alm_b}
+    # TODO: unify pair/multiwise structure (see `potential` collection)
+    #    return {"a": alm_a, "b": alm_b}
+    return {"seqs": [alm_a, alm_b]}
 
 
 # TODO: different gap penalties at the borders? -- strip border gaps
@@ -188,7 +190,8 @@ def build_align(path, seq_a, seq_b, gap="-"):
 # TODO: should allow scoring gaps only in seq2, or in both?
 # TODO: should have bidirectional
 # TODO: should gap penalties be allowed to be functions?
-def align(graph, nodes, seq_a, seq_b, k, **kwargs):
+# TODO: add comment/doc on `scorer`
+def align(graph, nodes, seq_a, seq_b, scorer, k, **kwargs):
     """
     Return the `k` best alignments in terms of costs.
 
@@ -271,33 +274,17 @@ def align(graph, nodes, seq_a, seq_b, k, **kwargs):
 
         # Build sequential representation of the alignment alignment
         alignment = build_align(path, seq_a, seq_b, gap=gap)
-
-        # Add weights from gap opening and extension in both sequences
-        # NOTE: as `groupby` returns an iterator, two subsequent list
-        # comprehensions are needed in order not to consume it immediately,
-        # thus casting to a list.
-        gap_seqs_a = [list(g) for k, g in groupby(alignment["a"])]
-        gap_seqs_b = [list(g) for k, g in groupby(alignment["b"])]
-        gap_seqs_a = [g for g in gap_seqs_a if g[0] in gap]
-        gap_seqs_b = [g for g in gap_seqs_b if g[0] in gap]
-
-        # Update scores
-        # TODO: decide how to normalize, as this is a weight
-        alignment["score_a"] = weight + (gap_open * len(gap_seqs_a))
-        alignment["score_a"] += sum([gap_ext * len(gap_seq) for gap_seq in gap_seqs_a])
-
-        alignment["score_b"] = weight + (gap_open * len(gap_seqs_b))
-        alignment["score_b"] += sum([gap_ext * len(gap_seq) for gap_seq in gap_seqs_b])
-
-        alignment["score"] = alignment["score_a"] + alignment["score_b"]
-
+        alignment["score"] = utils.score_alignment(alignment["seqs"], scorer)
         alignments.append(alignment)
 
     # sort by weight
     # TODO: improve sorting and make more reproducible (for same score... alphabetic?)
-    alignments = sorted(alignments, key=lambda a: a["score"])
+    #    alignments = sorted(alignments, key=lambda a: a["score"])
+    alignments = utils.sort_alignments(alignments)
 
-    return alignments[:k]
+    #    return alignments[:k]
+
+    return alignments
 
 
 # TODO: decide on n_paths -- pass more than `k`, but how much?
@@ -312,6 +299,6 @@ def yenksp_align(seq_a, seq_b, k=1, matrix=None, **kwargs):
     graph = compute_graph(seq_a, seq_b, matrix, gap)
 
     dest = (len(seq_a), len(seq_b))
-    alms = align(graph, ((0, 0), dest), seq_a, seq_b, k, n_paths=k * 2)
+    alms = align(graph, ((0, 0), dest), seq_a, seq_b, matrix, k, n_paths=k * 2)
 
     return alms

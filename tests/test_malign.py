@@ -63,13 +63,13 @@ class TestMalign(unittest.TestCase):
         graph = malign.yenksp.compute_graph(dna_seq1, dna_seq2, malign.utils.DNA_MATRIX)
 
         dest = (len(dna_seq1), len(dna_seq2))
-        aligns = malign.yenksp.align(graph, ((0, 0), dest), dna_seq1, dna_seq2, 3)
+        aligns = malign.yenksp.align(
+            graph, ((0, 0), dest), dna_seq1, dna_seq2, malign.utils.DNA_MATRIX, 3
+        )
 
-        assert "".join(aligns[0]["a"]) == "TGGAC-CCGG-G-AAGGTGACCCAC"
-        assert "".join(aligns[0]["b"]) == "TTACCACCGGCGCGAACCCCCCCCC"
-        assert isclose(aligns[0]["score_a"], 191.0)
-        assert isclose(aligns[0]["score_b"], 188.0)
-        assert isclose(aligns[0]["score"], 379.0)
+        assert "".join(aligns[0]["seqs"][0]) == "TGGACC--CGG-G-AAGGTGACCCAC"
+        assert "".join(aligns[0]["seqs"][1]) == "TT-ACCACCGGCGCGAACCCCCCCCC"
+        assert isclose(aligns[0]["score"], 55.0)
 
     def test_compute_graph(self):
         """
