@@ -13,6 +13,7 @@ install:
 script:
   - "coverage run tests/test_malign.py"
   - "coverage run -a tests/test_matrix.py"
+  - "coverage run -a tests/test_demo.py"
 
 after_success:
   - "codecov"
