@@ -3,7 +3,6 @@ Main module with code for alignment methods.
 """
 
 # TODO: rename `matrix` to `scorer`?
-# TODO: check expansion of `k`
 
 # Import Python standard libraries
 from collections import defaultdict
@@ -32,15 +31,8 @@ def _build_candidates(potential, matrix):
     cand = [potential[longest][idx] for idx in sorted(potential[longest])]
     alms = []
     for aligns in itertools.product(*cand):
-        alm = {"seqs": []}
-
-        for entry in aligns:
-            alm["seqs"].append(entry)
-
-        # compute alignment score using matrix and gap opening/ext
-        alm["score"] = np.mean([matrix[corr] for corr in zip(*alm["seqs"])])
-
-        alms.append(alm)
+        seqs = list(aligns)
+        alms.append({"seqs": seqs, "score": utils.score_alignment(seqs, matrix)})
 
     # return sorted
     return utils.sort_alignments(alms)
