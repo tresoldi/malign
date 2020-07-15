@@ -30,7 +30,7 @@ setup(
     long_description_content_type="text/x-rst",
     long_description=README_FILE,
     name="malign",
-    packages=["malign", "resources"],
+    packages=["malign", "resources", "docs"],
     project_urls={"Documentation": "https://malign.readthedocs.io"},
     test_suite="tests",
     tests_require=[],
