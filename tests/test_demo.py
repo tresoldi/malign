@@ -232,7 +232,9 @@ class TestMalignResults(unittest.TestCase):
         ita_rus = malign.ScoringMatrix(filename=filename_a.as_posix())
         ita_grk = malign.ScoringMatrix(filename=filename_b.as_posix())
 
-        full_matrix = malign.utils.combine_matrices(ita_rus, ita_grk)
+        full_matrix = malign.ScoringMatrix(
+            scores={}, sub_matrices={(0, 1): ita_rus, (0, 2): ita_grk}
+        )
         full_matrix["o", "в", "ο"] = -4
         full_matrix["i", "-", "Ι"] = -4
         full_matrix["c", "к", "κ"] = 10
