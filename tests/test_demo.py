@@ -183,7 +183,7 @@ class TestMalignResults(unittest.TestCase):
         alms = malign.multi_align(
             [seq_a, seq_b], k=2, method="nw", matrix=malign.utils.DNA_MATRIX
         )
-        assert tuple(alms[0]["seqs"][1]) == ("-", "-", "-", "-", "A", "-", "-")
+        assert tuple(alms[0]["seqs"][1]) == ("-", "A", "-", "-", "-", "-", "-")
         assert isclose(alms[0]["score"], -2.85714, rel_tol=1e-05)
 
         seq_a = "GATTACA"
@@ -250,9 +250,9 @@ class TestMalignResults(unittest.TestCase):
             "Я",
             "-",
             "к",
-            "-",
-            "-",
             "о",
+            "-",
+            "-",
             "в",
         )
         assert isclose(yenksp_alms[0]["score"], 4.5375, rel_tol=1e-05)
@@ -284,18 +284,19 @@ class TestMalignResults(unittest.TestCase):
             seqs, method="yenksp", k=4, matrix=voldemort_matrix
         )
         assert tuple(yenksp_alms[0]["seqs"][0]) == (
-            "-",
             "V",
             "O",
             "L",
+            "-",
             "D",
             "E",
+            "-",
             "M",
             "O",
             "R",
             "T",
         )
-        assert isclose(yenksp_alms[0]["score"], -0.76798, rel_tol=1e-05)
+        assert isclose(yenksp_alms[0]["score"], -0.7868006, rel_tol=1e-05)
 
 
 if __name__ == "__main__":

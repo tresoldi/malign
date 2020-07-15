@@ -83,14 +83,15 @@ def _malign_longest_product(seqs, matrix, pw_func, **kwargs):
 
         # Store in `potential` by length
         for alm in alms:
-            potential[len(alm["a"])][idx_x].add(tuple(alm["a"]))
-            potential[len(alm["b"])][idx_y].add(tuple(alm["b"]))
+            potential[len(alm["seqs"][0])][idx_x].add(tuple(alm["seqs"][0]))
+            potential[len(alm["seqs"][1])][idx_y].add(tuple(alm["seqs"][1]))
 
     # Before taking the product of all potential alignments with longest
     # lenght, we need to make sure that all sequences have such length,
     # as there might be cases where all alignments were shorter; in order to
     # do so, we get all potentials with the longest alignment and align
     # again, this time using the gaps
+    # TODO: do we really need to compute submatrices?
     longest = max(potential)
     has_longest = list(potential[longest])
     idx_to_compute = [idx for idx in range(len(seqs)) if idx not in has_longest]
@@ -105,16 +106,16 @@ def _malign_longest_product(seqs, matrix, pw_func, **kwargs):
                     seq_a = seqs[seq_idx]
                     seq_b = list(aligned)
                     mtx = sub_matrix[seq_idx, long_idx]
-                    alm_key = "a"  # seqs[seq_idx] is the first element
+                    alm_idx = 0  # seqs[seq_idx] is the first element
                 else:
                     seq_a = list(aligned)
                     seq_b = seqs[seq_idx]
                     mtx = sub_matrix[long_idx, seq_idx]
-                    alm_key = "b"  # seqs[seq_idx] is the second element
+                    alm_idx = 1  # seqs[seq_idx] is the second element
 
                 # Align and add
                 for alm in pw_func(seq_a, seq_b, k=k, matrix=mtx):
-                    potential[longest][seq_idx].add(tuple(alm[alm_key]))
+                    potential[longest][seq_idx].add(tuple(alm["seqs"][alm_idx]))
 
     # Build all potential alignments and score them
     alms = _build_candidates(potential, matrix)

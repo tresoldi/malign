@@ -8,6 +8,8 @@ import itertools
 # Import third-party libraries
 import numpy as np
 
+import malign.utils as utils
+
 # Defines the map for directions; keys are tuples of three booleans,
 # resulting from comparison of direction scores with the best scores,
 # being, in order, (1) diagonal, (2) horizontal, (3) vertical
@@ -250,23 +252,29 @@ def nw_align(seq_a, seq_b, matrix, gap="-", k=1):
     s_grid, d_grid = nw_grids(seq_a, seq_b, matrix, gap)
 
     # move in the direction grid, reversing sequences after it with `[::-1]`
+    # TODO: have backtrace return `seqs` already?
     alms = nw_backtrace(seq_a, seq_b, d_grid)
-    alms = [{"a": alm["a"][::-1], "b": alm["b"][::-1]} for alm in alms]
+    #    alms = [{"a": alm["a"][::-1], "b": alm["b"][::-1]} for alm in alms]
+    alms = [{"seqs": [alm["a"][::-1], alm["b"][::-1]]} for alm in alms]
 
     # TODO: use matrix
-    add_nw_scores(alms)
+    #    add_nw_scores(alms)
+    for alm in alms:
+        alm["score"] = utils.score_alignment(alm["seqs"], matrix)
 
     # Sort and return
     # TODO: checks, test, better order, etc.
-    alms = sorted(
-        alms,
-        key=lambda alm: (
-            -alm["score"],
-            -alm["score_a"],
-            -alm["score_b"],
-            alm["a"],
-            alm["b"],
-        ),
-    )
+    #    alms = sorted(
+    #        alms,
+    #        key=lambda alm: (
+    #            -alm["score"],
+    #            -alm["score_a"],
+    #            -alm["score_b"],
+    #            alm["a"],
+    #            alm["b"],
+    #        ),
+    #    )
+
+    alms = utils.sort_alignments(alms)
 
     return alms[:k]
