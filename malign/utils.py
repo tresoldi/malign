@@ -65,6 +65,17 @@ def pairwise_iter(iterable):
     return zip(item_a, item_b)
 
 
+def sort_alignments(alms):
+    """
+    Sorts a list of alignments in-place.
+
+    While the logic is simple, the usage of a single function guarantees that no
+    competing implementations are design for each alignment method.
+    """
+
+    return sorted(alms, reverse=True, key=lambda e: (e["score"], e["seqs"]))
+
+
 # TODO: gap extension as a function?
 # TODO: in this case, we don't expect full gap vectors (that are really only
 #       used for scoring), which here should be heavily penalized (or make
@@ -183,27 +194,3 @@ def identity_matrix(seqs, **kwargs):
     m = matrix.ScoringMatrix(scores)
 
     return m
-
-
-# TODO: multiple matrices and domains, now defaulting to (0,1) and (0,2)
-# TODO: check if the gap symbols are the same
-# TODO: allow to combine giving filenames? perhaps in matrix itself?
-# TODO: can this be moved to inside ScoringMatrix? is it already there?
-def combine_matrices(matrix_a, matrix_b):
-    # Collect alphabets
-    alphabets = [[], [], []]
-    alphabets[0] = sorted(set(matrix_a.alphabets[0] + matrix_b.alphabets[0]))
-    alphabets[1] = matrix_a.alphabets[1]
-    alphabets[2] = matrix_b.alphabets[1]
-
-    # we provide a single point ita/rus/grk
-    sub_matrices = {(0, 1): matrix_a, (0, 2): matrix_b}
-
-    # Initialize with an empty scorer and submatrices, besides alphabets
-    # TODO: have a solution so `scores` is not necessary -- if not provided, computation
-    #       of domain in `ScoringMatrix` will fail
-    new_matrix = matrix.ScoringMatrix(
-        scores={("-", "-", "-"): 0}, sub_matrices=sub_matrices, alphabets=alphabets
-    )
-
-    return new_matrix

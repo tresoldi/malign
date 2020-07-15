@@ -42,10 +42,8 @@ def _build_candidates(potential, matrix):
 
         alms.append(alm)
 
-    # sort so that the best comes first
-    alms = sorted(alms, reverse=True, key=lambda e: (e["score"], e["seqs"]))
-
-    return alms
+    # return sorted
+    return utils.sort_alignments(alms)
 
 
 # pylint: disable=too-many-locals
