@@ -42,7 +42,7 @@ class TestMalign(unittest.TestCase):
         assert len(alms) == 1
         assert tuple(alms[0]["seqs"][0]) == ("-", "-", "t", "r", "a")
         assert tuple(alms[0]["seqs"][1]) == ("f", "a", "t", "-", "a")
-        assert isclose(alms[0]["score"], -0.2)
+        assert isclose(alms[0]["score"], -7.0)
 
     # TODO: fix code so it computes the graph by itself, even in pairwise
     def test_yenksp_pw_align(self):
@@ -55,7 +55,7 @@ class TestMalign(unittest.TestCase):
         #        assert len(alms) == 1
         assert tuple(alms[0]["seqs"][0]) == ("-", "-", "t", "r", "a")
         assert tuple(alms[0]["seqs"][1]) == ("f", "a", "t", "-", "a")
-        assert isclose(alms[0]["score"], -0.2)
+        assert isclose(alms[0]["score"], -7.0)
 
         # More complex test with DNA scorer
         dna_seq1 = "TGGACCCGGGAAGGTGACCCAC"
