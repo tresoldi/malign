@@ -10,7 +10,7 @@ import itertools
 import numpy as np
 
 # Import other modules
-import malign.nw as nw  # TODO: rename to `anw` for asymmetric
+import malign.anw as anw
 import malign.dumb as dumb
 import malign.yenksp as yenksp
 import malign.utils as utils
@@ -130,7 +130,7 @@ def multi_align(seqs, method, **kwargs):
         be aligned.
     method : str
         The method to be used for alignment computation. Currently supported methods are
-        `"dumb"`, `"nw"` (for "asymmetric Needleman–Wunsch"), and `"yenksp"` (for
+        `"dumb"`, `"anw"` (for "asymmetric Needleman–Wunsch"), and `"yenksp"` (for
         the graph-alignment based on Yen's k-shortest paths algorithm).
     matrix :  dict or ScoringMatrix
         The matrix used for scoring the alignment. If provided, must match in length the
@@ -167,7 +167,7 @@ def multi_align(seqs, method, **kwargs):
             raise ValueError("Different gap symbols.")
     if k < 1:
         raise ValueError("At least one alignment must be returned.")
-    if method not in ["dumb", "nw", "yenksp"]:
+    if method not in ["dumb", "anw", "yenksp"]:
         raise ValueError("Invalid alignment method `%s`." % method)
 
     # Run alignment method; note that the `dumb` method does not rely in expansion
@@ -176,8 +176,8 @@ def multi_align(seqs, method, **kwargs):
     if method == "dumb":
         alms = dumb.dumb_malign(seqs, gap=gap)
     else:
-        if method == "nw":
-            pairwise_func = nw.nw_align
+        if method == "anw":
+            pairwise_func = anw.nw_align
         elif method == "yenksp":
             pairwise_func = yenksp.yenksp_align
 

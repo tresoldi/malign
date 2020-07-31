@@ -181,7 +181,7 @@ class TestMalignResults(unittest.TestCase):
         seq_a = "GATTACA"
         seq_b = "A"
         alms = malign.multi_align(
-            [seq_a, seq_b], k=2, method="nw", matrix=malign.utils.DNA_MATRIX
+            [seq_a, seq_b], k=2, method="anw", matrix=malign.utils.DNA_MATRIX
         )
         assert tuple(alms[0]["seqs"][1]) == ("-", "A", "-", "-", "-", "-", "-")
         assert isclose(alms[0]["score"], -27.0, rel_tol=1e-05)
@@ -189,7 +189,7 @@ class TestMalignResults(unittest.TestCase):
         seq_a = "GATTACA"
         seq_b = "ATTT"
         alms = malign.multi_align(
-            [seq_a, seq_b], k=2, method="nw", matrix=malign.utils.DNA_MATRIX
+            [seq_a, seq_b], k=2, method="anw", matrix=malign.utils.DNA_MATRIX
         )
         assert tuple(alms[0]["seqs"][1]) == ("-", "A", "T", "T", "-", "T", "-")
         assert isclose(alms[0]["score"], 7.0, rel_tol=1e-05)
@@ -204,7 +204,7 @@ class TestMalignResults(unittest.TestCase):
         matrix["C", "T"] = -99
         seq_a = "GATTACA"
         seq_b = "ATTT"
-        alms = malign.multi_align([seq_a, seq_b], k=4, method="nw", matrix=matrix)
+        alms = malign.multi_align([seq_a, seq_b], k=4, method="anw", matrix=matrix)
         assert tuple(alms[0]["seqs"][1]) == ("-", "A", "T", "T", "T", "-", "-", "-")
         assert isclose(alms[0]["score"], 0.0, rel_tol=1e-05)
 
@@ -217,7 +217,9 @@ class TestMalignResults(unittest.TestCase):
         filename = filename / "docs" / "ita_rus.matrix"
         ita_rus = malign.ScoringMatrix(filename=filename.as_posix())
 
-        alms = malign.multi_align(["Giacomo", "Яков"], k=4, method="nw", matrix=ita_rus)
+        alms = malign.multi_align(
+            ["Giacomo", "Яков"], k=4, method="anw", matrix=ita_rus
+        )
         assert tuple(alms[0]["seqs"][1]) == ("-", "Я", "-", "к", "о", "в", "-")
         assert isclose(alms[0]["score"], 19.0, rel_tol=1e-05)
 
@@ -240,7 +242,7 @@ class TestMalignResults(unittest.TestCase):
         full_matrix["c", "к", "κ"] = 10
 
         seqs = ["Giacomo", "Яков", "Ιακωβος"]
-        nw_alms = malign.multi_align(seqs, method="nw", k=4, matrix=full_matrix)
+        nw_alms = malign.multi_align(seqs, method="anw", k=4, matrix=full_matrix)
         assert tuple(nw_alms[0]["seqs"][1]) == ("-", "Я", "-", "к", "о", "-", "-", "в")
         assert isclose(nw_alms[0]["score"], 27.299999, rel_tol=1e-05)
 
@@ -265,7 +267,7 @@ class TestMalignResults(unittest.TestCase):
         seqs = ["VOLDEMORT", "WALDEMAR", "VLADIMIR", "VOLODYMIR"]
         voldemort_matrix = malign.utils.identity_matrix(seqs)
 
-        nw_alms = malign.multi_align(seqs, method="nw", k=4, matrix=voldemort_matrix)
+        nw_alms = malign.multi_align(seqs, method="anw", k=4, matrix=voldemort_matrix)
         assert tuple(nw_alms[0]["seqs"][0]) == (
             "V",
             "O",

@@ -38,7 +38,7 @@ class TestMalign(unittest.TestCase):
         Test `nw` pairwise alignment.
         """
 
-        alms = malign.multi_align(["tra", "fata"], k=2, method="nw")
+        alms = malign.multi_align(["tra", "fata"], k=2, method="anw")
         assert len(alms) == 1
         assert tuple(alms[0]["seqs"][0]) == ("-", "-", "t", "r", "a")
         assert tuple(alms[0]["seqs"][1]) == ("f", "a", "t", "-", "a")
@@ -146,7 +146,7 @@ class TestMalign(unittest.TestCase):
 
         # TODO: assertMultiLineEqual() is failing, only keeping here for coverage
 
-        alms = malign.multi_align(["tra", "fatata"], method="nw", k=3)
+        alms = malign.multi_align(["tra", "fatata"], method="anw", k=3)
         output = malign.tabulate_alms(alms)
 
         ref = """
