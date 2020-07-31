@@ -2,8 +2,6 @@
 Main module with code for alignment methods.
 """
 
-# TODO: rename `matrix` to `scorer`?
-
 # Import Python standard libraries
 from collections import defaultdict
 import itertools
