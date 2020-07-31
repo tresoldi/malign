@@ -13,4 +13,4 @@ __email__ = "tresoldi@shh.mpg.de"
 from malign.malign import multi_align
 
 from malign.utils import tabulate_alms
-from malign.matrix import ScoringMatrix
+from malign.scoring_matrix import ScoringMatrix

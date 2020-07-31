@@ -10,10 +10,10 @@ from string import ascii_uppercase
 from tabulate import tabulate
 
 # Import from the package
-import malign.matrix as matrix
+from malign.scoring_matrix import ScoringMatrix
 
 # TODO: Remove temporary DNA scorer holder in future versions
-DNA_MATRIX = matrix.ScoringMatrix(
+DNA_MATRIX = ScoringMatrix(
     {
         ("A", "A"): 10,
         ("A", "G"): -1,
@@ -176,4 +176,4 @@ def identity_matrix(seqs, **kwargs):
                 scores[key] = match
 
     # Build matrix and return
-    return matrix.ScoringMatrix(scores)
+    return ScoringMatrix(scores)
