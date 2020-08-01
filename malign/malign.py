@@ -13,6 +13,7 @@ import malign.yenksp as yenksp
 import malign.utils as utils
 
 
+# TODO: remove those made only of gaps
 def _build_candidates(potential_alms, matrix):
     """
     Internal function used by `_malign()`.
@@ -71,68 +72,50 @@ def _malign_longest_product(seqs, matrix, pw_func, **kwargs):
             potential[len(alm["seqs"][0])][idx_x].add(tuple(alm["seqs"][0]))
             potential[len(alm["seqs"][1])][idx_y].add(tuple(alm["seqs"][1]))
 
-    # TODO: new method
-    alms = []
+    # Starting from the minimum length (the maximum sequence length), fill all the
+    # potential alignments
+    min_length = max([len(seq) for seq in seqs])
     for length in sorted(potential):
+        # Skip if less than minimum or already full
+        if length <= min_length:
+            continue
+        if len(potential[length]) == len(seqs):
+            continue
+
+        # Get list of all indexes with the current length and list of those to compute
+        has_longest = list(potential[length])
+        to_compute = [idx for idx in range(len(seqs)) if idx not in has_longest]
+
+        # Compute as necessary
+        for seq_idx in to_compute:
+            for long_idx in has_longest:
+                # aling the current one with all long_idx aligned sequences
+                for aligned in potential[length][long_idx]:
+                    # Make sure we get the correct order; note that the calling is
+                    # more complex than it would be expected as we need to account
+                    # for the asymmetry in `sub_matrix` indexing
+                    if seq_idx < long_idx:
+                        seq_a = seqs[seq_idx]
+                        seq_b = list(aligned)
+                        mtx = sub_matrix[seq_idx, long_idx]
+                        alm_idx = 0  # seqs[seq_idx] is the first element
+                    else:
+                        seq_a = list(aligned)
+                        seq_b = seqs[seq_idx]
+                        mtx = sub_matrix[long_idx, seq_idx]
+                        alm_idx = 1  # seqs[seq_idx] is the second element
+
+                    # Align and add
+                    for alm in pw_func(seq_a, seq_b, k=k, matrix=mtx):
+                        potential[length][seq_idx].add(tuple(alm["seqs"][alm_idx]))
+
+    # Build all candidate alignments, sort, and return
+    alms = []
+    for length in potential:
         if len(potential[length]) == len(seqs):
             alms += _build_candidates(potential[length], matrix)
 
     return utils.sort_alignments(alms)
-
-    # TODO: just fill all potentials that are missing with the previous value, in
-    # ascending order -- the minimum potential should be the longest sequence length
-    # NOTE: actually, starting from hte first potential where all lengths are found
-    for min_length in sorted(potential):
-        if len(potential[min_length]) == len(seqs):
-            break
-
-    print(min_length, max(potential))
-
-    if min_length < max(potential) - 1:
-        for length in (min_length + 1, max(potential)):
-            print("checking", length)
-
-    # Before taking the product of all potential alignments with longest
-    # lenght, we need to make sure that all sequences have such length,
-    # as there might be cases where all alignments were shorter; in order to
-    # do so, we get all potentials with the longest alignment and align
-    # again, this time using the gaps.
-    # Note that we need to compute the submatrices (and not index directly), as the
-    # `.compute_submatrices()` method takes care of additional checks, such as `None`s
-    # in the key. It also make the flow easier to understand and to generalize, even
-    # though at some computational expense.
-    # TODO: consider other lengths, which also helps in terms vector with full gaps
-    longest = max(potential)
-    has_longest = list(potential[longest])
-    idx_to_compute = [idx for idx in range(len(seqs)) if idx not in has_longest]
-    for seq_idx in idx_to_compute:
-        for long_idx in has_longest:
-            # aling the current one with all long_idx aligned sequences
-            for aligned in potential[longest][long_idx]:
-                # Make sure we get the correct order; note that the calling is
-                # more complex than it would be expected as we need to account
-                # for the asymmetry in `sub_matrix` indexing
-                if seq_idx < long_idx:
-                    seq_a = seqs[seq_idx]
-                    seq_b = list(aligned)
-                    mtx = sub_matrix[seq_idx, long_idx]
-                    alm_idx = 0  # seqs[seq_idx] is the first element
-                else:
-                    seq_a = list(aligned)
-                    seq_b = seqs[seq_idx]
-                    mtx = sub_matrix[long_idx, seq_idx]
-                    alm_idx = 1  # seqs[seq_idx] is the second element
-
-                # Align and add
-                for alm in pw_func(seq_a, seq_b, k=k, matrix=mtx):
-                    potential[longest][seq_idx].add(tuple(alm["seqs"][alm_idx]))
-
-    # Build all potential alignments and score them
-
-
-#    alms = _build_candidates(potential[longest], matrix)
-
-#    return alms
 
 
 # TODO: gap opening/gap extension for scoring
@@ -198,14 +181,15 @@ def multi_align(seqs, method, **kwargs):
     else:
         if method == "anw":
             pairwise_func = anw.nw_align
+            pw_k = k
         elif method == "yenksp":
             # For `yenksp`, we will compute the twice the number of paths
             # requested, in order to get out of local minima
             pairwise_func = yenksp.yenksp_align
-            k = k * 2
+            pw_k = k * 2
 
         alms = _malign_longest_product(
-            seqs, matrix, pw_func=pairwise_func, gap=gap, k=k
+            seqs, matrix, pw_func=pairwise_func, gap=gap, k=pw_k
         )
 
     return alms[:k]

@@ -230,9 +230,9 @@ def nw_align(seq_a, seq_b, matrix, gap="-", **kwargs):
     # more complete `score_alignment()` function.
     _, d_grid = nw_grids(seq_a, seq_b, matrix, gap)
 
-    #    from tabulate import tabulate
-    #    print( tabulate(_, tablefmt="github"))
-    #    print( tabulate([[DIRECTION_MAP[d] for d in row] for row in d_grid], tablefmt="github") )
+    # from tabulate import tabulate
+    # print( tabulate(_, tablefmt="github"))
+    # print( tabulate([[DIRECTION_MAP[d] for d in row] for row in d_grid], tablefmt="github") )
 
     # Obtain the alignments from backtrace, and them along with a score;
     # sequences are reversed after it with `[::-1]`, as NW follows a northwest-direction;

@@ -3,8 +3,9 @@ Utility data and functions for the library.
 """
 
 # Import Python standard libraries
-import itertools
+from collections import Counter
 from string import ascii_uppercase
+import itertools
 
 # Import 3rd party tools
 from tabulate import tabulate
@@ -103,7 +104,8 @@ def score_alignment(seqs, scorer, **kwargs):
         len(gap_seqs) * gap_open
     )
 
-    return site_score + seq_penalty
+    # Correct by length, as we may be comparing alignments of different length
+    return (site_score + seq_penalty) / len(seqs[0])
 
 
 # TODO: allow customizations
@@ -146,17 +148,29 @@ def identity_matrix(seqs, **kwargs):
     """
 
     # Collect scores
-    match = kwargs.get("match", 1)
-    gap_score = kwargs.get("gap_score", -1)
+    match_score = kwargs.get("match", 1.0)
+    gap_score = kwargs.get("gap_score", -1.0)
     gap = kwargs.get("gap", "-")
-    mismatch = kwargs.get("mismatch", (match + gap_score) / 2.0)
+    mismatch_score = kwargs.get("mismatch", (match_score + gap_score) / 2.0)
 
     # Collect alphabet and build key space
     alphabet = list(set(list(itertools.chain.from_iterable(seqs)) + [gap]))
 
+    # Build full scoring matrix
+    scores = {}
+    for key in itertools.product(alphabet, repeat=len(seqs)):
+        counter = Counter(key)
+
+        most_common = counter.most_common(1)[0]
+
+        if most_common[0] == gap:
+            scores[key] = gap_score
+        else:
+            # TODO: review, the power and +1 might be too much
+            scores[key] = most_common[1] ** (1 + match_score)
+
     # Build pairwise sub-matrices first, using the identity logic
     # TODO: redo considering the full key from the number of seqs
-    scores = {}
     domains = list(itertools.combinations(range(len(seqs)), 2))
     for domain in domains:
         for symbols in itertools.product(alphabet, alphabet):
@@ -171,9 +185,9 @@ def identity_matrix(seqs, **kwargs):
             if gap in symbols:
                 scores[key] = gap_score
             elif symbols[0] != symbols[1]:
-                scores[key] = mismatch
+                scores[key] = mismatch_score
             else:
-                scores[key] = match
+                scores[key] = match_score
 
     # Build matrix and return
     return ScoringMatrix(scores)
