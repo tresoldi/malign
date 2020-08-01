@@ -220,8 +220,8 @@ class TestMalignResults(unittest.TestCase):
         alms = malign.multi_align(
             ["Giacomo", "Яков"], k=4, method="anw", matrix=ita_rus
         )
-        assert tuple(alms[0]["seqs"][1]) == ("Я", "-", "-", "к", "о", "в", "-")
-        assert isclose(alms[0]["score"], 18.0, rel_tol=1e-05)
+        assert tuple(alms[0]["seqs"][1]) == ("-", "Я", "-", "к", "о", "в", "-")
+        assert isclose(alms[0]["score"], 20.0, rel_tol=1e-05)
 
     def test_multialignment_linguistic(self):
         """
@@ -243,8 +243,8 @@ class TestMalignResults(unittest.TestCase):
 
         seqs = ["Giacomo", "Яков", "Ιακωβος"]
         nw_alms = malign.multi_align(seqs, method="anw", k=4, matrix=full_matrix)
-        assert tuple(nw_alms[0]["seqs"][1]) == ("Я", "-", "-", "к", "о", "-", "-", "в")
-        assert isclose(nw_alms[0]["score"], 17.8, rel_tol=1e-05)
+        assert tuple(nw_alms[0]["seqs"][1]) == ("-", "Я", "-", "к", "о", "-", "-", "в")
+        assert isclose(nw_alms[0]["score"], 27.299999, rel_tol=1e-05)
 
         yenksp_alms = malign.multi_align(seqs, method="yenksp", k=2, matrix=full_matrix)
         assert tuple(yenksp_alms[0]["seqs"][1]) == ("-", "-", "Я", "к", "о", "в", "-")
