@@ -46,8 +46,8 @@ def compute_graph(seq_a, seq_b, matrix=None, gap="-"):
         is build in terms of this first sequence.
     seq_b : list
         A list of hasheable elements to be aligned.
-    matrix: dict
-        A dictionary of scoring weights for the alignments. Dictionary keys
+    matrix: ScoringMatrix
+        A ScoringMatrix the alignments. Dictionary keys
         are tuples in the format (`seq_a character`, `seq_b character`),
         dictionary values are numbers holding the
         score (the higher the score, the more favoured will the
@@ -71,7 +71,6 @@ def compute_graph(seq_a, seq_b, matrix=None, gap="-"):
     # natural, given our graph approach, to store *cost* values instead of
     # *score* vaues (also favoring smaller/negative ones), the "tradition" in
     # sequence alignment is to report scorer.
-    # TODO: what if it is a dictionary?
     max_score = max(matrix.scores.values())
 
     # Add gaps to the beginning of both sequences, emulating the first row
@@ -235,7 +234,7 @@ def align(graph, nodes, seq_a, seq_b, scorer, **kwargs):
     """
 
     # Get arguments with defaults
-    # TODO: check gap with matrix gap
+    # TODO: check gap symbol with matrix gap
     gap_open = kwargs.get("gap_open", 1.0)
     gap_ext = kwargs.get("gap_ext", 0.0)
     gap = kwargs.get("gap", "-")
@@ -267,9 +266,22 @@ def align(graph, nodes, seq_a, seq_b, scorer, **kwargs):
     return utils.sort_alignments(alignments)
 
 
-def yenksp_align(seq_a, seq_b, k=None, matrix=None, **kwargs):
+def yenksp_align(seq_a, seq_b, k=4, matrix=None, **kwargs):
+    """
+    Perform pairwise alignment with the Yen K Shortest Paths method.
 
-    # TODO:check with matrix
+    Parameters
+    ==========
+
+    k: int or None
+        The number of paths to compute. The method can compute all possible paths
+        by explicitly passing `None` as a value, but this might be prohibitively
+        expansive depending on the length of the sequences and the complexity
+        of the alphabets/matrix. Defaults to 4 (that is, twice the number of
+        sequences).
+    """
+
+    # TODO:check with matrix gap symbol
     gap = kwargs.get("gap", "-")
 
     if not matrix:
@@ -277,14 +289,8 @@ def yenksp_align(seq_a, seq_b, k=None, matrix=None, **kwargs):
 
     graph = compute_graph(seq_a, seq_b, matrix, gap)
 
-    dest = (len(seq_a), len(seq_b))
+    # Get the paths extremes, if not provided
+    ne_loc = kwargs.get("ne_loc", (0, 0))
+    sw_loc = kwargs.get("sw_loc", (len(seq_a), len(seq_b)))
 
-    # TODO: decide on n_paths -- pass more than `k`, but how much?
-    if k:
-        n_paths = k * 2
-    else:
-        n_paths = None
-
-    alms = align(graph, ((0, 0), dest), seq_a, seq_b, matrix, n_paths=n_paths)
-
-    return alms
+    return align(graph, (ne_loc, sw_loc), seq_a, seq_b, matrix, n_paths=k)

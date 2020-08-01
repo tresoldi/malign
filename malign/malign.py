@@ -178,7 +178,10 @@ def multi_align(seqs, method, **kwargs):
         if method == "anw":
             pairwise_func = anw.nw_align
         elif method == "yenksp":
+            # For `yenksp`, we will compute the twice the number of paths
+            # requested, in order to get out of local minima
             pairwise_func = yenksp.yenksp_align
+            k = k * 2
 
         alms = _malign_longest_product(
             seqs, matrix, pw_func=pairwise_func, gap=gap, k=k
