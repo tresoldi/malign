@@ -31,7 +31,7 @@ class TestMalign(unittest.TestCase):
         assert len(alms) == 1
         assert tuple(alms[0]["seqs"][0]) == ("-", "t", "r", "a", "-", "-")
         assert tuple(alms[0]["seqs"][1]) == ("f", "a", "t", "a", "t", "a")
-        assert isclose(alms[0]["score"], 0.75)
+        assert isclose(alms[0]["score"], -3.0)
 
     def test_nw_pw_align(self):
         """
