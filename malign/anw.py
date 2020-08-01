@@ -5,9 +5,6 @@ Module for computing Needleman–Wunsch alignments.
 # Import Python standard libraries
 import itertools
 
-# Import third-party libraries
-import numpy as np
-
 # Import from package
 import malign.utils as utils
 
@@ -15,14 +12,14 @@ import malign.utils as utils
 # resulting from comparison of direction scores with the best scores,
 # being, in order, (1) diagonal, (2) horizontal, (3) vertical
 DIRECTION_MAP = {
-    (False, False, False): 0,  # stationary, up left corner
-    (True, True, True): 1,  # all movements with the same score
-    (True, False, False): 2,  # diagonal
-    (False, True, False): 3,  # horizontal
-    (False, False, True): 4,  # vertical
-    (True, True, False): 5,  # diagonal and horizontal
-    (True, False, True): 6,  # diagonal and vertical
-    (False, True, True): 7,  # horizontal and vertical
+    (False, False, False): "-",  # stationary, up left corner
+    (True, True, True): "*",  # all movements with the same score
+    (True, False, False): "↖",  # diagonal
+    (False, True, False): "←",  # horizontal
+    (False, False, True): "↑",  # vertical
+    (True, True, False): "←↖",  # diagonal and horizontal
+    (True, False, True): "↑↖",  # diagonal and vertical
+    (False, True, True): "←↑",  # horizontal and vertical
 }
 
 
@@ -40,18 +37,18 @@ def nw_grids(seq_a, seq_b, scorer, gap):
     # Initialize (seq_a x seq_b) grids, one for the scores (`s_grid`) and one
     # for the directions (`d_grid`). Note that `seq_a` is modelled at the top
     # (i.e., columns), so the indexing is performed with `grid[b][a]`
-    s_grid = np.empty([len_b, len_a])
-    d_grid = np.empty([len_b, len_a])
+    s_grid = [[None] * len_a for _ in seq_b]
+    d_grid = [[None] * len_a for _ in seq_b]
 
     # Fill first row and column of both grids
     s_grid[0][0] = scorer[gap, gap]
-    d_grid[0][0] = DIRECTION_MAP[False, False, False]  # no movement
+    d_grid[0][0] = (False, False, False)  # no movement
     for i in range(1, len_a):
         s_grid[0][i] = -i
-        d_grid[0][i] = DIRECTION_MAP[False, True, False]  # horizontal
+        d_grid[0][i] = (False, True, False)  # horizontal
     for j in range(1, len_b):
         s_grid[j][0] = -j
-        d_grid[j][0] = DIRECTION_MAP[False, False, True]  # vertical
+        d_grid[j][0] = (False, False, True)  # vertical
 
     # Fill the cells by (a) computing diagonal, vertical, and horizontal cost,
     # (b) getting the highest value for `s_grid`, (c) checking the directions
@@ -68,7 +65,7 @@ def nw_grids(seq_a, seq_b, scorer, gap):
 
         # set values
         s_grid[j][i] = best_score
-        d_grid[j][i] = DIRECTION_MAP[match_dir]
+        d_grid[j][i] = match_dir
 
     return s_grid, d_grid
 
@@ -112,25 +109,25 @@ def nw_backtrace(seq_a, seq_b, d_grid, i=None, j=None, **kwargs):
     # Does the backtrace, using recursion when necessary and changing in
     # place as much as possible for speed
     while True:
-        if d_grid[j][i] == DIRECTION_MAP[True, False, False]:
+        if d_grid[j][i] == (True, False, False):
             # diagonal
             for alm in alms:
                 alm["a"].append(seq_a[i])
                 alm["b"].append(seq_b[j])
             i, j = i - 1, j - 1
-        elif d_grid[j][i] == DIRECTION_MAP[False, True, False]:
+        elif d_grid[j][i] == (False, True, False):
             # horizontal
             for alm in alms:
                 alm["a"].append(seq_a[i])
                 alm["b"].append(gap)
             i = i - 1
-        elif d_grid[j][i] == DIRECTION_MAP[False, False, True]:
+        elif d_grid[j][i] == (False, False, True):
             # vertical
             for alm in alms:
                 alm["a"].append(gap)
                 alm["b"].append(seq_b[j])
             j = j - 1
-        elif d_grid[j][i] == DIRECTION_MAP[True, False, True]:
+        elif d_grid[j][i] == (True, False, True):
             # diagonal and vertical
             diag_paths = nw_backtrace(seq_a, seq_b, d_grid, i - 1, j - 1)
             vert_paths = nw_backtrace(seq_a, seq_b, d_grid, i, j - 1)
@@ -139,7 +136,7 @@ def nw_backtrace(seq_a, seq_b, d_grid, i=None, j=None, **kwargs):
             ret_alms += _product(alms, gap, seq_b[j], vert_paths)
 
             return ret_alms
-        elif d_grid[j][i] == DIRECTION_MAP[True, True, False]:
+        elif d_grid[j][i] == (True, True, False):
             # diagonal and horizontal
             diag_paths = nw_backtrace(seq_a, seq_b, d_grid, i - 1, j - 1)
             horz_paths = nw_backtrace(seq_a, seq_b, d_grid, i - 1, j)
@@ -148,7 +145,7 @@ def nw_backtrace(seq_a, seq_b, d_grid, i=None, j=None, **kwargs):
             ret_alms += _product(alms, seq_a[i], gap, horz_paths)
 
             return ret_alms
-        elif d_grid[j][i] == DIRECTION_MAP[False, True, True]:
+        elif d_grid[j][i] == (False, True, True):
             # vertical and horizontal
             vert_paths = nw_backtrace(seq_a, seq_b, d_grid, i, j - 1)
             horz_paths = nw_backtrace(seq_a, seq_b, d_grid, i - 1, j)
@@ -157,7 +154,7 @@ def nw_backtrace(seq_a, seq_b, d_grid, i=None, j=None, **kwargs):
             ret_alms += _product(alms, seq_a[i], gap, horz_paths)
 
             return ret_alms
-        elif d_grid[j][i] == DIRECTION_MAP[True, True, True]:
+        elif d_grid[j][i] == (True, True, True):
             # diagonal, vertical, and horizontal
             diag_paths = nw_backtrace(seq_a, seq_b, d_grid, i - 1, j - 1)
             vert_paths = nw_backtrace(seq_a, seq_b, d_grid, i, j - 1)
@@ -232,6 +229,10 @@ def nw_align(seq_a, seq_b, matrix, gap="-", **kwargs):
     # by `nw_grids()`) is not used in this routine, as the scoring is performed with the
     # more complete `score_alignment()` function.
     _, d_grid = nw_grids(seq_a, seq_b, matrix, gap)
+
+    #    from tabulate import tabulate
+    #    print( tabulate(_, tablefmt="github"))
+    #    print( tabulate([[DIRECTION_MAP[d] for d in row] for row in d_grid], tablefmt="github") )
 
     # Obtain the alignments from backtrace, and them along with a score;
     # sequences are reversed after it with `[::-1]`, as NW follows a northwest-direction;

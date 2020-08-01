@@ -105,6 +105,7 @@ Version 0.3:
   - Consider expanding dumb_malign by adding random gaps (perhaps calling it
     pad_align, maybe with swaps)
   - Complete documentation for functions, etc.
+  - Have NW working within a threshold (that is, not only the best score?)
 
 ## Community guidelines
 

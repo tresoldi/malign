@@ -188,7 +188,8 @@ class ScoringMatrix:
                     for idx in [mapper.get(idx, None) for idx in self._dr]
                 ]
 
-                self.scores[tuple(new_key)] = score
+                # Make sure all values are floats
+                self.scores[tuple(new_key)] = float(score)
 
         # Fill the matrix with the appropriate method if requested. Note that it is
         # not easy to verify beforehand if the matrix needs to be filled, as the
@@ -374,8 +375,11 @@ class ScoringMatrix:
             self._dr = tuple(serial_data["domain_range"])
             self.alphabets = serial_data["alphabets"].copy()
 
+            # Make sure values are floats
             self.scores = {
-                tuple([None if k == "NULL" else k for k in key.split(" / ")]): value
+                tuple([None if k == "NULL" else k for k in key.split(" / ")]): float(
+                    value
+                )
                 for key, value in serial_data["scores"].items()
             }
 
