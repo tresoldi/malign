@@ -42,7 +42,7 @@ class TestMalign(unittest.TestCase):
         assert len(alms) == 2
         assert tuple(alms[0]["seqs"][0]) == ("t", "r", "-", "a")
         assert tuple(alms[0]["seqs"][1]) == ("f", "a", "t", "a")
-        assert isclose(alms[0]["score"], -2.0)
+        assert isclose(alms[0]["score"], -0.5)
 
     # TODO: fix code so it computes the graph by itself, even in pairwise
     def test_yenksp_pw_align(self):
@@ -52,10 +52,10 @@ class TestMalign(unittest.TestCase):
 
         # Test with basic alignment, no scorer
         alms = malign.multi_align(["tra", "fata"], k=4, method="yenksp")
-        assert len(alms) == 8
+        assert len(alms) == 4
         assert tuple(alms[0]["seqs"][0]) == ("t", "r", "-", "a")
         assert tuple(alms[0]["seqs"][1]) == ("f", "a", "t", "a")
-        assert isclose(alms[0]["score"], -2.0)
+        assert isclose(alms[0]["score"], -0.5)
 
         # More complex test with DNA scorer
         dna_seq1 = "TGGACCCGGGAAGGTGACCCAC"
@@ -66,10 +66,9 @@ class TestMalign(unittest.TestCase):
         aligns = malign.yenksp.align(
             graph, ((0, 0), dest), dna_seq1, dna_seq2, malign.utils.DNA_MATRIX
         )
-
-        assert "".join(aligns[0]["seqs"][0]) == "TGGACC-C-GG-G-AAGGTGACCCAC"
-        assert "".join(aligns[0]["seqs"][1]) == "TT-ACCACCGGCGCGAACCCCCCCCC"
-        assert isclose(aligns[0]["score"], 59.0)
+        assert "".join(aligns[0]["seqs"][0]) == "TGGAC-CCGG-G-AAGGTGACCCAC"
+        assert "".join(aligns[0]["seqs"][1]) == "TTACCACCGGCGCGAACCCCCCCCC"
+        assert isclose(aligns[0]["score"], 2.32)
 
     def test_compute_graph(self):
         """
@@ -94,48 +93,54 @@ class TestMalign(unittest.TestCase):
 
         # Test #1 - perfect alignment
         alm = [("A", "T", "T"), ("A", "T", "T")]
-        assert isclose(malign.utils.score_alignment(alm, mtx), 26.0)
+        assert isclose(malign.utils.score_alignment(alm, mtx), 8.666666, rel_tol=1e-05)
 
         # Test #2 - mistmatch
         alm = [("A", "T", "T"), ("A", "T", "C")]
-        assert isclose(malign.utils.score_alignment(alm, mtx), 18.0)
+        assert isclose(malign.utils.score_alignment(alm, mtx), 6.0, rel_tol=1e-05)
 
         # Test #3 - gap
         alm = [("A", "T", "T"), ("A", "T", "-")]
-        assert isclose(malign.utils.score_alignment(alm, mtx), 11.0)
-        assert isclose(malign.utils.score_alignment(alm, mtx, gap_ext=-10), 2.0)
-        assert isclose(malign.utils.score_alignment(alm, mtx, gap_open=-10), 2.0)
+        assert isclose(malign.utils.score_alignment(alm, mtx), 3.666666, rel_tol=1e-05)
+        assert isclose(
+            malign.utils.score_alignment(alm, mtx, gap_ext=-10), 0.666666, rel_tol=1e-05
+        )
+        assert isclose(
+            malign.utils.score_alignment(alm, mtx, gap_open=-10),
+            0.666666,
+            rel_tol=1e-05,
+        )
 
         # Test #4 - complex alignment
         alm = [
             ("A", "T", "T", "C", "G", "G", "A", "-", "-", "T"),
             ("T", "A", "-", "C", "G", "G", "A", "T", "T", "T"),
         ]
-        assert isclose(malign.utils.score_alignment(alm, mtx), 13.0)
+        assert isclose(malign.utils.score_alignment(alm, mtx), 1.3, rel_tol=1e-05)
 
         alm = [
             ("A", "T", "T", "C", "G", "G", "A", "T", "-", "-"),
             ("T", "A", "-", "C", "G", "G", "A", "T", "T", "T"),
         ]
-        assert isclose(malign.utils.score_alignment(alm, mtx), 13.0)
+        assert isclose(malign.utils.score_alignment(alm, mtx), 1.3, rel_tol=1e-05)
 
         alm = [
             ("-", "A", "T", "T", "C", "G", "G", "A", "T", "-"),
             ("T", "A", "-", "C", "G", "G", "A", "T", "T", "T"),
         ]
-        assert isclose(malign.utils.score_alignment(alm, mtx), -5.0)
+        assert isclose(malign.utils.score_alignment(alm, mtx), -0.5, rel_tol=1e-05)
 
         alm = [
             ("-", "A", "T", "T", "C", "G", "G", "A", "-", "T"),
             ("T", "A", "-", "C", "G", "G", "A", "T", "T", "T"),
         ]
-        assert isclose(malign.utils.score_alignment(alm, mtx), -5.0)
+        assert isclose(malign.utils.score_alignment(alm, mtx), -0.5, rel_tol=1e-05)
 
         alm = [
             ("A", "T", "T", "-", "C", "G", "G", "A", "-", "-", "T"),
             ("T", "-", "-", "A", "C", "G", "G", "A", "T", "T", "T"),
         ]
-        assert isclose(malign.utils.score_alignment(alm, mtx), 5.0)
+        assert isclose(malign.utils.score_alignment(alm, mtx), 0.454545, rel_tol=1e-05)
 
         # TODO: multiple alignments, even with identity matrix is enough
 
