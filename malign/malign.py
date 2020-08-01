@@ -13,7 +13,7 @@ import malign.yenksp as yenksp
 import malign.utils as utils
 
 
-def _build_candidates(potential, matrix):
+def _build_candidates(potential_alms, matrix):
     """
     Internal function used by `_malign()`.
 
@@ -22,15 +22,13 @@ def _build_candidates(potential, matrix):
     """
 
     # Build all potential alignments and score them
-    longest = max(potential)
-    cand = [potential[longest][idx] for idx in sorted(potential[longest])]
+    cand = [potential_alms[idx] for idx in sorted(potential_alms)]
     alms = []
     for aligns in itertools.product(*cand):
         seqs = list(aligns)
         alms.append({"seqs": seqs, "score": utils.score_alignment(seqs, matrix)})
 
-    # return sorted
-    return utils.sort_alignments(alms)
+    return alms
 
 
 # pylint: disable=too-many-locals
@@ -73,6 +71,27 @@ def _malign_longest_product(seqs, matrix, pw_func, **kwargs):
             potential[len(alm["seqs"][0])][idx_x].add(tuple(alm["seqs"][0]))
             potential[len(alm["seqs"][1])][idx_y].add(tuple(alm["seqs"][1]))
 
+    # TODO: new method
+    alms = []
+    for length in sorted(potential):
+        if len(potential[length]) == len(seqs):
+            alms += _build_candidates(potential[length], matrix)
+
+    return utils.sort_alignments(alms)
+
+    # TODO: just fill all potentials that are missing with the previous value, in
+    # ascending order -- the minimum potential should be the longest sequence length
+    # NOTE: actually, starting from hte first potential where all lengths are found
+    for min_length in sorted(potential):
+        if len(potential[min_length]) == len(seqs):
+            break
+
+    print(min_length, max(potential))
+
+    if min_length < max(potential) - 1:
+        for length in (min_length + 1, max(potential)):
+            print("checking", length)
+
     # Before taking the product of all potential alignments with longest
     # lenght, we need to make sure that all sequences have such length,
     # as there might be cases where all alignments were shorter; in order to
@@ -109,9 +128,11 @@ def _malign_longest_product(seqs, matrix, pw_func, **kwargs):
                     potential[longest][seq_idx].add(tuple(alm["seqs"][alm_idx]))
 
     # Build all potential alignments and score them
-    alms = _build_candidates(potential, matrix)
 
-    return alms
+
+#    alms = _build_candidates(potential[longest], matrix)
+
+#    return alms
 
 
 # TODO: gap opening/gap extension for scoring
@@ -152,7 +173,7 @@ def multi_align(seqs, method, **kwargs):
     # Get the user-provided matrix, or compute an identity one
     matrix = kwargs.get("matrix", None)
     if not matrix:
-        matrix = utils.identity_matrix(seqs, match=+1, gap=-1)
+        matrix = utils.identity_matrix(seqs, match=+1, gap_score=-1)
 
     # Get default parameters
     gap = kwargs.get("gap", "-")

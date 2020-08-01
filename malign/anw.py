@@ -59,8 +59,8 @@ def nw_grids(seq_a, seq_b, scorer, gap):
     for i, j in itertools.product(range(1, len_a), range(1, len_b)):
         # compute direction scorers
         diag = s_grid[j - 1][i - 1] + scorer[seq_a[i], seq_b[j]]
-        horz = s_grid[j][i - 1] - 1
-        vert = s_grid[j - 1][i] - 1
+        horz = s_grid[j][i - 1] + scorer[seq_a[i], gap]
+        vert = s_grid[j - 1][i] + scorer[gap, seq_b[j]]
 
         # get best score and matching tuple
         best_score = max([diag, horz, vert])

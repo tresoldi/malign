@@ -118,7 +118,7 @@ def tabulate_alms(alms):
             for chars in itertools.product(ascii_uppercase, repeat=length):
                 yield "".join(chars)
 
-    alm_len = len(alms[0]["seqs"][0])
+    alm_len = max([len(alm["seqs"][0]) for alm in alms])
     headers = ["Idx", "Seq", "Score"] + [f"#{i}" for i in range(alm_len)]
     colalign = tuple(["left", "left", "decimal"] + ["center"] * alm_len)
     table = []
@@ -137,7 +137,6 @@ def tabulate_alms(alms):
 
 
 # TODO: do sub-matrices and matrices at the same pass?
-# TODO: add mismatch
 def identity_matrix(seqs, **kwargs):
     """
     Build an identity matrix from a list of sequences.
@@ -148,14 +147,15 @@ def identity_matrix(seqs, **kwargs):
 
     # Collect scores
     match = kwargs.get("match", 1)
-    gap = kwargs.get("gap", -1)
-    mismatch = kwargs.get("mismatch", gap)
-    gap_symbol = kwargs.get("gap_symbol", "-")
+    gap_score = kwargs.get("gap_score", -1)
+    gap = kwargs.get("gap", "-")
+    mismatch = kwargs.get("mismatch", (match + gap_score) / 2.0)
 
     # Collect alphabet and build key space
-    alphabet = list(set(list(itertools.chain.from_iterable(seqs)) + [gap_symbol]))
+    alphabet = list(set(list(itertools.chain.from_iterable(seqs)) + [gap]))
 
     # Build pairwise sub-matrices first, using the identity logic
+    # TODO: redo considering the full key from the number of seqs
     scores = {}
     domains = list(itertools.combinations(range(len(seqs)), 2))
     for domain in domains:
@@ -168,8 +168,8 @@ def identity_matrix(seqs, **kwargs):
                 ]
             )
 
-            if gap_symbol in symbols:
-                scores[key] = gap
+            if gap in symbols:
+                scores[key] = gap_score
             elif symbols[0] != symbols[1]:
                 scores[key] = mismatch
             else:
