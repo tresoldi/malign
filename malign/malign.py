@@ -171,6 +171,7 @@ def multi_align(seqs, method, **kwargs):
 
     # Run alignment method; note that the `dumb` method does not rely in expansion
     # from pairwise alingments with `_malign` as others
+    # TODO: have `dumb` work like other methods
     if method == "dumb":
         alms = dumb.dumb_malign(seqs, gap=gap)
     else:

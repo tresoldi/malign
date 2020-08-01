@@ -102,7 +102,9 @@ Version 0.3:
     graph that should be made unreachable by very high costs/weights)
   - Implement some cache system for `._fill_domain` in `ScoringMatrix`, for cases when
     the alphabets are the same (such as with identity matrices)
-
+  - Consider expanding dumb_malign by adding random gaps (perhaps calling it
+    pad_align, maybe with swaps)
+    
 ## Community guidelines
 
 While the author can be contacted directly for support, it is recommended
