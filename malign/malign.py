@@ -6,9 +6,6 @@ Main module with code for alignment methods.
 from collections import defaultdict
 import itertools
 
-# Import 3rd-party libraries
-import numpy as np
-
 # Import other modules
 import malign.anw as anw
 import malign.dumb as dumb
@@ -80,10 +77,12 @@ def _malign_longest_product(seqs, matrix, pw_func, **kwargs):
     # lenght, we need to make sure that all sequences have such length,
     # as there might be cases where all alignments were shorter; in order to
     # do so, we get all potentials with the longest alignment and align
-    # again, this time using the gaps
-    # TODO: do we really need to compute submatrices?
-    # TODO: have a global function for adding alignment removing full gap vectors, also
-    #       deciding what to do with scores (they should not change?)
+    # again, this time using the gaps.
+    # Note that we need to compute the submatrices (and not index directly), as the
+    # `.compute_submatrices()` method takes care of additional checks, such as `None`s
+    # in the key. It also make the flow easier to understand and to generalize, even
+    # though at some computational expense.
+    # TODO: consider other lengths, which also helps in terms vector with full gaps
     longest = max(potential)
     has_longest = list(potential[longest])
     idx_to_compute = [idx for idx in range(len(seqs)) if idx not in has_longest]
@@ -172,7 +171,6 @@ def multi_align(seqs, method, **kwargs):
 
     # Run alignment method; note that the `dumb` method does not rely in expansion
     # from pairwise alingments with `_malign` as others
-    # TODO: a "full" and default method should take all -- nw, yenksp, even dumb
     if method == "dumb":
         alms = dumb.dumb_malign(seqs, gap=gap)
     else:

@@ -100,6 +100,8 @@ Version 0.3:
   - Add function/method to represent graphically the graph used for `yenksp`
   - Allow excluding nodes/groups of nodes/ranges in yenksp.align (nodes in the
     graph that should be made unreachable by very high costs/weights)
+  - Implement some cache system for `._fill_domain` in `ScoringMatrix`, for cases when
+    the alphabets are the same (such as with identity matrices)
 
 ## Community guidelines
 

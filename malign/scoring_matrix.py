@@ -177,6 +177,7 @@ class ScoringMatrix:
             # We need to index the submatrix with its `._dr`, as the indexes
             # we need are the ones in this matrix being initialized. Note
             # how we keep a single dictionary, filling missing spots with `None`
+            # pylint: disable=protected-access
             mapper = dict(zip(sub_domain, matrix._dr))
             for sub_key, score in matrix.scores.items():
                 # sub_key ('b', 'X') -> new_key ['b', 'X', None]
@@ -189,11 +190,11 @@ class ScoringMatrix:
 
                 self.scores[tuple(new_key)] = score
 
-        # Fill the matrix with the appropriate method if requested
-        # TODO: check if we need to fill somehow? needs to consider only full vectors?
-        # expected_size = np.prod([len(alphabet) for alphabet in self.alphabets])
-        # if len([key for key in self.scores if all(key)]) == expected_size:
-        #     return
+        # Fill the matrix with the appropriate method if requested. Note that it is
+        # not easy to verify beforehand if the matrix needs to be filled, as the
+        # combination of submatrices and different domains implies that the
+        # expected size is not necessarily the product of the alphabets. For making
+        # the code simpler to follow, no check is performed beforehand.
         if self._fill_method:
             if self._fill_method == "standard":
                 self._fill_matrix_standard()
@@ -319,8 +320,6 @@ class ScoringMatrix:
                     ]
                 )
 
-    # TODO: if the alphabets are the same, we can save a lot of computation,
-    #       by caching, such as in identity matrices
     def _fill_domain(self, domain):
         """
         Internal function for filling a sub-domain.
@@ -342,18 +341,17 @@ class ScoringMatrix:
 
         # Fill keys
         # TODO: investigate better subsetting, loops to unroll
-        # TODO: also what should not be collected like full gaps
         for sub_key in itertools.product(*sub_alphabets):
             if sub_key not in self.scores:
+                if all([value == self.gap for value in sub_key]):
+                    continue
+
                 sub_scores = []
                 for key, score in self.scores.items():
-                    if all(
-                        [
-                            key[idx] == v
-                            for idx, v in enumerate(sub_key)
-                            if v is not None
-                        ]
-                    ):
+                    matches = [
+                        key[idx] == v for idx, v in enumerate(sub_key) if v is not None
+                    ]
+                    if all(matches):
                         sub_scores.append(score)
 
                 # Add adjusted value
@@ -423,8 +421,15 @@ class ScoringMatrix:
         with open(filename, "w") as json_handler:
             json.dump(serial_data, json_handler, indent=4, ensure_ascii=False)
 
-    # compute the submatrices as a dictionary of ScoringMatrix
     def compute_submatrices(self, domains):
+        """
+        Compute submatrices from a collection of domains.
+
+        Sub-matrices are useful, when compared to the possibility of addressing a
+        normal matrix with `None` values in keys, in simplifying computation and
+        debugging, as well as in some methods for smoothing.
+        """
+
         sub_matrix = {}
 
         for domain in domains:
@@ -543,9 +548,10 @@ class ScoringMatrix:
 
     def __setitem__(self, key, value):
         # We need to treat `None`, as usual
-        if not all(
-            [k in alphabet for k, alphabet in zip(key, self.alphabets) if k is not None]
-        ):
+        matches = [
+            k in alphabet for k, alphabet in zip(key, self.alphabets) if k is not None
+        ]
+        if not all(matches):
             raise ValueError("`key` uses symbol(s) not in alphabet.")
 
         self.scores[tuple(key)] = value
