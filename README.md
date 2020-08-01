@@ -104,7 +104,8 @@ Version 0.3:
     the alphabets are the same (such as with identity matrices)
   - Consider expanding dumb_malign by adding random gaps (perhaps calling it
     pad_align, maybe with swaps)
-    
+  - Complete documentation for functions, etc. 
+
 ## Community guidelines
 
 While the author can be contacted directly for support, it is recommended
