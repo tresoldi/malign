@@ -104,7 +104,7 @@ Version 0.3:
     the alphabets are the same (such as with identity matrices)
   - Consider expanding dumb_malign by adding random gaps (perhaps calling it
     pad_align, maybe with swaps)
-  - Complete documentation for functions, etc. 
+  - Complete documentation for functions, etc.
 
 ## Community guidelines
 
@@ -114,6 +114,10 @@ pull requests, to contribute, report problems, or seek support.
 
 Contributing guidelines, including a code of conduct, can be found in
 the `CONTRIBUTING.md` file.
+
+## References
+
+https://journals.sagepub.com/doi/abs/10.1177/0049124100029001003?casa_token=uYDn0Ah-288AAAAA:jRQOwcbQyhySiVzMhtMkFC7K3CJatsMcidTtZE2ezQcNyF3dn-1elnr4H7pDWUPFU-6cLZu6IpeBLAA
 
 ## Author and citation
 

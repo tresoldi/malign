@@ -282,7 +282,7 @@ class ScoringMatrix:
 
     def _fill_matrix_fallback(self):
         """
-        Internal function for last resource on matrix feeling.
+        Internal function for last resource on matrix filling.
 
         This function will be used when there are still empty cells in cell and
         the method for filling it was unable to account for. As a last resource,
@@ -306,16 +306,17 @@ class ScoringMatrix:
                     gap_scores.append(score)
 
         symbol_score = {key: np.mean(scores) for key, scores in symbol_score.items()}
-        gap_scores = np.mean(gap_scores)
+        gap_score = np.mean(gap_scores)
 
         for key in itertools.product(*self.alphabets):
             if key not in self.scores:
                 # If the alphabet passed by the user has symbols not in the scorer,
                 # we will have a KeyError in symbol_score[domain_idx][symbol]; the
                 # `.get()` will default towards the `gap`, which is always necessary
+                num_gaps = len([value for value in key if value == self.gap])
                 self.scores[key] = np.mean(
                     [
-                        symbol_score.get((domain_idx, symbol), gap_scores)
+                        symbol_score.get((domain_idx, symbol), num_gaps * gap_score)
                         for domain_idx, symbol in enumerate(key)
                     ]
                 )
