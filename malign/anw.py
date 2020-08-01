@@ -2,9 +2,6 @@
 Module for computing Needleman–Wunsch alignments.
 """
 
-# TODO: write/fix function documentation
-# TODO: general rename of `gap` to `gap_symbol` depending on scoring?
-
 # Import Python standard libraries
 import itertools
 
@@ -211,9 +208,12 @@ def nw_align(seq_a, seq_b, matrix, gap="-", **kwargs):
         to both the sequences and the scoring matrix) and that this implementation of
         the Needleman-Wunsch algorithm is not intended for collection of as many
         k-best alignments as possible (if so desired, the `yenksp` method is
-        recommended). Defaults to `1`; if equal to `None`, all the collected alignments
+        recommended). Defaults to `None`, meaning that all the collected alignments
         will be returned.
     """
+
+    # Get arguments
+    k = kwargs.get("k", None)
 
     # Validate parameters
     if not gap:
@@ -246,5 +246,4 @@ def nw_align(seq_a, seq_b, matrix, gap="-", **kwargs):
     ]
 
     # Sort and return
-    # TODO: should the `k` cut be performed here? i.e. `alms[:k]`? if so, do we need it?
-    return utils.sort_alignments(alms)
+    return utils.sort_alignments(alms)[:k]
