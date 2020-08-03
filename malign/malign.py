@@ -72,6 +72,12 @@ def _malign_longest_product(seqs, matrix, pw_func, **kwargs):
             potential[len(alm["seqs"][0])][idx_x].add(tuple(alm["seqs"][0]))
             potential[len(alm["seqs"][1])][idx_y].add(tuple(alm["seqs"][1]))
 
+    ##    import pprint
+    ##    for __l in sorted(potential):
+    ##        for idx in sorted(potential[__l]):
+    ##            print("---", __l, idx)
+    ##            pprint.pprint(potential[__l][idx])
+
     # Starting from the minimum length (the maximum sequence length), fill all the
     # potential alignments
     min_length = max([len(seq) for seq in seqs])
@@ -106,7 +112,7 @@ def _malign_longest_product(seqs, matrix, pw_func, **kwargs):
                         alm_idx = 1  # seqs[seq_idx] is the second element
 
                     # Align and add
-                    for alm in pw_func(seq_a, seq_b, k=k, matrix=mtx):
+                    for alm in pw_func(seq_a, seq_b, gap=gap, k=k, matrix=mtx):
                         potential[length][seq_idx].add(tuple(alm["seqs"][alm_idx]))
 
     # Build all candidate alignments, sort, and return
@@ -186,7 +192,7 @@ def multi_align(seqs, method, **kwargs):
             # For `yenksp`, we will compute the twice the number of paths
             # requested, in order to get out of local minima
             pairwise_func = yenksp.yenksp_align
-            pw_k = k * 2
+            pw_k = k ** 2
 
         alms = _malign_longest_product(
             seqs, matrix, pw_func=pairwise_func, gap=gap, k=pw_k

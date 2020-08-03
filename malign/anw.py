@@ -222,8 +222,8 @@ def nw_align(seq_a, seq_b, matrix, gap="-", **kwargs):
     # Add initial gaps; note that this also makes a
     # copy of the contents of each sequence, so we preserve the original
     # memory in-place
-    seq_a = [gap] + seq_a
-    seq_b = [gap] + seq_b
+    seq_a = [gap] + list(seq_a)
+    seq_b = [gap] + list(seq_b)
 
     # Build Needleman-Wunsch grids; note that the scoring grid (the first value returned
     # by `nw_grids()`) is not used in this routine, as the scoring is performed with the

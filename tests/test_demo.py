@@ -290,6 +290,7 @@ class TestMalignResults(unittest.TestCase):
             "V",
             "O",
             "L",
+            "-",
             "D",
             "E",
             "M",
@@ -297,7 +298,7 @@ class TestMalignResults(unittest.TestCase):
             "R",
             "T",
         )
-        assert isclose(yenksp_alms[0]["score"], 6.444444, rel_tol=1e-05)
+        assert isclose(yenksp_alms[0]["score"], 7.3, rel_tol=1e-05)
 
 
 if __name__ == "__main__":
