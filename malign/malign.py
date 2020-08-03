@@ -14,6 +14,7 @@ import malign.utils as utils
 
 
 # TODO: remove those made only of gaps
+# TODO: use gap from matrix
 def _build_candidates(potential_alms, matrix):
     """
     Internal function used by `_malign()`.
@@ -24,14 +25,24 @@ def _build_candidates(potential_alms, matrix):
 
     # Build all potential alignments and score them
     cand = [potential_alms[idx] for idx in sorted(potential_alms)]
-    alms = []
+    alms = set()
     for aligns in itertools.product(*cand):
         seqs = list(aligns)
-        alms.append({"seqs": seqs, "score": utils.score_alignment(seqs, matrix)})
+
+        # The combination of alignments might results in full-gap vectors; here we
+        # remove them and make sure to only add unique alignments
+        full_gap = tuple(["-"] * len(seqs))
+        vectors = list(zip(*seqs))
+        if full_gap in vectors:
+            vectors = [vector for vector in vectors if vector != full_gap]
+            seqs = list(zip(*vectors))
+
+        alms.add(tuple(seqs))
 
     return alms
 
 
+# TODO: rename as the name does not mirror the work anymore
 # pylint: disable=too-many-locals
 def _malign_longest_product(seqs, matrix, pw_func, **kwargs):
     """
@@ -72,12 +83,6 @@ def _malign_longest_product(seqs, matrix, pw_func, **kwargs):
             potential[len(alm["seqs"][0])][idx_x].add(tuple(alm["seqs"][0]))
             potential[len(alm["seqs"][1])][idx_y].add(tuple(alm["seqs"][1]))
 
-    ##    import pprint
-    ##    for __l in sorted(potential):
-    ##        for idx in sorted(potential[__l]):
-    ##            print("---", __l, idx)
-    ##            pprint.pprint(potential[__l][idx])
-
     # Starting from the minimum length (the maximum sequence length), fill all the
     # potential alignments
     min_length = max([len(seq) for seq in seqs])
@@ -111,15 +116,21 @@ def _malign_longest_product(seqs, matrix, pw_func, **kwargs):
                         mtx = sub_matrix[long_idx, seq_idx]
                         alm_idx = 1  # seqs[seq_idx] is the second element
 
-                    # Align and add
+                    # Align and add only those with the requested length
                     for alm in pw_func(seq_a, seq_b, gap=gap, k=k, matrix=mtx):
-                        potential[length][seq_idx].add(tuple(alm["seqs"][alm_idx]))
+                        if len(alm["seqs"][alm_idx]) == length:
+                            potential[length][seq_idx].add(tuple(alm["seqs"][alm_idx]))
 
     # Build all candidate alignments, sort, and return
-    alms = []
+    alms = set()
     for length in potential:
         if len(potential[length]) == len(seqs):
-            alms += _build_candidates(potential[length], matrix)
+            alms = alms.union(_build_candidates(potential[length], matrix))
+
+    # Compute scores, sort and return
+    alms = [
+        {"seqs": seqs, "score": utils.score_alignment(seqs, matrix)} for seqs in alms
+    ]
 
     return utils.sort_alignments(alms)
 
