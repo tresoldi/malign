@@ -151,7 +151,8 @@ def identity_matrix(seqs, **kwargs):
     match_score = kwargs.get("match", 1.0)
     gap_score = kwargs.get("gap_score", -1.0)
     gap = kwargs.get("gap", "-")
-    mismatch_score = kwargs.get("mismatch", (match_score + gap_score) / 2.0)
+    #    mismatch_score = kwargs.get("mismatch", (match_score + gap_score) / 2.0)
+    mismatch_score = kwargs.get("mismatch", gap_score * 0.9)  # TODO: just a bit below
 
     # Collect alphabet and build key space
     alphabet = list(set(list(itertools.chain.from_iterable(seqs)) + [gap]))
