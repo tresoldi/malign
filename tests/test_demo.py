@@ -70,8 +70,8 @@ class TestMalignResults(unittest.TestCase):
         matrix_std = malign.ScoringMatrix(vectors)
         matrix_fill = malign.ScoringMatrix(vectors, fill_method="distance")
 
-        assert isclose(matrix_std["a", "-"], 1.0)
-        assert isclose(matrix_std["c", "Y"], 2.0)
+        assert isclose(matrix_std["a", "-"], 1.25)
+        assert isclose(matrix_std["c", "Y"], 0.8)
         assert isclose(matrix_fill["a", "-"], 1.0)
         assert isclose(matrix_fill["c", "Y"], 0.8)
 
@@ -153,7 +153,7 @@ class TestMalignResults(unittest.TestCase):
             matrix["-", "-", "3"], -4.0, rel_tol=1e-05
         )  # inferred in first round
         assert isclose(
-            matrix["c", "-", "4"], -0.247604, rel_tol=1e-05
+            matrix["c", "-", "4"], -1.439491, rel_tol=1e-05
         )  # inferred in second round
 
     def test_dumb_alignment(self):

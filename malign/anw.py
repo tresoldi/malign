@@ -10,7 +10,8 @@ import malign.utils as utils
 
 # Defines the map for directions; keys are tuples of three booleans,
 # resulting from comparison of direction scores with the best scores,
-# being, in order, (1) diagonal, (2) horizontal, (3) vertical
+# being, in order, (1) diagonal, (2) horizontal, (3) vertical. Used for
+# debugging.
 DIRECTION_MAP = {
     (False, False, False): "-",  # stationary, up left corner
     (True, True, True): "*",  # all movements with the same score
@@ -29,6 +30,13 @@ def nw_grids(seq_a, seq_b, scorer, gap):
 
     Note that the sequences must already have the initial gap added to them at this
     point.
+
+    Parameters
+    ==========
+    seq_a : str or list or tuple
+        First sequence for the pairwise alignment.
+    seq_b : str or list or tuple
+        Second sequence for the pairwise alignment.
     """
 
     # cache lengths
@@ -70,6 +78,21 @@ def nw_grids(seq_a, seq_b, scorer, gap):
     return s_grid, d_grid
 
 
+def _nw_product(prev_alms, char_a, char_b, paths):
+    """
+    Internal function for building a product of paths.
+
+    The function is used for NW alignments with two or more directions.
+    """
+    ret_alms = []
+    for alm in prev_alms:
+        ret_alms += [
+            {"a": [*alm["a"], char_a, *path["a"]], "b": [*alm["b"], char_b, *path["b"]]}
+            for path in paths
+        ]
+    return ret_alms
+
+
 # pylint: disable=too-many-branches
 def nw_backtrace(seq_a, seq_b, d_grid, i=None, j=None, **kwargs):
     """
@@ -82,9 +105,18 @@ def nw_backtrace(seq_a, seq_b, d_grid, i=None, j=None, **kwargs):
     As this function will only operate pairwise, for easiness of debugging and
     inspection the returned structure does not follow the approach used alsewhere of
     a list of sequences, but it is a dictionary with `a` and `b` keys.
+
+    Parameters
+    ==========
+    seq_a : str or list or tuple
+        First sequence for the pairwise alignment.
+    seq_b : str or list or tuple
+        Second sequence for the pairwise alignment.
+    d_grid: dict
+        A direction grid, as returned from `nw_grids`.
     """
 
-    # Get parameters, and default to the full alignment, if (i, j) is not provided
+    # Get parameters, and default for the full alignment, if (i, j) is not provided
     gap = kwargs.get("gap", "-")
     if not i and not j:
         i = len(seq_a) - 1
@@ -92,19 +124,6 @@ def nw_backtrace(seq_a, seq_b, d_grid, i=None, j=None, **kwargs):
 
     # Define empty, initial alignment collection with a single alignment
     alms = [{"a": [], "b": []}]
-
-    # Build product of paths, for cases with two or more directions
-    def _product(prev_alms, char_a, char_b, paths):
-        ret_alms = []
-        for alm in prev_alms:
-            ret_alms += [
-                {
-                    "a": [*alm["a"], char_a, *path["a"]],
-                    "b": [*alm["b"], char_b, *path["b"]],
-                }
-                for path in paths
-            ]
-        return ret_alms
 
     # Does the backtrace, using recursion when necessary and changing in
     # place as much as possible for speed
@@ -132,8 +151,8 @@ def nw_backtrace(seq_a, seq_b, d_grid, i=None, j=None, **kwargs):
             diag_paths = nw_backtrace(seq_a, seq_b, d_grid, i - 1, j - 1)
             vert_paths = nw_backtrace(seq_a, seq_b, d_grid, i, j - 1)
 
-            ret_alms = _product(alms, seq_a[i], seq_b[j], diag_paths)
-            ret_alms += _product(alms, gap, seq_b[j], vert_paths)
+            ret_alms = _nw_product(alms, seq_a[i], seq_b[j], diag_paths)
+            ret_alms += _nw_product(alms, gap, seq_b[j], vert_paths)
 
             return ret_alms
         elif d_grid[j][i] == (True, True, False):
@@ -141,8 +160,8 @@ def nw_backtrace(seq_a, seq_b, d_grid, i=None, j=None, **kwargs):
             diag_paths = nw_backtrace(seq_a, seq_b, d_grid, i - 1, j - 1)
             horz_paths = nw_backtrace(seq_a, seq_b, d_grid, i - 1, j)
 
-            ret_alms = _product(alms, seq_a[i], seq_b[j], diag_paths)
-            ret_alms += _product(alms, seq_a[i], gap, horz_paths)
+            ret_alms = _nw_product(alms, seq_a[i], seq_b[j], diag_paths)
+            ret_alms += _nw_product(alms, seq_a[i], gap, horz_paths)
 
             return ret_alms
         elif d_grid[j][i] == (False, True, True):
@@ -150,8 +169,8 @@ def nw_backtrace(seq_a, seq_b, d_grid, i=None, j=None, **kwargs):
             vert_paths = nw_backtrace(seq_a, seq_b, d_grid, i, j - 1)
             horz_paths = nw_backtrace(seq_a, seq_b, d_grid, i - 1, j)
 
-            ret_alms = _product(alms, gap, seq_b[j], vert_paths)
-            ret_alms += _product(alms, seq_a[i], gap, horz_paths)
+            ret_alms = _nw_product(alms, gap, seq_b[j], vert_paths)
+            ret_alms += _nw_product(alms, seq_a[i], gap, horz_paths)
 
             return ret_alms
         elif d_grid[j][i] == (True, True, True):
@@ -160,9 +179,9 @@ def nw_backtrace(seq_a, seq_b, d_grid, i=None, j=None, **kwargs):
             vert_paths = nw_backtrace(seq_a, seq_b, d_grid, i, j - 1)
             horz_paths = nw_backtrace(seq_a, seq_b, d_grid, i - 1, j)
 
-            ret_alms = _product(alms, seq_a[i], seq_b[j], diag_paths)
-            ret_alms += _product(alms, gap, seq_b[j], vert_paths)
-            ret_alms += _product(alms, seq_a[i], gap, horz_paths)
+            ret_alms = _nw_product(alms, seq_a[i], seq_b[j], diag_paths)
+            ret_alms += _nw_product(alms, gap, seq_b[j], vert_paths)
+            ret_alms += _nw_product(alms, seq_a[i], gap, horz_paths)
 
             return ret_alms
         else:
@@ -229,10 +248,6 @@ def nw_align(seq_a, seq_b, matrix, gap="-", **kwargs):
     # by `nw_grids()`) is not used in this routine, as the scoring is performed with the
     # more complete `score_alignment()` function.
     _, d_grid = nw_grids(seq_a, seq_b, matrix, gap)
-
-    # from tabulate import tabulate
-    # print( tabulate(_, tablefmt="github"))
-    # print( tabulate([[DIRECTION_MAP[d] for d in row] for row in d_grid], tablefmt="github") )
 
     # Obtain the alignments from backtrace, and them along with a score;
     # sequences are reversed after it with `[::-1]`, as NW follows a northwest-direction;
