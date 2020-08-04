@@ -11,13 +11,7 @@ import networkx as nx
 # Import other modules
 import malign.utils as utils
 
-# TODO: check what happens with the ("-", "-") default of 0.0 when adjusting weight for cost
-# TODO: should add notes in SE direction, instead of NW? This could be
-#       potentially be used to improve path finding, combining/selecting the
-#       results of both directions, but it *cannot* be mixed in a single
-#       graph, as we can't have loops for Yen's -- maybe this also implies
-#       adding gaps to the end, in a mirrored needleman-wunsch
-# TODO: allow to correct costs by some parameter, perhaps even non-linear?
+
 def compute_graph(seq_a, seq_b, matrix=None, gap="-"):
     """
     Computes a weighted directed graph for alignment.
@@ -78,7 +72,6 @@ def compute_graph(seq_a, seq_b, matrix=None, gap="-"):
     # NOTE: the "+" operation on lists here allows us to, in a single step,
     # add the necessary alignment gap and make an in-memory copy of both
     # sequences, preserving the original ones.
-    # TODO: remove this list conversion from here
     seq_a = [gap] + list(seq_a)
     seq_b = [gap] + list(seq_b)
 
@@ -118,7 +111,8 @@ def compute_graph(seq_a, seq_b, matrix=None, gap="-"):
                 hor_score = matrix[gap, symbol_b]
                 ver_score = matrix[symbol_a, gap]
 
-            # Add edges (and nodes automatically)
+            # Add edges (and nodes automatically); note that this, as expected, will
+            # not add or adjust the top left cell (0, 0).
             if dig_score is not None:
                 graph.add_edge((i - 1, j - 1), (i, j), weight=max_score - dig_score)
             if hor_score is not None:
@@ -185,9 +179,7 @@ def build_align(path, seq_a, seq_b, gap="-"):
     return {"seqs": [alm_a, alm_b]}
 
 
-# TODO: should have bidirectional
-# TODO: add comment/doc on `scorer`
-def align(graph, nodes, seq_a, seq_b, scorer, **kwargs):
+def align(graph, nodes, seq_a, seq_b, matrix, **kwargs):
     """
     Return the `k` best alignments in terms of costs.
 
@@ -212,12 +204,6 @@ def align(graph, nodes, seq_a, seq_b, scorer, **kwargs):
     seq_b : list
         A list of elements used as the second sequences (on the horizontal
         border).
-    gap_open : number
-        The penalty score for gap openings. The higher the value, the
-        more penalty will be applied to each gap. Defaults to 1.0.
-    gap_ext : number
-        The penalty score for gap extension. The higher the value, the
-        more penalty will be applied to each gap. Defaults to 0.0.
     gap : str
         A string used as gap symbol. Defaults to `"-"`.
     n_paths : int
@@ -234,9 +220,6 @@ def align(graph, nodes, seq_a, seq_b, scorer, **kwargs):
     """
 
     # Get arguments with defaults
-    # TODO: check gap symbol with matrix gap
-    gap_open = kwargs.get("gap_open", 1.0)
-    gap_ext = kwargs.get("gap_ext", 0.0)
     gap = kwargs.get("gap", "-")
 
     # Given that `networkx` does not return the sum of edge weights and
@@ -259,7 +242,7 @@ def align(graph, nodes, seq_a, seq_b, scorer, **kwargs):
     for path in list(islice(paths, n_paths)):
         # Build sequential representation of the alignment alignment
         alignment = build_align(path, seq_a, seq_b, gap=gap)
-        alignment["score"] = utils.score_alignment(alignment["seqs"], scorer)
+        alignment["score"] = utils.score_alignment(alignment["seqs"], matrix)
         alignments.append(alignment)
 
     # Sort and return
@@ -281,16 +264,20 @@ def yenksp_align(seq_a, seq_b, k=4, matrix=None, **kwargs):
         sequences).
     """
 
-    # TODO:check with matrix gap symbol
-    gap = kwargs.get("gap", "-")
-
+    # Obtain parameters
     if not matrix:
         matrix = utils.identity_matrix([seq_a, seq_b])
 
-    graph = compute_graph(seq_a, seq_b, matrix, gap)
+    gap = kwargs.get("gap", "-")
+    if gap != matrix.gap:
+        raise ValueError("Different gap symbols.")
 
     # Get the paths extremes, if not provided
     ne_loc = kwargs.get("ne_loc", (0, 0))
     sw_loc = kwargs.get("sw_loc", (len(seq_a), len(seq_b)))
 
+    # Compute the graph for the alignment
+    graph = compute_graph(seq_a, seq_b, matrix, gap)
+
+    # Align from the graph and return
     return align(graph, (ne_loc, sw_loc), seq_a, seq_b, matrix, n_paths=k)

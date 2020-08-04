@@ -186,13 +186,13 @@ class TestMalign(unittest.TestCase):
         assert tuple(matrix_default.alphabets[2]) == ("-", "i", "j")
 
         assert matrix_default["-", "-", "-"] == 0.0
-        assert math.isclose(matrix_default["a", "Y", "j"], 8.0)
-        assert math.isclose(matrix_default["a", "X", "j"], 3.0)
-        assert math.isclose(matrix_default["c", "X", "-"], 0.0)
-        assert math.isclose(matrix_default["b", "-", "i"], 1.0)
-        assert math.isclose(matrix_default["b", "-", "j"], 1.5)
-        assert math.isclose(matrix_default["c", "Y", "j"], 4.0)
-        assert math.isclose(matrix_default["-", "X", "-"], -3.0)
+        assert math.isclose(matrix_default["a", "Y", "j"], 8.0, rel_tol=1e-05)
+        assert math.isclose(matrix_default["a", "X", "j"], 2.428571, rel_tol=1e-05)
+        assert math.isclose(matrix_default["c", "X", "-"], 0.333333, rel_tol=1e-05)
+        assert math.isclose(matrix_default["b", "-", "i"], 0.5, rel_tol=1e-05)
+        assert math.isclose(matrix_default["b", "-", "j"], -0.166666, rel_tol=1e-05)
+        assert math.isclose(matrix_default["c", "Y", "j"], 1.0, rel_tol=1e-05)
+        assert math.isclose(matrix_default["-", "X", "-"], -1.8, rel_tol=1e-05)
 
         assert math.isclose(matrix_distance["a", "X", "j"], 1.3846153846153846)
         assert math.isclose(matrix_distance["c", "X", "-"], 0.6153846153846154)

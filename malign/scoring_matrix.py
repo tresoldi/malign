@@ -250,8 +250,8 @@ class ScoringMatrix:
 
                 # Cache the new value if possible
                 if any(all_sub_scores):
-                    # TODO: allow other methods, such as mean/median
-                    score_cache[key] = np.percentile(all_sub_scores, 50)
+                    # TODO: allow other methods, such as percentile/median
+                    score_cache[key] = np.mean(all_sub_scores)
 
         # Update with the new values
         self.scores.update(score_cache)

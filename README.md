@@ -106,6 +106,10 @@ Version 0.3:
     pad_align, maybe with swaps)
   - Complete documentation for functions, etc.
   - Have NW working within a threshold (that is, not only the best score?)
+  - Implement a method combining anw and yenksp
+  - Allow to set starting and end position for `anw` alignment, for the backtrace
+    function (currently defaulting to lengths in i and j and going all the way to
+    (0, 0))
 
 ## Community guidelines
 
