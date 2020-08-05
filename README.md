@@ -5,10 +5,13 @@
 [![codecov](https://codecov.io/gh/tresoldi/malign/branch/master/graph/badge.svg)](https://codecov.io/gh/tresoldi/malign)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/f6428290a03742e69a6a5cb512a99650)](https://www.codacy.com/manual/tresoldi/malign?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tresoldi/malign&amp;utm_campaign=Badge_Grade)
 
-MALIGN is a library for multiple asymmetric alignments on different alphabets.
-It is currently under initial research and development, but can already be
-used to obtain multiple alignments for DNA sequences.
-
+MALIGN is a library for performing multiple alignments on sequences of different
+alphabets. It allows each sequence to have its own domain, which in turns allows to
+use asymmetric and sparse scoring matrices, including on gaps,
+and to perform real, single-pass multiple alignment, allowing to compute
+`k`-best alignments. While intended for linguistic usage mostly, it can be used for aligning any type of
+sequential representation, and it is particularly suitable as a general-purpose tool
+for cases where there are no prior hypotheses on the scoring matrices.
 
 ## Installation and usage
 
@@ -74,42 +77,29 @@ T - A C G G A T T T
 Version 0.1:
   - First release for internal announcement, testing, and community outreach
 
+Version 0.2:
+  - Major revision with asymmetric Needleman-Wunsch and Yen's `k`-shortest path
+    implementation.
+  - Added scoring matrix object
+  - Sort alignments in consistent and reproducible ways, even when the alignment
+    score is the same
+
 ## Roadmap
 
-Version 0.2:
-  - Setup readthedocs
-  - Sort in consistent and reproducible way all alignments, even when the
-    score is the same
-  - Deal with conflicting package versions due to `lingpy`, or write new
-    NW implementation
-  - Implement single-pass function with defaults, with scorer, graph,
-    destnation, etc.
-
 Version 0.3:
+  - Complete documentation and setup `readthedocs`
   - Add new inference method to sparse matrices using impurity/entropy
-  - Describe in more detail the filling methods, for example how they (especially
-    `standard`) are kinds of MLE
-  - Implement UPGMA/NJ multialignment?
-  - Expand the "longest product" multiwise method to a. include lengths other than
-    the longest (which will probably score lower), as long as they are computable,
-    and b. potentially use the dumb alignment method and just add gaps
-  - Add a partial function for only the best alignment (k=1)
-  - Check where it is worth to remove/reimplement numpy
-  - Implement blocks and local search in Needleman-Wunsch, with different
-    starting/ending positions?
-  - Add function/method to represent graphically the graph used for `yenksp`
-  - Allow excluding nodes/groups of nodes/ranges in yenksp.align (nodes in the
-    graph that should be made unreachable by very high costs/weights)
-  - Implement some cache system for `._fill_domain` in `ScoringMatrix`, for cases when
-    the alphabets are the same (such as with identity matrices)
-  - Consider expanding dumb_malign by adding random gaps (perhaps calling it
-    pad_align, maybe with swaps)
-  - Complete documentation for functions, etc.
-  - Have NW working within a threshold (that is, not only the best score?)
-  - Implement a method combining anw and yenksp
-  - Allow to set starting and end position for `anw` alignment, for the backtrace
-    function (currently defaulting to lengths in i and j and going all the way to
-    (0, 0))
+  - Describe matrix filling methods in more detail
+  - Consider implementation of UPGMA and NJ multiple alignment
+  - Add function/method to visualize the graphs used for the `yenksp` methods
+  - Implement blocks and local search in `anw` and `yenksp`, with different
+    starting/ending positions
+  - Implement memoization where possible
+  - Consider expanding dumb_malign by adding random gaps (`pad_align`), as an additional
+    baseline method
+  - Allow `anw` to work within a threshold percentage of the best score
+  - Implement a method combining the results of the different algorithms
+  - Add methods and demonstration for matrix optimization
 
 ## Community guidelines
 
@@ -119,10 +109,6 @@ pull requests, to contribute, report problems, or seek support.
 
 Contributing guidelines, including a code of conduct, can be found in
 the `CONTRIBUTING.md` file.
-
-## References
-
-https://journals.sagepub.com/doi/abs/10.1177/0049124100029001003?casa_token=uYDn0Ah-288AAAAA:jRQOwcbQyhySiVzMhtMkFC7K3CJatsMcidTtZE2ezQcNyF3dn-1elnr4H7pDWUPFU-6cLZu6IpeBLAA
 
 ## Author and citation
 
@@ -136,16 +122,17 @@ No. [ERC Grant #715618](https://cordis.europa.eu/project/rcn/206320/factsheet/en
 
 If you use `malign`, please cite it as:
 
-  > Tresoldi, Tiago (2020). MALIGN, a library for multiple asymmetric alignments on different alphabets. Version 1.0. Jena.
+  > Tresoldi, Tiago (2020). MALIGN, a library for multiple asymmetric alignments on different alphabets. Version 0.2. Jena.
 
   In BibTeX:
 
 ```bibtex
 @misc{Tresoldi2020malign,
   author = {Tresoldi, Tiago},
-  title = {MALIGN, a library for multiple asymmetric alignments on different alphabets. Version 0.1.},
+  title = {MALIGN, a library for multiple asymmetric alignments on different alphabets. Version 0.2},
   howpublished = {\url{https://github.com/tresoldi/malign}},
   address = {Jena},
+  publisher = {Max Planck Institute for the Science of Human History}
   year = {2020},
 }
 ```
