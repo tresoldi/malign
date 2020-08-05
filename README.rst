@@ -3,9 +3,15 @@ MAlign
 
 |PyPI| |Build Status| |codecov| |Codacy Badge|
 
-MALIGN is a library for multiple asymmetric alignments on different
-alphabets. It is currently under initial research and development, but
-can already be used to obtain multiple alignments for DNA sequences.
+MALIGN is a library for performing multiple alignments on sequences of
+different alphabets. It allows each sequence to have its own domain,
+which in turns allows to use asymmetric and sparse scoring matrices,
+including on gaps, and to perform real, single-pass multiple alignment,
+allowing to compute ``k``-best alignments. While intended for linguistic
+usage mostly, it can be used for aligning any type of sequential
+representation, and it is particularly suitable as a general-purpose
+tool for cases where there are no prior hypotheses on the scoring
+matrices.
 
 Installation and usage
 ----------------------
@@ -73,14 +79,26 @@ Changelog
 Version 0.1: - First release for internal announcement, testing, and
 community outreach
 
+Version 0.2: - Major revision with asymmetric Needleman-Wunsch and Yen’s
+``k``-shortest path implementation. - Added scoring matrix object - Sort
+alignments in consistent and reproducible ways, even when the alignment
+score is the same
+
 Roadmap
 -------
 
-Version 0.2: - Setup readthedocs - Sort in consistent and reproducible
-way all alignments, even when the score is the same - Deal with
-conflicting package versions due to ``lingpy``, or write new NW
-implementation - Implement single-pass function with defaults, with
-scorer, graph, destnation, etc.
+Version 0.3: - Complete documentation and setup ``readthedocs`` - Add
+new inference method to sparse matrices using impurity/entropy -
+Describe matrix filling methods in more detail - Consider implementation
+of UPGMA and NJ multiple alignment - Add function/method to visualize
+the graphs used for the ``yenksp`` methods - Implement blocks and local
+search in ``anw`` and ``yenksp``, with different starting/ending
+positions - Implement memoization where possible - Consider expanding
+dumb_malign by adding random gaps (``pad_align``), as an additional
+baseline method - Allow ``anw`` to work within a threshold percentage of
+the best score - Implement a method combining the results of the
+different algorithms - Add methods and demonstration for matrix
+optimization
 
 Community guidelines
 --------------------
@@ -107,7 +125,7 @@ programme (grant agreement No. \ `ERC Grant
 If you use ``malign``, please cite it as:
 
    Tresoldi, Tiago (2020). MALIGN, a library for multiple asymmetric
-   alignments on different alphabets. Version 1.0. Jena.
+   alignments on different alphabets. Version 0.2. Jena.
 
 In BibTeX:
 
@@ -115,9 +133,10 @@ In BibTeX:
 
    @misc{Tresoldi2020malign,
      author = {Tresoldi, Tiago},
-     title = {MALIGN, a library for multiple asymmetric alignments on different alphabets. Version 0.1.},
+     title = {MALIGN, a library for multiple asymmetric alignments on different alphabets. Version 0.2},
      howpublished = {\url{https://github.com/tresoldi/malign}},
      address = {Jena},
+     publisher = {Max Planck Institute for the Science of Human History}
      year = {2020},
    }
 
