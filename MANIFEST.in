@@ -3,4 +3,9 @@ include AUTHORS.md
 include CONTRIBUTING.md
 include LICENSE
 include requirements.txt
-include resources/*
+include resources/bdpa/*
+include resources/cmudict/*
+include resources/neurodecipher/*
+include resources/northeuralex/*
+include resources/wiktionary/*
+includes docs/*
