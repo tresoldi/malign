@@ -5,10 +5,13 @@
 [![codecov](https://codecov.io/gh/tresoldi/malign/branch/master/graph/badge.svg)](https://codecov.io/gh/tresoldi/malign)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/f6428290a03742e69a6a5cb512a99650)](https://www.codacy.com/manual/tresoldi/malign?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tresoldi/malign&amp;utm_campaign=Badge_Grade)
 
-MALIGN is a library for multiple asymmetric alignments on different alphabets.
-It is currently under initial research and development, but can already be
-used to obtain multiple alignments for DNA sequences.
-
+MALIGN is a library for performing multiple alignments on sequences of different
+alphabets. It allows each sequence to have its own domain, which in turns allows to
+use asymmetric and sparse scoring matrices, including on gaps,
+and to perform real, single-pass multiple alignment, allowing to compute
+`k`-best alignments. While intended for linguistic usage mostly, it can be used for aligning any type of
+sequential representation, and it is particularly suitable as a general-purpose tool
+for cases where there are no prior hypotheses on the scoring matrices.
 
 ## Installation and usage
 
@@ -21,52 +24,76 @@ In any standard Python environment, `malign` can be installed with:
 $ pip install malign
 ```
 
-For most purposes, it is enough to pass the two sequences to be aligned,
-along with a scorer, to the `get_aligns()` function:
+For most purposes, it is enough to pass the sequences to be aligned and a method
+(such as `anw` or `yenksp`) to the `.multi_align()` function:
 
 
 ```python
->> import malign
->> seq1 = ["A", "T", "T", "C", "G", "G", "A", "T"]
->> seq2 = ["T", "A", "C", "G", "G", "A", "T", "T", "T"]
->> graph = malign.compute_graph(seq1, seq2, malign.DNA_SCORER)
->> dest = "%i:%i" % (len(seq1), len(seq2))
->> aligns = malign.get_aligns(graph, ("0:0", dest), seq1, seq2, 4)
->> for idx, align in enumerate(aligns):
->>   print(" ".join(align[0][0]), align[1])
->>   print(" ".join(align[0][1]), "\n")
-A T T C G G A - - T 84.0
-T A - C G G A T T T
-
-A T T C G G A - - T 84.0
-T - A C G G A T T T
-
-A T T C G G A T - - 84.0
-T A - C G G A T T T
-
-A T T C G G A T - - 84.0
-T - A C G G A T T T
+>>> import malign                                                                                                      
+>>> alms = malign.multi_align(["ATTCGGAT", "TACGGATTT"], "anw", k=2)                                                   
+>>> print(malign.tabulate_alms(alms))                                                                                  
+| Idx   | Seq   |   Score |  #0  |  #1  |  #2  |  #3  |  #4  |  #5  |  #6  |  #7  |  #8  |  #9  |
+|-------|-------|---------|------|------|------|------|------|------|------|------|------|------|
+| 0     | A     |   -0.29 |  A   |  T   |  T   |  C   |  G   |  G   |  A   |  -   |  T   |  -   |
+| 0     | B     |   -0.29 |  -   |  T   |  A   |  C   |  G   |  G   |  A   |  T   |  T   |  T   |
+|       |       |         |      |      |      |      |      |      |      |      |      |      |
+| 1     | A     |   -0.29 |  A   |  T   |  T   |  C   |  G   |  G   |  A   |  -   |  -   |  T   |
+| 1     | B     |   -0.29 |  -   |  T   |  A   |  C   |  G   |  G   |  A   |  T   |  T   |  T   |
 ```
 
-The library can also be used by means of the command-line `malign` tool:
+Scoring matrices can be either computed with the auxiliary methods, including various
+optimizations, or read from JSON files:
+
+```python
+>>> ita_rus = malign.ScoringMatrix(filename="docs/ita_rus.matrix")
+>>> alms = malign.multi_align(["Giacomo", "Яков"], k=4, method="anw", matrix=ita_rus)
+>>> print(malign.tabulate_alms(alms))
+| Idx   | Seq   |   Score |  #0  |  #1  |  #2  |  #3  |  #4  |  #5  |  #6  |  #7  |
+|-------|-------|---------|------|------|------|------|------|------|------|------|
+| 0     | A     |    2.86 |  G   |  i   |  a   |  c   |  o   |  m   |  o   |      |
+| 0     | B     |    2.86 |  -   |  Я   |  -   |  к   |  о   |  в   |  -   |      |
+|       |       |         |      |      |      |      |      |      |      |      |
+| 1     | A     |    2.29 |  G   |  i   |  a   |  c   |  o   |  m   |  o   |      |
+| 1     | B     |    2.29 |  -   |  Я   |  -   |  к   |  о   |  -   |  в   |      |
+|       |       |         |      |      |      |      |      |      |      |      |
+| 2     | A     |    2.12 |  G   |  i   |  a   |  c   |  o   |  m   |  o   |  -   |
+| 2     | B     |    2.12 |  -   |  Я   |  -   |  к   |  о   |  -   |  -   |  в   |
+|       |       |         |      |      |      |      |      |      |      |      |
+| 3     | A     |    2.12 |  G   |  i   |  a   |  c   |  o   |  m   |  o   |  -   |
+| 3     | B     |    2.12 |  -   |  Я   |  -   |  к   |  -   |  -   |  о   |  в   |
+
+```
+
+The library can also be used by means of the command-line `malign` tool. If no matrix
+is provided, an identity one is used by default.
 
 ```bash
-$ malign --dna ATTCGGAT TACGGATTT
-Alignment #0 (score: 84.00)
-A T T C G G A - - T
-T A - C G G A T T T
+$ ▶ malign baba,maa
+| Idx   | Seq   |   Score |  #0  |  #1  |  #2  |  #3  |
+|-------|-------|---------|------|------|------|------|
+| 0     | A     |   -0.47 |  b   |  a   |  b   |  a   |
+| 0     | B     |   -0.47 |  m   |  a   |  -   |  a   |
 
-Alignment #1 (score: 84.00)
-A T T C G G A - - T
-T - A C G G A T T T
-
-Alignment #2 (score: 84.00)
-A T T C G G A T - -
-T A - C G G A T T T
-
-Alignment #3 (score: 84.00)
-A T T C G G A T - -
-T - A C G G A T T T
+$ ▶ malign --matrix docs/ita_rus.matrix -k 6 Giacomo,Яков
+| Idx   | Seq   |   Score |  #0  |  #1  |  #2  |  #3  |  #4  |  #5  |  #6  |  #7  |
+|-------|-------|---------|------|------|------|------|------|------|------|------|
+| 0     | A     |    2.86 |  G   |  i   |  a   |  c   |  o   |  m   |  o   |      |
+| 0     | B     |    2.86 |  -   |  Я   |  -   |  к   |  о   |  в   |  -   |      |
+|       |       |         |      |      |      |      |      |      |      |      |
+| 1     | A     |    2.29 |  G   |  i   |  a   |  c   |  o   |  m   |  o   |      |
+| 1     | B     |    2.29 |  -   |  Я   |  -   |  к   |  о   |  -   |  в   |      |
+|       |       |         |      |      |      |      |      |      |      |      |
+| 2     | A     |    2.12 |  G   |  i   |  a   |  c   |  o   |  m   |  o   |  -   |
+| 2     | B     |    2.12 |  -   |  Я   |  -   |  к   |  о   |  -   |  -   |  в   |
+|       |       |         |      |      |      |      |      |      |      |      |
+| 3     | A     |    2.12 |  G   |  i   |  a   |  c   |  o   |  m   |  o   |  -   |
+| 3     | B     |    2.12 |  -   |  Я   |  -   |  к   |  -   |  -   |  о   |  в   |
+|       |       |         |      |      |      |      |      |      |      |      |
+| 4     | A     |    2.12 |  G   |  i   |  a   |  c   |  o   |  m   |  -   |  o   |
+| 4     | B     |    2.12 |  -   |  Я   |  -   |  к   |  о   |  -   |  в   |  -   |
+|       |       |         |      |      |      |      |      |      |      |      |
+| 5     | A     |    2.12 |  G   |  i   |  a   |  c   |  o   |  -   |  m   |  o   |
+| 5     | B     |    2.12 |  -   |  Я   |  -   |  к   |  о   |  в   |  -   |  -   |
 ```
 
 ## Changelog
@@ -74,16 +101,29 @@ T - A C G G A T T T
 Version 0.1:
   - First release for internal announcement, testing, and community outreach
 
+Version 0.2:
+  - Major revision with asymmetric Needleman-Wunsch and Yen's `k`-shortest path
+    implementation.
+  - Added scoring matrix object
+  - Sort alignments in consistent and reproducible ways, even when the alignment
+    score is the same
+
 ## Roadmap
 
-Version 0.2:
-  - Setup readthedocs
-  - Sort in consistent and reproducible way all alignments, even when the
-    score is the same
-  - Deal with conflicting package versions due to `lingpy`, or write new
-    NW implementation
-  - Implement single-pass function with defaults, with scorer, graph,
-    destnation, etc.
+Version 0.3:
+  - Complete documentation and setup `readthedocs`
+  - Add new inference method to sparse matrices using impurity/entropy
+  - Describe matrix filling methods in more detail
+  - Consider implementation of UPGMA and NJ multiple alignment
+  - Add function/method to visualize the graphs used for the `yenksp` methods
+  - Implement blocks and local search in `anw` and `yenksp`, with different
+    starting/ending positions
+  - Implement memoization where possible
+  - Consider expanding dumb_malign by adding random gaps (`pad_align`), as an additional
+    baseline method
+  - Allow `anw` to work within a threshold percentage of the best score
+  - Implement a method combining the results of the different algorithms
+  - Add methods and demonstration for matrix optimization
 
 ## Community guidelines
 
@@ -106,16 +146,17 @@ No. [ERC Grant #715618](https://cordis.europa.eu/project/rcn/206320/factsheet/en
 
 If you use `malign`, please cite it as:
 
-  > Tresoldi, Tiago (2020). MALIGN, a library for multiple asymmetric alignments on different alphabets. Version 1.0. Jena.
+  > Tresoldi, Tiago (2020). MALIGN, a library for multiple asymmetric alignments on different alphabets. Version 0.2. Jena.
 
   In BibTeX:
 
 ```bibtex
 @misc{Tresoldi2020malign,
   author = {Tresoldi, Tiago},
-  title = {MALIGN, a library for multiple asymmetric alignments on different alphabets. Version 0.1.},
+  title = {MALIGN, a library for multiple asymmetric alignments on different alphabets. Version 0.2},
   howpublished = {\url{https://github.com/tresoldi/malign}},
   address = {Jena},
+  publisher = {Max Planck Institute for the Science of Human History}
   year = {2020},
 }
 ```
