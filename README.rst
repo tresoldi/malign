@@ -25,53 +25,76 @@ In any standard Python environment, ``malign`` can be installed with:
 
    $ pip install malign
 
-For most purposes, it is enough to pass the two sequences to be aligned,
-along with a scorer, to the ``get_aligns()`` function:
+For most purposes, it is enough to pass the sequences to be aligned and
+a method (such as ``anw`` or ``yenksp``) to the ``.multi_align()``
+function:
 
 .. code:: python
 
-   >> import malign
-   >> seq1 = ["A", "T", "T", "C", "G", "G", "A", "T"]
-   >> seq2 = ["T", "A", "C", "G", "G", "A", "T", "T", "T"]
-   >> graph = malign.compute_graph(seq1, seq2, malign.DNA_SCORER)
-   >> dest = "%i:%i" % (len(seq1), len(seq2))
-   >> aligns = malign.get_aligns(graph, ("0:0", dest), seq1, seq2, 4)
-   >> for idx, align in enumerate(aligns):
-   >>   print(" ".join(align[0][0]), align[1])
-   >>   print(" ".join(align[0][1]), "\n")
-   A T T C G G A - - T 84.0
-   T A - C G G A T T T
+   >>> import malign                                                                                                      
+   >>> alms = malign.multi_align(["ATTCGGAT", "TACGGATTT"], "anw", k=2)                                                   
+   >>> print(malign.tabulate_alms(alms))                                                                                  
+   | Idx   | Seq   |   Score |  #0  |  #1  |  #2  |  #3  |  #4  |  #5  |  #6  |  #7  |  #8  |  #9  |
+   |-------|-------|---------|------|------|------|------|------|------|------|------|------|------|
+   | 0     | A     |   -0.29 |  A   |  T   |  T   |  C   |  G   |  G   |  A   |  -   |  T   |  -   |
+   | 0     | B     |   -0.29 |  -   |  T   |  A   |  C   |  G   |  G   |  A   |  T   |  T   |  T   |
+   |       |       |         |      |      |      |      |      |      |      |      |      |      |
+   | 1     | A     |   -0.29 |  A   |  T   |  T   |  C   |  G   |  G   |  A   |  -   |  -   |  T   |
+   | 1     | B     |   -0.29 |  -   |  T   |  A   |  C   |  G   |  G   |  A   |  T   |  T   |  T   |
 
-   A T T C G G A - - T 84.0
-   T - A C G G A T T T
+Scoring matrices can be either computed with the auxiliary methods,
+including various optimizations, or read from JSON files:
 
-   A T T C G G A T - - 84.0
-   T A - C G G A T T T
+.. code:: python
 
-   A T T C G G A T - - 84.0
-   T - A C G G A T T T
+   >>> ita_rus = malign.ScoringMatrix(filename="docs/ita_rus.matrix")
+   >>> alms = malign.multi_align(["Giacomo", "Яков"], k=4, method="anw", matrix=ita_rus)
+   >>> print(malign.tabulate_alms(alms))
+   | Idx   | Seq   |   Score |  #0  |  #1  |  #2  |  #3  |  #4  |  #5  |  #6  |  #7  |
+   |-------|-------|---------|------|------|------|------|------|------|------|------|
+   | 0     | A     |    2.86 |  G   |  i   |  a   |  c   |  o   |  m   |  o   |      |
+   | 0     | B     |    2.86 |  -   |  Я   |  -   |  к   |  о   |  в   |  -   |      |
+   |       |       |         |      |      |      |      |      |      |      |      |
+   | 1     | A     |    2.29 |  G   |  i   |  a   |  c   |  o   |  m   |  o   |      |
+   | 1     | B     |    2.29 |  -   |  Я   |  -   |  к   |  о   |  -   |  в   |      |
+   |       |       |         |      |      |      |      |      |      |      |      |
+   | 2     | A     |    2.12 |  G   |  i   |  a   |  c   |  o   |  m   |  o   |  -   |
+   | 2     | B     |    2.12 |  -   |  Я   |  -   |  к   |  о   |  -   |  -   |  в   |
+   |       |       |         |      |      |      |      |      |      |      |      |
+   | 3     | A     |    2.12 |  G   |  i   |  a   |  c   |  o   |  m   |  o   |  -   |
+   | 3     | B     |    2.12 |  -   |  Я   |  -   |  к   |  -   |  -   |  о   |  в   |
 
 The library can also be used by means of the command-line ``malign``
-tool:
+tool. If no matrix is provided, an identity one is used by default.
 
 .. code:: bash
 
-   $ malign --dna ATTCGGAT TACGGATTT
-   Alignment #0 (score: 84.00)
-   A T T C G G A - - T
-   T A - C G G A T T T
+   $ ▶ malign baba,maa
+   | Idx   | Seq   |   Score |  #0  |  #1  |  #2  |  #3  |
+   |-------|-------|---------|------|------|------|------|
+   | 0     | A     |   -0.47 |  b   |  a   |  b   |  a   |
+   | 0     | B     |   -0.47 |  m   |  a   |  -   |  a   |
 
-   Alignment #1 (score: 84.00)
-   A T T C G G A - - T
-   T - A C G G A T T T
-
-   Alignment #2 (score: 84.00)
-   A T T C G G A T - -
-   T A - C G G A T T T
-
-   Alignment #3 (score: 84.00)
-   A T T C G G A T - -
-   T - A C G G A T T T
+   $ ▶ malign --matrix docs/ita_rus.matrix -k 6 Giacomo,Яков
+   | Idx   | Seq   |   Score |  #0  |  #1  |  #2  |  #3  |  #4  |  #5  |  #6  |  #7  |
+   |-------|-------|---------|------|------|------|------|------|------|------|------|
+   | 0     | A     |    2.86 |  G   |  i   |  a   |  c   |  o   |  m   |  o   |      |
+   | 0     | B     |    2.86 |  -   |  Я   |  -   |  к   |  о   |  в   |  -   |      |
+   |       |       |         |      |      |      |      |      |      |      |      |
+   | 1     | A     |    2.29 |  G   |  i   |  a   |  c   |  o   |  m   |  o   |      |
+   | 1     | B     |    2.29 |  -   |  Я   |  -   |  к   |  о   |  -   |  в   |      |
+   |       |       |         |      |      |      |      |      |      |      |      |
+   | 2     | A     |    2.12 |  G   |  i   |  a   |  c   |  o   |  m   |  o   |  -   |
+   | 2     | B     |    2.12 |  -   |  Я   |  -   |  к   |  о   |  -   |  -   |  в   |
+   |       |       |         |      |      |      |      |      |      |      |      |
+   | 3     | A     |    2.12 |  G   |  i   |  a   |  c   |  o   |  m   |  o   |  -   |
+   | 3     | B     |    2.12 |  -   |  Я   |  -   |  к   |  -   |  -   |  о   |  в   |
+   |       |       |         |      |      |      |      |      |      |      |      |
+   | 4     | A     |    2.12 |  G   |  i   |  a   |  c   |  o   |  m   |  -   |  o   |
+   | 4     | B     |    2.12 |  -   |  Я   |  -   |  к   |  о   |  -   |  в   |  -   |
+   |       |       |         |      |      |      |      |      |      |      |      |
+   | 5     | A     |    2.12 |  G   |  i   |  a   |  c   |  o   |  -   |  m   |  o   |
+   | 5     | B     |    2.12 |  -   |  Я   |  -   |  к   |  о   |  в   |  -   |  -   |
 
 Changelog
 ---------
