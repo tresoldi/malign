@@ -19,12 +19,23 @@ def parse_arguments():
     """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("seq_a", type=str, help="The first string to be aligned")
-    parser.add_argument("seq_b", type=str, help="The second string to be aligned")
+    parser.add_argument("seqs", type=str, help="The sequences to align")
     parser.add_argument(
-        "--dna",
-        action="store_true",
-        help="Whether to use the standard DNA scorer (default: uniform scorer)",
+        "--seq_sep",
+        type=str,
+        default=",",
+        help="The sequence delimiter character (default: `,`)",
+    )
+    parser.add_argument(
+        "--matrix",
+        type=str,
+        help="Path to the matrix file to use (if not provided, the method default will be used)",
+    )
+    parser.add_argument(
+        "--method",
+        type=str,
+        default="anw",
+        help="The alignment method to use (default: `anw`)",
     )
     parser.add_argument(
         "-k",
@@ -45,24 +56,19 @@ def main():
     # Parse command-line arguments
     args = parse_arguments()
 
-    # Run alignments
-    dna_seq1 = [base for base in args.seq_a]
-    dna_seq2 = [base for base in args.seq_b]
-    if args.dna:
-        scorer = malign.kbest.fill_scorer("ACGT", "ACGT", malign.DNA_SCORER)
+    # Get sequences
+    seqs = [[tok for tok in seq] for seq in args.seqs.split(args.seq_sep)]
+
+    # Load matrix, if any
+    if args.matrix:
+        matrix = malign.ScoringMatrix(filename=args.matrix)
     else:
-        scorer = malign.kbest.fill_scorer("ACGT", "ACGT")
-    graph = malign.kbest.compute_graph(dna_seq1, dna_seq2, scorer)
+        matrix = None
 
-    dest = (len(dna_seq1), len(dna_seq2))
-    aligns = malign.kbest.align(graph, ((0, 0), dest), dna_seq1, dna_seq2, args.k)
+    # Run alignment
+    alms = malign.multi_align(seqs, args.method, k=args.k, matrix=matrix)
 
-    # Output
-    for idx, align in enumerate(aligns):
-        print("Alignment #%i (score: %.2f)" % (idx, align["score"]))
-        print(" ".join(align["a"]), align["score_a"])
-        print(" ".join(align["b"]), align["score_b"])
-        print()
+    print(malign.tabulate_alms(alms))
 
 
 if __name__ == "__main__":
