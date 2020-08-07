@@ -8,4 +8,4 @@ include resources/cmudict/*
 include resources/neurodecipher/*
 include resources/northeuralex/*
 include resources/wiktionary/*
-includes docs/*
+include docs/*
