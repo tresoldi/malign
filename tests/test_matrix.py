@@ -208,16 +208,21 @@ class TestMalign(unittest.TestCase):
         """
 
         # Build sub matrices, and then the main matrix
-        matrix01 = malign.ScoringMatrix(PAIRWISE_TEST_SPARSE_VECTOR_01)
-        matrix02 = malign.ScoringMatrix(PAIRWISE_TEST_SPARSE_VECTOR_02)
-        matrix = malign.ScoringMatrix(
-            scores={}, sub_matrices={(0, 1): matrix01, (0, 2): matrix02}
-        )
+        scores_01 = {
+            (key[0], key[1], None): value
+            for key, value in PAIRWISE_TEST_SPARSE_VECTOR_01.items()
+        }
+        scores_02 = {
+            (key[0], None, key[1]): value
+            for key, value in PAIRWISE_TEST_SPARSE_VECTOR_02.items()
+        }
+        scores = {**scores_01, **scores_02}
+        matrix = malign.ScoringMatrix(scores)
 
         # Assertions
         assert matrix.num_domains == 3
         assert matrix.gap == "-"
-        assert len(matrix.scores) == 60
+        assert len(matrix.scores) == 51
         assert len(matrix.domains) == 3
 
         assert matrix["-", "-", "-"] == 0.0
@@ -227,7 +232,7 @@ class TestMalign(unittest.TestCase):
         assert math.isclose(matrix["b", "-", "i"], -5.0)
         assert math.isclose(matrix["b", "-", "j"], 2.0)
         assert math.isclose(matrix["c", "Y", "j"], 5.5)
-        assert math.isclose(matrix["-", "X", "-"], -1.5)
+        assert math.isclose(matrix["-", "X", "-"], -3)
 
     def test_subdomain_query(self):
         """
