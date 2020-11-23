@@ -57,13 +57,13 @@ class ScoringMatrix:
             A dictionary with domains (tuples of ints) as scorers and
             ScoringMatrices as values. Assumes the sub-matrices are
             complete.
-        alphabets : list of lists of strings
-            A list of lists of strings, with the alphabets of each domain
-            that will be used for alignment. If provided, the alphabet lists
-            will be sorted. If not provided, it will be
+        domains : list of lists of strings
+            A list of lists of strings, with the set of symbols ("domain") that
+            composes each domain that will be used for alignment. If provided,
+            the domain lists will be sorted. If not provided, it will be
             computed from the `scores`, assuming that all symbols are used
             at least once. Note that, by definition, the gap symbol must be
-            part of the alphabet (unless it is explicitly assumed that the
+            part of the domain (unless it is explicitly assumed that the
             domain does not allow gaps).
         gap : str
             The string to use as a gap symbol. Defaults to `-`.
@@ -89,54 +89,54 @@ class ScoringMatrix:
             self._fill_method = kwargs.get("fill_method", "standard")
             self.gap = kwargs.get("gap", "-")
 
-            # Extract the alphabets or build them, if they were not provided;
+            # Extract the domains or build them, if they were not provided;
             # during extraction, `None`s are removed as the user or the library might
             # be passing sub-matrices as well (as when creating an identity matrix,
             # when it makes more sense to provide the sub-matrix identities)
-            self.alphabets = kwargs.get("alphabets", None)
+            self.domains = kwargs.get("domains", None)
 
-            if self.alphabets:
-                # Organize provided alphabets
-                self.alphabets = [sorted(alphabet) for alphabet in self.alphabets]
+            if self.domains:
+                # Organize provided domains
+                self.domains = [sorted(domain) for domain in self.domains]
 
-                # Make sure the alphabets contain all symbols used in `scores`
+                # Make sure the domains contain all symbols used in `scores`
                 # TODO: add check for submatrices' symbols, if provided
-                scores_alphabets = list(zip(*scores.keys()))
+                scores_domains = list(zip(*scores.keys()))
                 available = [
-                    all([symbol in ref_alphabet for symbol in scores_alphabet])
-                    for scores_alphabet, ref_alphabet in zip(
-                        scores_alphabets, self.alphabets
+                    all([symbol in ref_domain for symbol in scores_domain])
+                    for scores_domain, ref_domain in zip(
+                        scores_domains, self.domains
                     )
                 ]
                 if not all(available):
-                    raise ValueError("`scores` has symbols not in alphabets.")
+                    raise ValueError("`scores` has symbols not in domains.")
 
             else:
-                # Collect alphabet from scores; if no `scores` were provided but
-                # only `sub_matrices`, we need to initialize `self.alphabets` to the
+                # Collect domain from scores; if no `scores` were provided but
+                # only `sub_matrices`, we need to initialize `self.domains` to the
                 # length we can derive from the `sub_matrices` keys
                 if scores:
-                    self.alphabets = [
-                        list(alphabet) for alphabet in zip(*scores.keys())
+                    self.domains = [
+                        list(domain) for domain in zip(*scores.keys())
                     ]
                 else:
-                    num_alphabets = max([max(domain) for domain in sub_matrices])
-                    self.alphabets = [[] for _ in range(num_alphabets + 1)]
+                    num_domains = max([max(domain) for domain in sub_matrices])
+                    self.domains = [[] for _ in range(num_domains + 1)]
 
-                # Extend with alphabets from submatrices, if they were provided
+                # Extend with domains from submatrices, if they were provided
                 for sub_matrix, obj in sub_matrices.items():
-                    for dmn, alphabet in zip(sub_matrix, obj.alphabets):
-                        self.alphabets[dmn] += alphabet
+                    for dmn, domain in zip(sub_matrix, obj.domains):
+                        self.domains[dmn] += domain
 
                 # Make sorted lists, making sure the gap is there
-                self.alphabets = [
+                self.domains = [
                     sorted(
                         set(
-                            [symbol for symbol in alphabet if symbol is not None]
+                            [symbol for symbol in domain if symbol is not None]
                             + [self.gap]
                         )
                     )
-                    for alphabet in self.alphabets
+                    for domain in self.domains
                 ]
 
             # Initialize from the scores
@@ -193,7 +193,7 @@ class ScoringMatrix:
         # Fill the matrix with the appropriate method if requested. Note that it is
         # not easy to verify beforehand if the matrix needs to be filled, as the
         # combination of submatrices and different domains implies that the
-        # expected size is not necessarily the product of the alphabets. For making
+        # expected size is not necessarily the product of the domains. For making
         # the code simpler to follow, no check is performed beforehand.
         if self._fill_method:
             if self._fill_method == "standard":
@@ -239,7 +239,7 @@ class ScoringMatrix:
         # available `sub_scores`. We cache the new values in order to only
         # apply them after the loop, not changing `self.scores` in-place.
         score_cache = {}
-        for key in itertools.product(*self.alphabets):
+        for key in itertools.product(*self.domains):
             if key not in self.scores:
                 # Collect all sub-scores
                 all_sub_scores = []
@@ -261,7 +261,7 @@ class ScoringMatrix:
         """
 
         score_cache = {}
-        for cur_key in itertools.product(*self.alphabets):
+        for cur_key in itertools.product(*self.domains):
             if cur_key not in self.scores:
 
                 _scores = []
@@ -308,9 +308,9 @@ class ScoringMatrix:
         symbol_score = {key: np.mean(scores) for key, scores in symbol_score.items()}
         gap_score = np.mean(gap_scores)
 
-        for key in itertools.product(*self.alphabets):
+        for key in itertools.product(*self.domains):
             if key not in self.scores:
-                # If the alphabet passed by the user has symbols not in the scorer,
+                # If the domain passed by the user has symbols not in the scorer,
                 # we will have a KeyError in symbol_score[domain_idx][symbol]; the
                 # `.get()` will default towards the `gap`, which is always necessary
                 num_gaps = len([value for value in key if value == self.gap])
@@ -335,14 +335,14 @@ class ScoringMatrix:
             Tuble of the sub-domain to be filled.
         """
 
-        # Obtain the alphabets of the sub-domain
-        sub_alphabets = [
-            self.alphabets[d_idx] if d_idx in domain else [None] for d_idx in self._dr
+        # Obtain the domains of the sub-domain
+        sub_domains = [
+            self.domains[d_idx] if d_idx in domain else [None] for d_idx in self._dr
         ]
 
         # Fill keys
         # TODO: investigate better subsetting, loops to unroll
-        for sub_key in itertools.product(*sub_alphabets):
+        for sub_key in itertools.product(*sub_domains):
             if sub_key not in self.scores:
                 if all([value == self.gap for value in sub_key]):
                     continue
@@ -372,7 +372,7 @@ class ScoringMatrix:
 
             self.gap = serial_data["gap"]
             self._dr = tuple(serial_data["domain_range"])
-            self.alphabets = serial_data["alphabets"].copy()
+            self.domains = serial_data["domains"].copy()
 
             # Make sure values are floats
             self.scores = {
@@ -396,8 +396,8 @@ class ScoringMatrix:
         """
 
         # Make sure the reserved symbol is not used
-        if any([" / " in alphabet for alphabet in self.alphabets]):
-            raise ValueError("At least one alphabet uses reserved symbols.")
+        if any([" / " in domain for domain in self.domains]):
+            raise ValueError("At least one domain uses reserved symbols.")
 
         # Make a copy of `self.scores` replacing `None`s, which cannot be part
         # of the key as per the JSON standard, with a custom element, which
@@ -415,7 +415,7 @@ class ScoringMatrix:
 
         # Build serialized data
         serial_data = {
-            "alphabets": self.alphabets,
+            "domains": self.domains,
             "gap": self.gap,
             "domain_range": list(self._dr),
             "scores": _scores,
@@ -470,7 +470,7 @@ class ScoringMatrix:
 
     # TODO: currently only working for 2 or 3 domains
     # TODO: use more options from tabulate
-    # TODO: check about identity matrix? from alphabets with a method?
+    # TODO: check about identity matrix? from domains with a method?
     def tabulate(self):
         """
         Build a string with a tabulated representation of the matrix.
@@ -485,28 +485,28 @@ class ScoringMatrix:
         rows = []
         if self.num_domains == 2:
 
-            for symbol_a in self.alphabets[0]:
+            for symbol_a in self.domains[0]:
                 row = [symbol_a] + [
-                    self.scores[symbol_a, symbol_b] for symbol_b in self.alphabets[1]
+                    self.scores[symbol_a, symbol_b] for symbol_b in self.domains[1]
                 ]
                 rows.append(row)
 
-            headers = [""] + list(self.alphabets[1])
+            headers = [""] + list(self.domains[1])
 
         elif self.num_domains == 3:
             rows = []
-            for symbol_a in self.alphabets[0]:
+            for symbol_a in self.domains[0]:
                 row = [symbol_a] + [
                     self.scores.get((symbol_a, symbol_b, symbol_c), "-")
                     for symbol_b, symbol_c in itertools.product(
-                        self.alphabets[1], self.alphabets[2]
+                        self.domains[1], self.domains[2]
                     )
                 ]
                 rows.append(row)
 
             headers = [""] + [
                 "/" + "/".join(sub_key)
-                for sub_key in itertools.product(self.alphabets[1], self.alphabets[2])
+                for sub_key in itertools.product(self.domains[1], self.domains[2])
             ]
         else:
             raise ValueError("number of domains is not two or 3")
@@ -553,9 +553,9 @@ class ScoringMatrix:
     def __setitem__(self, key, value):
         # We need to treat `None`, as usual
         matches = [
-            k in alphabet for k, alphabet in zip(key, self.alphabets) if k is not None
+            k in domain for k, domain in zip(key, self.domains) if k is not None
         ]
         if not all(matches):
-            raise ValueError("`key` uses symbol(s) not in alphabet.")
+            raise ValueError("`key` uses symbol(s) not in domain.")
 
         self.scores[tuple(key)] = value
