@@ -10,8 +10,8 @@ Tests for the scoring matrices of the `malign` package.
 
 # TODO: add test for identity matrix
 # TODO: add test for initialization only from sparse subdomain
-# TODO: add test providing alphabets
-# TODO: add, in general, tests where there is disagreement between scores/subm/alphabet
+# TODO: add test providing domains
+# TODO: add, in general, tests where there is disagreement between scores/subm/domain
 # TODO: replace .num_domains with len(.domains) -- or maybe just __len__?
 
 # Import Python libraries
@@ -117,34 +117,34 @@ class TestMalign(unittest.TestCase):
         assert len(matrix.scores) == 12
         assert matrix["-", "-"] == 0.0
         assert matrix["a", "Y"] == 8.0
-        assert len(matrix.alphabets) == 2
-        assert tuple(matrix.alphabets[1]) == ("-", "X", "Y")
+        assert len(matrix.domains) == 2
+        assert tuple(matrix.domains[1]) == ("-", "X", "Y")
 
-    def test_pairwise_from_full_vectors_with_alphabets(self):
+    def test_pairwise_from_full_vectors_with_domains(self):
         """
-        Test pairwise matrices built from complete vectors with alphabets.
+        Test pairwise matrices built from complete vectors with domains.
         """
 
-        # Build matrix with "correct" alphabets
+        # Build matrix with "correct" domains
         matrix_a = malign.ScoringMatrix(
-            PAIRWISE_TEST_VECTORS, alphabets=[["-", "a", "b", "c"], ["-", "X", "Y"]]
+            PAIRWISE_TEST_VECTORS, domains=[["-", "a", "b", "c"], ["-", "X", "Y"]]
         )
 
-        # Build matrix with "expanded" alphabets
+        # Build matrix with "expanded" domains
         matrix_b = malign.ScoringMatrix(
             PAIRWISE_TEST_VECTORS,
-            alphabets=[["-", "a", "b", "c", "d"], ["-", "X", "Y", "Z"]],
+            domains=[["-", "a", "b", "c", "d"], ["-", "X", "Y", "Z"]],
         )
 
-        # Build matrix with "insufficient" alphabets
+        # Build matrix with "insufficient" domains
         with self.assertRaises(ValueError):
             malign.ScoringMatrix(
-                PAIRWISE_TEST_VECTORS, alphabets=[["-", "a", "b"], ["-", "Y", "Z"]]
+                PAIRWISE_TEST_VECTORS, domains=[["-", "a", "b"], ["-", "Y", "Z"]]
             )
 
         # Assertions
-        assert tuple(matrix_a.alphabets[1]) == ("-", "X", "Y")
-        assert tuple(matrix_b.alphabets[1]) == ("-", "X", "Y", "Z")
+        assert tuple(matrix_a.domains[1]) == ("-", "X", "Y")
+        assert tuple(matrix_b.domains[1]) == ("-", "X", "Y", "Z")
 
     def test_multiwise_from_full_vectors(self):
         """
@@ -158,8 +158,8 @@ class TestMalign(unittest.TestCase):
         assert matrix.num_domains == 3
         assert matrix.gap == "-"
         assert len(matrix.scores) == 36
-        assert len(matrix.alphabets) == 3
-        assert tuple(matrix.alphabets[2]) == ("-", "i", "j")
+        assert len(matrix.domains) == 3
+        assert tuple(matrix.domains[2]) == ("-", "i", "j")
         assert matrix["-", "-", "-"] == 0.0
         assert math.isclose(matrix["a", "Y", "j"], 8.0)
 
@@ -183,8 +183,8 @@ class TestMalign(unittest.TestCase):
         assert matrix_default.num_domains == 3
         assert matrix_default.gap == "-"
         assert len(matrix_default.scores) == 36
-        assert len(matrix_default.alphabets) == 3
-        assert tuple(matrix_default.alphabets[2]) == ("-", "i", "j")
+        assert len(matrix_default.domains) == 3
+        assert tuple(matrix_default.domains[2]) == ("-", "i", "j")
 
         assert matrix_default["-", "-", "-"] == 0.0
         assert math.isclose(matrix_default["a", "Y", "j"], 8.0, rel_tol=1e-05)
@@ -218,7 +218,7 @@ class TestMalign(unittest.TestCase):
         assert matrix.num_domains == 3
         assert matrix.gap == "-"
         assert len(matrix.scores) == 60
-        assert len(matrix.alphabets) == 3
+        assert len(matrix.domains) == 3
 
         assert matrix["-", "-", "-"] == 0.0
         assert math.isclose(matrix["a", "Y", "j"], 5.0)
@@ -258,7 +258,7 @@ class TestMalign(unittest.TestCase):
 
         # Assertions
         assert matrix.scores == matrix2.scores
-        assert tuple(matrix.alphabets) == tuple(matrix2.alphabets)
+        assert tuple(matrix.domains) == tuple(matrix2.domains)
 
     def test_copy(self):
         """
@@ -273,7 +273,7 @@ class TestMalign(unittest.TestCase):
 
         # Perform manual comparison
         assert ref_matrix.scores == cpy_matrix.scores
-        assert ref_matrix.alphabets == cpy_matrix.alphabets
+        assert ref_matrix.domains == cpy_matrix.domains
 
     def test_set_item(self):
         """
