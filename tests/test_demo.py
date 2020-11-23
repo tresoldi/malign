@@ -214,7 +214,7 @@ class TestMalignResults(unittest.TestCase):
 
         filename = Path(__file__).parent.parent
         filename = filename / "docs" / "ita_rus.matrix"
-        ita_rus = malign.ScoringMatrix(filename=filename.as_posix())
+        ita_rus = malign.ScoringMatrix(filename.as_posix())
 
         alms = malign.multi_align(
             ["Giacomo", "Яков"], k=4, method="anw", matrix=ita_rus
@@ -230,8 +230,8 @@ class TestMalignResults(unittest.TestCase):
         docs_path = Path(__file__).parent.parent
         filename_a = docs_path / "docs" / "ita_rus.matrix"
         filename_b = docs_path / "docs" / "ita_grk.matrix"
-        ita_rus = malign.ScoringMatrix(filename=filename_a.as_posix())
-        ita_grk = malign.ScoringMatrix(filename=filename_b.as_posix())
+        ita_rus = malign.ScoringMatrix(filename_a.as_posix())
+        ita_grk = malign.ScoringMatrix(filename_b.as_posix())
 
         full_matrix = malign.ScoringMatrix(
             scores={}, sub_matrices={(0, 1): ita_rus, (0, 2): ita_grk}

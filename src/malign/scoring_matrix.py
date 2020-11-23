@@ -25,13 +25,13 @@ class ScoringMatrix:
     multidimensionality of the matrices for multiple alignmentes used in
     this library, that is:
 
-      - a unique alphabet for each sequence
+      - a unique domain for each sequence (even if the domains are
+        equal)
       - asymmetric information
       - gaps are full, normal "symbols"
 
     The object especially facilitates dealing with sparse matrices/vectors and
-    with submatrices (i.e., not full domains), both for querying and for
-    building.
+    with submatrices, both for querying and for building.
     """
 
     def __init__(self, scores=None, **kwargs):
@@ -45,16 +45,14 @@ class ScoringMatrix:
         Parameters
         ==========
 
-        scores : dict
-            A scoring dictionary, with tuples of strings as keys (respecting
+        scores : str or dict
+            Either a string with the path to a serialized matrix in JSON format,
+            or a scoring dictionary, with tuples of strings as keys (respecting
             the order that will be used when using the matrix) and floating
             points as values. Exclusive-gap alignments (that is, keys
             composed only of gaps) will be overriden to a value of 0.0 if
-            provided. Subdomains are indicated by `None` valus in the keys.
+            provided. Unused domains are indicated by `None` values in the keys.
             Defaults to `None`.
-        filename : str
-            A string with the path to a serialized matrix in JSON format. Either
-            `scores` or `filename` must be provided when initializing a matrix.
         sub_matrices : dict
             A dictionary with domains (tuples of ints) as scorers and
             ScoringMatrices as values. Assumes the sub-matrices are
@@ -76,14 +74,13 @@ class ScoringMatrix:
             Defaults to the `"standard"` method.
         """
 
-        # Extract `scores`, `filename`, and `submatrices`, if provided
-        filename = kwargs.get("filename", None)
+        # Extract `submatrices`, if provided
         sub_matrices = kwargs.get("sub_matrices", {})
 
         # If a filename was provided, load a serialized matrix; otherwise, initialize
         # from user provided `scores`
-        if filename:
-            self._load(filename)
+        if isinstance(scores, str):
+            self._load(scores)
         else:
             # Extract additional values; note that these, as everything else, are
             # not considered when loading from disk
