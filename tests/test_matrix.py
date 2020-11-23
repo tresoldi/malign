@@ -253,7 +253,7 @@ class TestMalign(unittest.TestCase):
         matrix.save(handler.name)
 
         # Load and check
-        matrix2 = malign.ScoringMatrix(filename=handler.name)
+        matrix2 = malign.ScoringMatrix(handler.name)
 
         # Assertions
         assert matrix.scores == matrix2.scores
