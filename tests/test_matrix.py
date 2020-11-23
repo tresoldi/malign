@@ -12,6 +12,7 @@ Tests for the scoring matrices of the `malign` package.
 # TODO: add test for initialization only from sparse subdomain
 # TODO: add test providing alphabets
 # TODO: add, in general, tests where there is disagreement between scores/subm/alphabet
+# TODO: replace .num_domains with len(.domains) -- or maybe just __len__?
 
 # Import Python libraries
 import math
@@ -111,7 +112,7 @@ class TestMalign(unittest.TestCase):
         matrix = malign.ScoringMatrix(PAIRWISE_TEST_VECTORS)
 
         # Assertions
-        assert matrix.domains == 2
+        assert matrix.num_domains == 2
         assert matrix.gap == "-"
         assert len(matrix.scores) == 12
         assert matrix["-", "-"] == 0.0
@@ -154,7 +155,7 @@ class TestMalign(unittest.TestCase):
         matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
 
         # Assertions
-        assert matrix.domains == 3
+        assert matrix.num_domains == 3
         assert matrix.gap == "-"
         assert len(matrix.scores) == 36
         assert len(matrix.alphabets) == 3
@@ -179,7 +180,7 @@ class TestMalign(unittest.TestCase):
         matrix_distance = malign.ScoringMatrix(vectors, fill_method="distance")
 
         # Assertions
-        assert matrix_default.domains == 3
+        assert matrix_default.num_domains == 3
         assert matrix_default.gap == "-"
         assert len(matrix_default.scores) == 36
         assert len(matrix_default.alphabets) == 3
@@ -214,7 +215,7 @@ class TestMalign(unittest.TestCase):
         )
 
         # Assertions
-        assert matrix.domains == 3
+        assert matrix.num_domains == 3
         assert matrix.gap == "-"
         assert len(matrix.scores) == 60
         assert len(matrix.alphabets) == 3
