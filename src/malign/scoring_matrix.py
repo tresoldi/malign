@@ -34,7 +34,7 @@ class ScoringMatrix:
     with submatrices, both for querying and for building.
     """
 
-    def __init__(self, scores=None, **kwargs):
+    def __init__(self, scores, **kwargs):
         """
         Initialize a scoring matrix.
 
@@ -77,8 +77,6 @@ class ScoringMatrix:
         else:
             # Extract additional values; note that these, as everything else, are
             # not considered when loading from disk
-
-            # Store values
             self._fill_method = kwargs.get("fill_method", "standard")
             self.gap = kwargs.get("gap", "-")
 
@@ -88,20 +86,7 @@ class ScoringMatrix:
             # when it makes more sense to provide the sub-matrix identities)
             self.domains = kwargs.get("domains", None)
 
-            if self.domains:
-                # Organize provided domains
-                self.domains = [sorted(domain) for domain in self.domains]
-
-                # Make sure the domains contain all symbols used in `scores`
-                scores_domains = list(zip(*scores.keys()))
-                available = [
-                    all([symbol in ref_domain for symbol in scores_domain])
-                    for scores_domain, ref_domain in zip(scores_domains, self.domains)
-                ]
-                if not all(available):
-                    raise ValueError("`scores` has symbols not in domains.")
-
-            else:
+            if not self.domains:
                 # Collect domain from scores; if no `scores` were provided but
                 # only `sub_matrices`, we need to initialize `self.domains` to the
                 # length we can derive from the `sub_matrices` keys
@@ -109,14 +94,23 @@ class ScoringMatrix:
 
                 # Make sorted lists, making sure the gap is there
                 self.domains = [
-                    sorted(
-                        set(
-                            [symbol for symbol in domain if symbol is not None]
-                            + [self.gap]
-                        )
-                    )
+                    set([symbol for symbol in domain if symbol] + [self.gap])
                     for domain in self.domains
                 ]
+
+            # Organize provided domains
+            self.domains = [sorted(set(domain)) for domain in self.domains]
+
+            # Make sure the domains contain all symbols used in `scores`; while this would
+            # not be strictly necessary when the domains are collected automatically,
+            # it is still good to keep a simpler loop for that
+            scores_domains = list(zip(*scores.keys()))
+            found = [
+                all([symbol in ref_domain for symbol in scores_domain if symbol])
+                for scores_domain, ref_domain in zip(scores_domains, self.domains)
+            ]
+            if not all(found):
+                raise ValueError("`scores` has symbols not in domains.")
 
             # Initialize from the scores
             self._init_from_scores(scores)
@@ -525,6 +519,7 @@ class ScoringMatrix:
 
         return self.scores[tuple(key)]
 
+    # TODO: make sure this is only available for debug, etc.
     def __setitem__(self, key, value):
         # We need to treat `None`, as usual
         matches = [k in domain for k, domain in zip(key, self.domains) if k is not None]
