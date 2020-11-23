@@ -100,14 +100,14 @@ class TestMalignResults(unittest.TestCase):
             ("c", "j"): 4.0,
         }
 
-        matrix01 = malign.ScoringMatrix(vector_01)
-        matrix02 = malign.ScoringMatrix(vector_02)
-        matrix = malign.ScoringMatrix(
-            scores={}, sub_matrices={(0, 1): matrix01, (0, 2): matrix02}
-        )
+        scores_01 = {(key[0], key[1], None): value for key, value in vector_01.items()}
+        scores_02 = {(key[0], None, key[1]): value for key, value in vector_02.items()}
+        scores = {**scores_01, **scores_02}
 
-        assert isclose(matrix["-", "-", "i"], -0.75)
-        assert isclose(matrix["b", "X", "i"], -3)
+        matrix = malign.ScoringMatrix(scores)
+
+        assert isclose(matrix["-", "-", "i"], -1.663636, rel_tol=1e-05)
+        assert isclose(matrix["b", "X", "i"], -5.0)
         assert isclose(matrix["c", "Y", "j"], 5.5)
 
     def test_identity_matrix(self):
@@ -233,9 +233,16 @@ class TestMalignResults(unittest.TestCase):
         ita_rus = malign.ScoringMatrix(filename_a.as_posix())
         ita_grk = malign.ScoringMatrix(filename_b.as_posix())
 
-        full_matrix = malign.ScoringMatrix(
-            scores={}, sub_matrices={(0, 1): ita_rus, (0, 2): ita_grk}
-        )
+        # TODO: have/function methods that does this
+        scores_ita_rus = {
+            (key[0], key[1], None): value for key, value in ita_rus.scores.items()
+        }
+        scores_ita_grk = {
+            (key[0], None, key[1]): value for key, value in ita_grk.scores.items()
+        }
+        scores = {**scores_ita_rus, **scores_ita_grk}
+
+        full_matrix = malign.ScoringMatrix(scores)
         full_matrix["o", "в", "ο"] = -4
         full_matrix["i", "-", "Ι"] = -4
         full_matrix["c", "к", "κ"] = 10

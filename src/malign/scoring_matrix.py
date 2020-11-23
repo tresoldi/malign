@@ -53,10 +53,6 @@ class ScoringMatrix:
             composed only of gaps) will be overriden to a value of 0.0 if
             provided. Unused domains are indicated by `None` values in the keys.
             Defaults to `None`.
-        sub_matrices : dict
-            A dictionary with domains (tuples of ints) as scorers and
-            ScoringMatrices as values. Assumes the sub-matrices are
-            complete.
         domains : list of lists of strings
             A list of lists of strings, with the set of symbols ("domain") that
             composes each domain that will be used for alignment. If provided,
@@ -73,9 +69,6 @@ class ScoringMatrix:
             matrix will not be filled. Choices are `"standard"` and `"distance"`.
             Defaults to the `"standard"` method.
         """
-
-        # Extract `submatrices`, if provided
-        sub_matrices = kwargs.get("sub_matrices", {})
 
         # If a filename was provided, load a serialized matrix; otherwise, initialize
         # from user provided `scores`
@@ -100,13 +93,10 @@ class ScoringMatrix:
                 self.domains = [sorted(domain) for domain in self.domains]
 
                 # Make sure the domains contain all symbols used in `scores`
-                # TODO: add check for submatrices' symbols, if provided
                 scores_domains = list(zip(*scores.keys()))
                 available = [
                     all([symbol in ref_domain for symbol in scores_domain])
-                    for scores_domain, ref_domain in zip(
-                        scores_domains, self.domains
-                    )
+                    for scores_domain, ref_domain in zip(scores_domains, self.domains)
                 ]
                 if not all(available):
                     raise ValueError("`scores` has symbols not in domains.")
@@ -115,18 +105,7 @@ class ScoringMatrix:
                 # Collect domain from scores; if no `scores` were provided but
                 # only `sub_matrices`, we need to initialize `self.domains` to the
                 # length we can derive from the `sub_matrices` keys
-                if scores:
-                    self.domains = [
-                        list(domain) for domain in zip(*scores.keys())
-                    ]
-                else:
-                    num_domains = max([max(domain) for domain in sub_matrices])
-                    self.domains = [[] for _ in range(num_domains + 1)]
-
-                # Extend with domains from submatrices, if they were provided
-                for sub_matrix, obj in sub_matrices.items():
-                    for dmn, domain in zip(sub_matrix, obj.domains):
-                        self.domains[dmn] += domain
+                self.domains = [list(domain) for domain in zip(*scores.keys())]
 
                 # Make sorted lists, making sure the gap is there
                 self.domains = [
@@ -140,27 +119,23 @@ class ScoringMatrix:
                 ]
 
             # Initialize from the scores
-            self._init_from_scores(scores, sub_matrices)
+            self._init_from_scores(scores)
 
-    def _init_from_scores(self, scores, sub_matrices):
+    def _init_from_scores(self, scores):
         """
         Internal function for initializing from user-provided scores.
         """
 
         # Make sure all `scores` report the same number of domains, store
         # the number of domains
-        if scores:
-            num_domains = {len(key) for key in scores}
-            if len(num_domains) > 1:
-                raise ValueError("Different domain-lengths in `scores`.")
+        num_domains = {len(key) for key in scores}
+        if len(num_domains) > 1:
+            raise ValueError("Different domain-lengths in `scores`.")
 
-            # Copy `domains` and define the global, full `domain range`
-            # NOTE: the comma after `self.num_domains` is used to unpack the
-            # `domains` set, which at this point we know contains a single
-            # item
-            self.num_domains, = num_domains
-        else:
-            self.num_domains = 1 + max([max(domain) for domain in sub_matrices])
+        # Copy `domains` and define the global, full `domain range`
+        # NOTE: the comma after `self.num_domains` is used to unpack the
+        # `domains` set, which at this point we know contains a single item
+        self.num_domains, = num_domains
 
         # Store a copy of the `scores` and cache the `domain_range` as an internal
         # variable (as it will be used repeated times -- the one facing the user
@@ -172,23 +147,23 @@ class ScoringMatrix:
         self.scores[tuple([self.gap] * self.num_domains)] = 0.0
 
         # Add submatrices, if provided
-        for sub_domain, matrix in sub_matrices.items():
-            # We need to index the submatrix with its `._dr`, as the indexes
-            # we need are the ones in this matrix being initialized. Note
-            # how we keep a single dictionary, filling missing spots with `None`
-            # pylint: disable=protected-access
-            mapper = dict(zip(sub_domain, matrix._dr))
-            for sub_key, score in matrix.scores.items():
-                # sub_key ('b', 'X') -> new_key ['b', 'X', None]
-                # sub_key ('c', '-') -> new_key ['c', '-', None]
-                # sub_key ('a', '-') -> new_key ['a', None, '-']
-                new_key = [
-                    sub_key[idx] if idx is not None else None
-                    for idx in [mapper.get(idx, None) for idx in self._dr]
-                ]
-
-                # Make sure all values are floats
-                self.scores[tuple(new_key)] = float(score)
+        #        for sub_domain, matrix in sub_matrices.items():
+        #            # We need to index the submatrix with its `._dr`, as the indexes
+        #            # we need are the ones in this matrix being initialized. Note
+        #            # how we keep a single dictionary, filling missing spots with `None`
+        #            # pylint: disable=protected-access
+        #            mapper = dict(zip(sub_domain, matrix._dr))
+        #            for sub_key, score in matrix.scores.items():
+        #                # sub_key ('b', 'X') -> new_key ['b', 'X', None]
+        #                # sub_key ('c', '-') -> new_key ['c', '-', None]
+        #                # sub_key ('a', '-') -> new_key ['a', None, '-']
+        #                new_key = [
+        #                    sub_key[idx] if idx is not None else None
+        #                    for idx in [mapper.get(idx, None) for idx in self._dr]
+        #                ]
+        #
+        #                # Make sure all values are floats
+        #                self.scores[tuple(new_key)] = float(score)
 
         # Fill the matrix with the appropriate method if requested. Note that it is
         # not easy to verify beforehand if the matrix needs to be filled, as the
@@ -552,9 +527,7 @@ class ScoringMatrix:
 
     def __setitem__(self, key, value):
         # We need to treat `None`, as usual
-        matches = [
-            k in domain for k, domain in zip(key, self.domains) if k is not None
-        ]
+        matches = [k in domain for k, domain in zip(key, self.domains) if k is not None]
         if not all(matches):
             raise ValueError("`key` uses symbol(s) not in domain.")
 
