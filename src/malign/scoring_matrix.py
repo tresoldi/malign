@@ -150,26 +150,26 @@ class ScoringMatrix:
         # Make sure all `scores` report the same number of domains, store
         # the number of domains
         if scores:
-            domains = {len(key) for key in scores}
-            if len(domains) > 1:
+            num_domains = {len(key) for key in scores}
+            if len(num_domains) > 1:
                 raise ValueError("Different domain-lengths in `scores`.")
 
             # Copy `domains` and define the global, full `domain range`
-            # NOTE: the comma after `self.domains` is used to unpack the
+            # NOTE: the comma after `self.num_domains` is used to unpack the
             # `domains` set, which at this point we know contains a single
             # item
-            self.domains, = domains
+            self.num_domains, = num_domains
         else:
-            self.domains = 1 + max([max(domain) for domain in sub_matrices])
+            self.num_domains = 1 + max([max(domain) for domain in sub_matrices])
 
         # Store a copy of the `scores` and cache the `domain_range` as an internal
         # variable (as it will be used repeated times -- the one facing the user
-        # is `self.domains`)
+        # is `self.num_domains`)
         self.scores = scores.copy()
-        self._dr = tuple(range(self.domains))
+        self._dr = tuple(range(self.num_domains))
 
         # Set (or override) the value of all-gap vector
-        self.scores[tuple([self.gap] * self.domains)] = 0.0
+        self.scores[tuple([self.gap] * self.num_domains)] = 0.0
 
         # Add submatrices, if provided
         for sub_domain, matrix in sub_matrices.items():
@@ -483,7 +483,7 @@ class ScoringMatrix:
         """
 
         rows = []
-        if self.domains == 2:
+        if self.num_domains == 2:
 
             for symbol_a in self.alphabets[0]:
                 row = [symbol_a] + [
@@ -493,7 +493,7 @@ class ScoringMatrix:
 
             headers = [""] + list(self.alphabets[1])
 
-        elif self.domains == 3:
+        elif self.num_domains == 3:
             rows = []
             for symbol_a in self.alphabets[0]:
                 row = [symbol_a] + [
