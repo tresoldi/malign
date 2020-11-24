@@ -157,7 +157,7 @@ class TestMalign(unittest.TestCase):
         # Assertions
         assert matrix.num_domains == 3
         assert matrix.gap == "-"
-        assert len(matrix.scores) == 36
+        assert len(matrix.scores) == 69
         assert len(matrix.domains) == 3
         assert tuple(matrix.domains[2]) == ("-", "i", "j")
         assert matrix["-", "-", "-"] == 0.0
@@ -177,30 +177,30 @@ class TestMalign(unittest.TestCase):
         vectors.pop(("c", "Y", "j"))
         vectors.pop(("-", "X", "-"))
         matrix_default = malign.ScoringMatrix(vectors)
-        matrix_distance = malign.ScoringMatrix(vectors, fill_method="distance")
+        #    matrix_distance = malign.ScoringMatrix(vectors, impute_method="distance")
 
         # Assertions
         assert matrix_default.num_domains == 3
         assert matrix_default.gap == "-"
-        assert len(matrix_default.scores) == 36
+        assert len(matrix_default.scores) == 69
         assert len(matrix_default.domains) == 3
         assert tuple(matrix_default.domains[2]) == ("-", "i", "j")
 
         assert matrix_default["-", "-", "-"] == 0.0
-        assert math.isclose(matrix_default["a", "Y", "j"], 8.0, rel_tol=1e-05)
-        assert math.isclose(matrix_default["a", "X", "j"], 2.428571, rel_tol=1e-05)
-        assert math.isclose(matrix_default["c", "X", "-"], 0.333333, rel_tol=1e-05)
-        assert math.isclose(matrix_default["b", "-", "i"], 0.5, rel_tol=1e-05)
-        assert math.isclose(matrix_default["b", "-", "j"], -0.166666, rel_tol=1e-05)
-        assert math.isclose(matrix_default["c", "Y", "j"], 1.0, rel_tol=1e-05)
-        assert math.isclose(matrix_default["-", "X", "-"], -1.8, rel_tol=1e-05)
+        assert math.isclose(matrix_default["a", "Y", "j"], 8.0, rel_tol=1e-04)
+        assert math.isclose(matrix_default["a", "X", "j"], 2.83974, rel_tol=1e-04)
+        assert math.isclose(matrix_default["c", "X", "-"], 0.48655, rel_tol=1e-04)
+        assert math.isclose(matrix_default["b", "-", "i"], 1.36074, rel_tol=1e-04)
+        assert math.isclose(matrix_default["b", "-", "j"], 1.45179, rel_tol=1e-04)
+        assert math.isclose(matrix_default["c", "Y", "j"], 1.43649, rel_tol=1e-04)
+        assert math.isclose(matrix_default["-", "X", "-"], -3.45639, rel_tol=1e-04)
 
-        assert math.isclose(matrix_distance["a", "X", "j"], 1.3846153846153846)
-        assert math.isclose(matrix_distance["c", "X", "-"], 0.6153846153846154)
-        assert math.isclose(matrix_distance["b", "-", "i"], 0.5357142857142857)
-        assert math.isclose(matrix_distance["b", "-", "j"], 0.46153846153846156)
-        assert math.isclose(matrix_distance["c", "Y", "j"], 0.7407407407407407)
-        assert math.isclose(matrix_distance["-", "X", "-"], -0.9629629629629629)
+    #    assert math.isclose(matrix_distance["a", "X", "j"], 1.38461, rel_tol=1e-04)
+    #    assert math.isclose(matrix_distance["c", "X", "-"], 0.61538, rel_tol=1e-04)
+    #    assert math.isclose(matrix_distance["b", "-", "i"], 0.53571, rel_tol=1e-04)
+    #    assert math.isclose(matrix_distance["b", "-", "j"], 0.46153, rel_tol=1e-04)
+    #    assert math.isclose(matrix_distance["c", "Y", "j"], 0.74074, rel_tol=1e-04)
+    #    assert math.isclose(matrix_distance["-", "X", "-"], -0.96296, rel_tol=1e-04)
 
     def test_multiwise_from_subvectors(self):
         """
@@ -222,17 +222,17 @@ class TestMalign(unittest.TestCase):
         # Assertions
         assert matrix.num_domains == 3
         assert matrix.gap == "-"
-        assert len(matrix.scores) == 51
+        assert len(matrix.scores) == 69
         assert len(matrix.domains) == 3
 
         assert matrix["-", "-", "-"] == 0.0
-        assert math.isclose(matrix["a", "Y", "j"], 5.0)
-        assert math.isclose(matrix["a", "X", "j"], 1.0)
-        assert math.isclose(matrix["c", "X", "-"], -4.0)
-        assert math.isclose(matrix["b", "-", "i"], -5.0)
-        assert math.isclose(matrix["b", "-", "j"], 2.0)
-        assert math.isclose(matrix["c", "Y", "j"], 5.5)
-        assert math.isclose(matrix["-", "X", "-"], -3)
+        assert math.isclose(matrix["a", "Y", "j"], 7.29478, rel_tol=1e-05)
+        assert math.isclose(matrix["a", "X", "j"], 2.91425, rel_tol=1e-05)
+        assert math.isclose(matrix["c", "X", "-"], -2.40041, rel_tol=1e-05)
+        assert math.isclose(matrix["b", "-", "i"], -1.67591, rel_tol=1e-05)
+        assert math.isclose(matrix["b", "-", "j"], 1.87231, rel_tol=1e-05)
+        assert math.isclose(matrix["c", "Y", "j"], 6.80505, rel_tol=1e-05)
+        assert math.isclose(matrix["-", "X", "-"], -2.19299, rel_tol=1e-05)
 
     def test_subdomain_query(self):
         """
@@ -242,9 +242,9 @@ class TestMalign(unittest.TestCase):
         # Build matrices with the various filling methods
         matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
 
-        assert math.isclose(matrix[None, "X", "i"], 4.0)
-        assert math.isclose(matrix["c", None, "i"], 7.0)
-        assert math.isclose(matrix["c", "X", None], 6.0)
+        assert math.isclose(matrix[None, "X", "i"], 0.653183, rel_tol=1e-05)
+        assert math.isclose(matrix["c", None, "i"], 0.53235, rel_tol=1e-05)
+        assert math.isclose(matrix["c", "X", None], 1.33871, rel_tol=1e-05)
 
     def test_load_save(self):
         """

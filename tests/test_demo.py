@@ -68,12 +68,13 @@ class TestMalignResults(unittest.TestCase):
         }
 
         matrix_std = malign.ScoringMatrix(vectors)
-        matrix_fill = malign.ScoringMatrix(vectors, fill_method="distance")
+        #    matrix_fill = malign.ScoringMatrix(vectors, impute_method="distance")
 
-        assert isclose(matrix_std["a", "-"], 1.25)
-        assert isclose(matrix_std["c", "Y"], 0.8)
-        assert isclose(matrix_fill["a", "-"], 1.0)
-        assert isclose(matrix_fill["c", "Y"], 0.8)
+        assert isclose(matrix_std["a", "-"], 0.00118, rel_tol=1e-03)
+        assert isclose(matrix_std["c", "Y"], 0.00098, rel_tol=1e-03)
+
+    #    assert isclose(matrix_fill["a", "-"], 1.0, rel_tol=1e-03)
+    #    assert isclose(matrix_fill["c", "Y"], 0.8, rel_tol=1e-03)
 
     def test_matrix_from_sub_matrices(self):
         """
@@ -106,9 +107,9 @@ class TestMalignResults(unittest.TestCase):
 
         matrix = malign.ScoringMatrix(scores)
 
-        assert isclose(matrix["-", "-", "i"], -1.663636, rel_tol=1e-05)
-        assert isclose(matrix["b", "X", "i"], -5.0)
-        assert isclose(matrix["c", "Y", "j"], 5.5)
+        assert isclose(matrix["-", "-", "i"], -1.33253, rel_tol=1e-05)
+        assert isclose(matrix["b", "X", "i"], -1.25966, rel_tol=1e-05)
+        assert isclose(matrix["c", "Y", "j"], 6.80505, rel_tol=1e-05)
 
     def test_identity_matrix(self):
         """
@@ -148,13 +149,10 @@ class TestMalignResults(unittest.TestCase):
             ("-", "B", "3"): -5,
         }
         matrix = malign.ScoringMatrix(scores)
+
         assert isclose(matrix["a", "A", "2"], 4.0, rel_tol=1e-05)  # provided
-        assert isclose(
-            matrix["-", "-", "3"], -4.0, rel_tol=1e-05
-        )  # inferred in first round
-        assert isclose(
-            matrix["c", "-", "4"], -1.439491, rel_tol=1e-05
-        )  # inferred in second round
+        assert isclose(matrix["-", "-", "3"], -7.51025, rel_tol=1e-05)
+        assert isclose(matrix["c", "-", "4"], -2.01180, rel_tol=1e-05)
 
     def test_dumb_alignment(self):
         """
@@ -249,21 +247,12 @@ class TestMalignResults(unittest.TestCase):
 
         seqs = ["Giacomo", "Яков", "Ιακωβος"]
         nw_alms = malign.multi_align(seqs, method="anw", k=4, matrix=full_matrix)
-        assert tuple(nw_alms[0]["seqs"][1]) == ("-", "Я", "-", "к", "о", "-", "-", "в")
-        assert isclose(nw_alms[0]["score"], 3.412499, rel_tol=1e-05)
+        assert tuple(nw_alms[0]["seqs"][1]) == ("Я", "к", "о", "в", "-", "-", "-")
+        assert isclose(nw_alms[0]["score"], 2.12027, rel_tol=1e-05)
 
         yenksp_alms = malign.multi_align(seqs, method="yenksp", k=2, matrix=full_matrix)
-        assert tuple(yenksp_alms[0]["seqs"][1]) == (
-            "-",
-            "Я",
-            "-",
-            "к",
-            "о",
-            "в",
-            "-",
-            "-",
-        )
-        assert isclose(yenksp_alms[0]["score"], 3.412499, rel_tol=1e-05)
+        assert tuple(yenksp_alms[0]["seqs"][1]) == ("Я", "-", "-", "к", "о", "в", "-")
+        assert isclose(yenksp_alms[0]["score"], 2.12027, rel_tol=1e-05)
 
     # TODO: reimplement these tests
     def test_alignment_identity(self):
