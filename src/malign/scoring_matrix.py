@@ -3,6 +3,7 @@ Module for scoring matrices.
 """
 
 # check https://scikit-learn.org/stable/modules/impute.html
+# https://scikit-learn.org/stable/auto_examples/impute/plot_iterative_imputer_variants_comparison.html#sphx-glr-auto-examples-impute-plot-iterative-imputer-variants-comparison-py
 
 # Import Python standard libraries
 from collections import defaultdict
@@ -13,6 +14,9 @@ import json
 # Import 3rd-party libraries
 import numpy as np
 from tabulate import tabulate
+
+from sklearn.experimental import enable_iterative_imputer
+from sklearn.impute import IterativeImputer
 
 
 class ScoringMatrix:
@@ -63,7 +67,7 @@ class ScoringMatrix:
             domain does not allow gaps).
         gap : str
             The string to use as a gap symbol. Defaults to `-`.
-        fill_method : string or None
+        impute_method : string or None
             The method used to fill empty elements in the matrix, using
             values computed from the ones provided. If set to `None`, the
             matrix will not be filled. Choices are `"standard"` and `"distance"`.
@@ -77,7 +81,7 @@ class ScoringMatrix:
         else:
             # Extract additional values; note that these, as everything else, are
             # not considered when loading from disk
-            self._fill_method = kwargs.get("fill_method", "standard")
+            self._impute_method = kwargs.get("impute_method", "standard")
             self.gap = kwargs.get("gap", "-")
 
             # Extract the domains or build them, if they were not provided;
@@ -90,7 +94,7 @@ class ScoringMatrix:
                 # Collect domain from scores; if no `scores` were provided but
                 # only `sub_matrices`, we need to initialize `self.domains` to the
                 # length we can derive from the `sub_matrices` keys
-                self.domains = [list(domain) for domain in zip(*scores.keys())]
+                self.domains = list(zip(*scores.keys()))
 
                 # Make sorted lists, making sure the gap is there
                 self.domains = [
@@ -98,19 +102,8 @@ class ScoringMatrix:
                     for domain in self.domains
                 ]
 
-            # Organize provided domains
+            # Organize the domains
             self.domains = [sorted(set(domain)) for domain in self.domains]
-
-            # Make sure the domains contain all symbols used in `scores`; while this would
-            # not be strictly necessary when the domains are collected automatically,
-            # it is still good to keep a simpler loop for that
-            scores_domains = list(zip(*scores.keys()))
-            found = [
-                all([symbol in ref_domain for symbol in scores_domain if symbol])
-                for scores_domain, ref_domain in zip(scores_domains, self.domains)
-            ]
-            if not all(found):
-                raise ValueError("`scores` has symbols not in domains.")
 
             # Initialize from the scores
             self._init_from_scores(scores)
@@ -121,176 +114,108 @@ class ScoringMatrix:
         """
 
         # Make sure all `scores` report the same number of domains, store
-        # the number of domains
-        num_domains = {len(key) for key in scores}
-        if len(num_domains) > 1:
-            raise ValueError("Different domain-lengths in `scores`.")
-
-        # Copy `domains` and define the global, full `domain range`
+        # the number of domains and an internal variable with the range (which
+        # is used multiple times; the one facing the user is `self.num_domains`)
         # NOTE: the comma after `self.num_domains` is used to unpack the
         # `domains` set, which at this point we know contains a single item
-        self.num_domains, = num_domains
-
-        # Store a copy of the `scores` and cache the `domain_range` as an internal
-        # variable (as it will be used repeated times -- the one facing the user
-        # is `self.num_domains`)
-        self.scores = scores.copy()
+        self.num_domains = {len(key) for key in scores}
+        if len(self.num_domains) > 1:
+            raise ValueError("Different domain-lengths in `scores`.")
+        self.num_domains, = self.num_domains
         self._dr = tuple(range(self.num_domains))
 
-        # Set (or override) the value of all-gap vector
+        # Make sure the domains contain all symbols used in `scores`; while this would
+        # not be strictly necessary when the domains are collected automatically,
+        # it is still good to keep a simpler loop for that
+        scores_domains = list(zip(*scores.keys()))
+        found = [
+            all([symbol in ref_domain for symbol in scores_domain if symbol])
+            for scores_domain, ref_domain in zip(scores_domains, self.domains)
+        ]
+        if not all(found):
+            raise ValueError("`scores` has symbols not in domains.")
+
+        # Store a copy of the `scores` and set (or override) the value of the
+        # all-gap vector
+        self.scores = scores.copy()
         self.scores[tuple([self.gap] * self.num_domains)] = 0.0
 
-        # Add submatrices, if provided
-        #        for sub_domain, matrix in sub_matrices.items():
-        #            # We need to index the submatrix with its `._dr`, as the indexes
-        #            # we need are the ones in this matrix being initialized. Note
-        #            # how we keep a single dictionary, filling missing spots with `None`
-        #            # pylint: disable=protected-access
-        #            mapper = dict(zip(sub_domain, matrix._dr))
-        #            for sub_key, score in matrix.scores.items():
-        #                # sub_key ('b', 'X') -> new_key ['b', 'X', None]
-        #                # sub_key ('c', '-') -> new_key ['c', '-', None]
-        #                # sub_key ('a', '-') -> new_key ['a', None, '-']
-        #                new_key = [
-        #                    sub_key[idx] if idx is not None else None
-        #                    for idx in [mapper.get(idx, None) for idx in self._dr]
-        #                ]
-        #
-        #                # Make sure all values are floats
-        #                self.scores[tuple(new_key)] = float(score)
-
-        # Fill the matrix with the appropriate method if requested. Note that it is
-        # not easy to verify beforehand if the matrix needs to be filled, as the
-        # combination of submatrices and different domains implies that the
-        # expected size is not necessarily the product of the domains. For making
-        # the code simpler to follow, no check is performed beforehand.
-        if self._fill_method:
-            if self._fill_method == "standard":
-                self._fill_matrix_standard()
-            elif self._fill_method == "distance":
-                self._fill_matrix_distance()
-            else:
+        # Fill the matrix with the appropriate method if requested.
+        # TODO: check before-hand if it is necessary
+        if self._impute_method:
+            if self._impute_method not in ["standard"]:
                 raise ValueError("Unknown filling method.")
 
-            # Run the fallback for cells we could not fit, if any
-            self._fill_matrix_fallback()
+            self._fill_matrix_standard()
 
     def _fill_matrix_standard(self):
         """
         Internal function for filling a matrix with the `standard` method.
         """
 
-        # For each domain, we first collect all keys without considering
-        # the symbol in the domain itself, and fill any missing spot with
-        # the some descriptive value (mean, median, percentile, etc.).
-        # No difference is made in terms of treatment of gaps.
-        # Example: if we have ('a', 'A', '1')==10 and ('b', 'A', '1')==0, but
-        # no ('c', 'A', '1'), this will set the latter to the mean value
-        # of 5, as coming from (?, 'A', '1')
-        sub_scores = {}
-        for domain_idx in self._dr:
-            # Collect all sub-keys and values
-            sub_scores[domain_idx] = defaultdict(list)
-            for key, score in self.scores.items():
-                # Don't account for the full gap vector
-                if all([v == self.gap for v in key]):
-                    continue
+        # We perform matrix imputation on multi-hot vectors, with one true position
+        # for each domain. `None`, as used for submatrices, is always mapped to
+        # the first site of its domain; the gap symbol will be part of the sorted
+        # list of symbols, if found. In order to do that, we build an initial list
+        # of all domain/values, so we can fill the vectors. We call it `encoder` due
+        # to analogy with data analysis pipelines, even though it is not strictly
+        # an encoder but an auxiliary data structure.
+        encoder = list(
+            itertools.chain.from_iterable(
+                [
+                    [(domain_idx, value) for value in [None] + domain_values]
+                    for domain_idx, domain_values in enumerate(self.domains)
+                ]
+            )
+        )
 
-                sub_key = tuple(
-                    [value for idx, value in enumerate(key) if idx != domain_idx]
-                )
+        # Fill the matrix for inputation for each possible combination
+        domains_with_none = [[None] + domain for domain in self.domains]
+        train_matrix = []
+        imp_matrix = []
+        for cat_vector in itertools.product(*domains_with_none):
+            # We need to add `None`s in order to account for submatrices, but also
+            # need to make sure that at least two non-`None`s are found (we need at
+            # least to sequences to have an alignment)
+            # TODO: if we only need pairwise, should we change to ==2? or have as an option?
+            if len([val for val in cat_vector if val]) < 2:
+                continue
 
-                # We might have `None`s due to submatrices
-                if not None in sub_key:
-                    sub_scores[domain_idx][sub_key].append(score)
+            # Build the multi-hot vector
+            mh_vector = [cat_vector[element[0]] == element[1] for element in encoder]
+            score = self.scores.get(cat_vector)
+            if score is not None:
+                train_matrix.append(mh_vector + [score])
+            else:
+                imp_matrix.append(mh_vector + [np.nan])
 
-        # Set the new score when possible, from the mean of the
-        # available `sub_scores`. We cache the new values in order to only
-        # apply them after the loop, not changing `self.scores` in-place.
-        score_cache = {}
-        for key in itertools.product(*self.domains):
-            if key not in self.scores:
-                # Collect all sub-scores
-                all_sub_scores = []
-                for domain_idx in self._dr:
-                    sub_key = key[:domain_idx] + key[domain_idx + 1 :]
-                    all_sub_scores += sub_scores[domain_idx].get(sub_key, [])
+        # TODO: better code, leave if there is no imp_matrix
+        # TODO: collect submatrix by first collecting all submatrix-like, and adding None later
+        if not imp_matrix:
+            return
 
-                # Cache the new value if possible
-                if any(all_sub_scores):
-                    # TODO: allow other methods, such as percentile/median
-                    score_cache[key] = np.mean(all_sub_scores)
+        # Instantiate the imputer, train it, and fill the matrix
+        imputer = IterativeImputer(max_iter=3, random_state=0)
+        print("fitting...")
+        imputer.fit(train_matrix)
+        print("transforming...")
+        trans_matrix = imputer.transform(imp_matrix)
 
-        # Update with the new values
-        self.scores.update(score_cache)
+        # Reverse from the transformed matrix and store the value
+        for row in trans_matrix:
+            mh_vector, value = row[:-1], row[-1]
 
-    def _fill_matrix_distance(self):
-        """
-        Internal function for filling a matrix with the `distance` method.
-        """
+            # `encoder[idx]` is a tuple (position, character), but we only need the
+            # character as we can trust the code not to give us more than one
+            # character per poistion
+            cat_vector = [
+                encoder[idx][1] for idx, value in enumerate(mh_vector) if value
+            ]
 
-        score_cache = {}
-        for cur_key in itertools.product(*self.domains):
-            if cur_key not in self.scores:
+            self.scores[tuple(cat_vector)] = value
 
-                _scores = []
-                for ref_key, score in self.scores.items():
-                    match_sites = sum(
-                        [
-                            symbol_key == symbol_ref
-                            for symbol_key, symbol_ref in zip(ref_key, cur_key)
-                        ]
-                    )
-                    _scores += [score] * match_sites
-
-                # TODO: allow measures other than mean
-                score_cache[cur_key] = np.mean(_scores)
-
-        # Update with the new values
-        self.scores.update(score_cache)
-
-    def _fill_matrix_fallback(self):
-        """
-        Internal function for last resource on matrix filling.
-
-        This function will be used when there are still empty cells in cell and
-        the method for filling it was unable to account for. As a last resource,
-        it is intended as a common method.
-        """
-
-        # Holder for temporary scores
-        symbol_score = defaultdict(list)
-        gap_scores = []
-
-        # Collect a dictionary of all scores for all symbols in each domain, plus
-        # the mean score overall for gaps
-        # NOTE: this is collecting also full-gap alignment
-        for key, score in self.scores.items():
-            for domain_idx in self._dr:
-                # Collect cell score
-                symbol_score[domain_idx, key[domain_idx]].append(score)
-
-                # Collect score if a gap
-                if key[domain_idx] == self.gap:
-                    gap_scores.append(score)
-
-        symbol_score = {key: np.mean(scores) for key, scores in symbol_score.items()}
-        gap_score = np.mean(gap_scores)
-
-        for key in itertools.product(*self.domains):
-            if key not in self.scores:
-                # If the domain passed by the user has symbols not in the scorer,
-                # we will have a KeyError in symbol_score[domain_idx][symbol]; the
-                # `.get()` will default towards the `gap`, which is always necessary
-                num_gaps = len([value for value in key if value == self.gap])
-                self.scores[key] = np.mean(
-                    [
-                        symbol_score.get((domain_idx, symbol), num_gaps * gap_score)
-                        for domain_idx, symbol in enumerate(key)
-                    ]
-                )
-
-    def _fill_domain(self, domain):
+    # TODO: rename the various `domain` in the method to `submatrix`
+    def _fill_submatrix(self, submatrix):
         """
         Internal function for filling a sub-domain.
 
@@ -306,23 +231,23 @@ class ScoringMatrix:
 
         # Obtain the domains of the sub-domain
         sub_domains = [
-            self.domains[d_idx] if d_idx in domain else [None] for d_idx in self._dr
+            self.domains[d_idx] if d_idx in submatrix else [None] for d_idx in self._dr
         ]
 
         # Fill keys
         # TODO: investigate better subsetting, loops to unroll
         for sub_key in itertools.product(*sub_domains):
             if sub_key not in self.scores:
-                if all([value == self.gap for value in sub_key]):
-                    continue
-
-                sub_scores = []
-                for key, score in self.scores.items():
-                    matches = [
-                        key[idx] == v for idx, v in enumerate(sub_key) if v is not None
-                    ]
-                    if all(matches):
-                        sub_scores.append(score)
+                if not all([value == self.gap for value in sub_key]):
+                    sub_scores = []
+                    for key, score in self.scores.items():
+                        matches = [
+                            key[idx] == v
+                            for idx, v in enumerate(sub_key)
+                            if v is not None
+                        ]
+                        if all(matches):
+                            sub_scores.append(score)
 
                 # Add adjusted value
                 # TODO: allow other manipulations? percentile perhaps?
@@ -345,9 +270,12 @@ class ScoringMatrix:
 
             # Make sure values are floats
             self.scores = {
-                tuple([None if k == "NULL" else k for k in key.split(" / ")]): float(
-                    value
-                )
+                tuple(
+                    [
+                        None if sub_key == "NULL" else sub_key
+                        for sub_key in key.split(" / ")
+                    ]
+                ): float(value)
                 for key, value in serial_data["scores"].items()
             }
 
@@ -394,6 +322,7 @@ class ScoringMatrix:
         with open(filename, "w") as json_handler:
             json.dump(serial_data, json_handler, indent=4, ensure_ascii=False)
 
+    # TODO: rename `domain` to `submatrix` where appropriate
     def compute_submatrices(self, domains):
         """
         Compute submatrices from a collection of domains.
@@ -403,28 +332,28 @@ class ScoringMatrix:
         debugging, as well as in some methods for smoothing.
         """
 
-        sub_matrix = {}
+        sub_matrix_scores = {}
 
-        for domain in domains:
+        for sub_matrix in domains:
             # Trigger the computation/completion of the domain
-            self._fill_domain(domain)
+            self._fill_submatrix(sub_matrix)
 
             # Collect all scores for the given domain
             sub_scores = {}
             for key, value in self.scores.items():
                 # Make sure all entries of domain exist...
-                check = [key[idx] is not None for idx in domain]
+                check = [key[idx] is not None for idx in sub_matrix]
                 # ...and all others don't
-                check += [key[idx] is None for idx in self._dr if idx not in domain]
+                check += [key[idx] is None for idx in self._dr if idx not in sub_matrix]
 
                 if all(check):
                     sub_key = tuple([k for k in key if k is not None])
                     sub_scores[sub_key] = value
 
             # Create the ScoringMatrix
-            sub_matrix[domain] = ScoringMatrix(sub_scores)
+            sub_matrix_scores[sub_matrix] = ScoringMatrix(sub_scores)
 
-        return sub_matrix
+        return sub_matrix_scores
 
     def copy(self):
         """
@@ -478,7 +407,7 @@ class ScoringMatrix:
                 for sub_key in itertools.product(self.domains[1], self.domains[2])
             ]
         else:
-            raise ValueError("number of domains is not two or 3")
+            raise ValueError("number of domains is not 2 or 3")
 
         return tabulate(rows, headers=headers, tablefmt="github")
 
@@ -512,10 +441,12 @@ class ScoringMatrix:
         # is missing, it means the submatrix was not provided and has not been computed
         # yet; we do it now, caching the results.
         if None in key:
-            domain = tuple([idx for idx, value in enumerate(key) if value is not None])
+            submatrix = tuple(
+                [idx for idx, value in enumerate(key) if value is not None]
+            )
 
             if key not in self.scores:
-                self._fill_domain(domain)
+                self._fill_submatrix(submatrix)
 
         return self.scores[tuple(key)]
 
