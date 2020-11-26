@@ -2,9 +2,6 @@
 Module for scoring matrices.
 """
 
-# check https://scikit-learn.org/stable/modules/impute.html
-# https://scikit-learn.org/stable/auto_examples/impute/plot_iterative_imputer_variants_comparison.html#sphx-glr-auto-examples-impute-plot-iterative-imputer-variants-comparison-py
-
 # Import Python standard libraries
 from collections import defaultdict
 import copy
@@ -17,6 +14,10 @@ from tabulate import tabulate
 
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
+from sklearn.linear_model import BayesianRidge
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import ExtraTreesRegressor
+from sklearn.neighbors import KNeighborsRegressor
 
 
 class ScoringMatrix:
@@ -81,7 +82,7 @@ class ScoringMatrix:
         else:
             # Extract additional values; note that these, as everything else, are
             # not considered when loading from disk
-            self._impute_method = kwargs.get("impute_method", "standard")
+            self._impute_method = kwargs.get("impute_method", "default")
             self.gap = kwargs.get("gap", "-")
 
             # Extract the domains or build them, if they were not provided;
@@ -142,16 +143,23 @@ class ScoringMatrix:
 
         # Fill the matrix with the appropriate method if requested.
         # TODO: check before-hand if it is necessary
+        # TODO: should be a general method that can applied when loaded from disk as well
         if self._impute_method:
-            if self._impute_method not in ["standard"]:
-                raise ValueError("Unknown filling method.")
+            self._fill_matrix()
 
-            self._fill_matrix_standard()
-
-    def _fill_matrix_standard(self):
+    def _fill_matrix(self):
         """
         Internal function for filling a matrix with the `standard` method.
         """
+
+        if self._impute_method not in [
+            "decision_tree",
+            "extra_trees",
+            "k_neighbors",
+            "bayesian_ridge",
+            "default",
+        ]:
+            raise ValueError("Unknown imputation method.")
 
         # We perform matrix imputation on multi-hot vectors, with one true position
         # for each domain. `None`, as used for submatrices, is always mapped to
@@ -195,7 +203,23 @@ class ScoringMatrix:
             return
 
         # Instantiate the imputer, train it, and fill the matrix
-        imputer = IterativeImputer(max_iter=3, random_state=0)
+        # TODO: allow setting more options when initializing, such num estimators and random state
+        if self._impute_method == "decision_tree":
+            estimator = DecisionTreeRegressor(max_features="sqrt", random_state=0)
+            imputer = IterativeImputer(random_state=0, estimator=estimator)
+        elif self._impute_method == "extra_trees":
+            estimator = ExtraTreesRegressor(n_estimators=10, random_state=0)
+            imputer = IterativeImputer(random_state=0, estimator=estimator)
+        elif self._impute_method == "k_neighbors":
+            estimator = KNeighborsRegressor(n_neighbors=15)
+            imputer = IterativeImputer(random_state=0, estimator=estimator)
+        elif self._impute_method == "bayesian_ridge":
+            estimator = BayesianRidge()
+            imputer = IterativeImputer(random_state=0, estimator=estimator)
+        else:
+            # TODO: should be a simple imputer
+            imputer = IterativeImputer(max_iter=3, random_state=0)
+
         print("fitting...")
         imputer.fit(train_matrix)
         print("transforming...")
@@ -213,45 +237,6 @@ class ScoringMatrix:
             ]
 
             self.scores[tuple(cat_vector)] = value
-
-    # TODO: rename the various `domain` in the method to `submatrix`
-    def _fill_submatrix(self, submatrix):
-        """
-        Internal function for filling a sub-domain.
-
-        The function assumes the full domain matrix has already been
-        filled.
-
-        Parameters
-        ==========
-
-        domain : tuple of ints
-            Tuble of the sub-domain to be filled.
-        """
-
-        # Obtain the domains of the sub-domain
-        sub_domains = [
-            self.domains[d_idx] if d_idx in submatrix else [None] for d_idx in self._dr
-        ]
-
-        # Fill keys
-        # TODO: investigate better subsetting, loops to unroll
-        for sub_key in itertools.product(*sub_domains):
-            if sub_key not in self.scores:
-                if not all([value == self.gap for value in sub_key]):
-                    sub_scores = []
-                    for key, score in self.scores.items():
-                        matches = [
-                            key[idx] == v
-                            for idx, v in enumerate(sub_key)
-                            if v is not None
-                        ]
-                        if all(matches):
-                            sub_scores.append(score)
-
-                # Add adjusted value
-                # TODO: allow other manipulations? percentile perhaps?
-                self.scores[sub_key] = max(sub_scores)
 
     def _load(self, filename):
         """
@@ -323,6 +308,7 @@ class ScoringMatrix:
             json.dump(serial_data, json_handler, indent=4, ensure_ascii=False)
 
     # TODO: rename `domain` to `submatrix` where appropriate
+    # TODO: should cache?
     def compute_submatrices(self, domains):
         """
         Compute submatrices from a collection of domains.
@@ -336,7 +322,9 @@ class ScoringMatrix:
 
         for sub_matrix in domains:
             # Trigger the computation/completion of the domain
-            self._fill_submatrix(sub_matrix)
+            # TODO: extend documentation to note that this assumes the matrix has been filled
+            # TODO: maybe some flag? check if filled indeed?
+            #        self._fill_submatrix(sub_matrix)
 
             # Collect all scores for the given domain
             sub_scores = {}
@@ -433,20 +421,6 @@ class ScoringMatrix:
         value : float
             The value associated with the element.
         """
-
-        # If there are `None`s in the key, it is a subdomain, be sure to check
-        # if it needs to be computed
-
-        # If there are `None`s in the key (as observed from the domain), and the key
-        # is missing, it means the submatrix was not provided and has not been computed
-        # yet; we do it now, caching the results.
-        if None in key:
-            submatrix = tuple(
-                [idx for idx, value in enumerate(key) if value is not None]
-            )
-
-            if key not in self.scores:
-                self._fill_submatrix(submatrix)
 
         return self.scores[tuple(key)]
 

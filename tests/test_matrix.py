@@ -177,7 +177,10 @@ class TestMalign(unittest.TestCase):
         vectors.pop(("c", "Y", "j"))
         vectors.pop(("-", "X", "-"))
         matrix_default = malign.ScoringMatrix(vectors)
-        #    matrix_distance = malign.ScoringMatrix(vectors, impute_method="distance")
+        matrix_dt = malign.ScoringMatrix(vectors, impute_method="decision_tree")
+        matrix_et = malign.ScoringMatrix(vectors, impute_method="extra_trees")
+        matrix_kn = malign.ScoringMatrix(vectors, impute_method="k_neighbors")
+        matrix_br = malign.ScoringMatrix(vectors, impute_method="bayesian_ridge")
 
         # Assertions
         assert matrix_default.num_domains == 3
@@ -187,20 +190,45 @@ class TestMalign(unittest.TestCase):
         assert tuple(matrix_default.domains[2]) == ("-", "i", "j")
 
         assert matrix_default["-", "-", "-"] == 0.0
-        assert math.isclose(matrix_default["a", "Y", "j"], 8.0, rel_tol=1e-04)
-        assert math.isclose(matrix_default["a", "X", "j"], 2.83974, rel_tol=1e-04)
-        assert math.isclose(matrix_default["c", "X", "-"], 0.48655, rel_tol=1e-04)
-        assert math.isclose(matrix_default["b", "-", "i"], 1.36074, rel_tol=1e-04)
-        assert math.isclose(matrix_default["b", "-", "j"], 1.45179, rel_tol=1e-04)
-        assert math.isclose(matrix_default["c", "Y", "j"], 1.43649, rel_tol=1e-04)
-        assert math.isclose(matrix_default["-", "X", "-"], -3.45639, rel_tol=1e-04)
+        assert math.isclose(matrix_default["a", "Y", "j"], 8.0, rel_tol=1e-03)
+        assert math.isclose(matrix_default["a", "X", "j"], 2.83974, rel_tol=1e-03)
+        assert math.isclose(matrix_default["c", "X", "-"], 0.48655, rel_tol=1e-03)
+        assert math.isclose(matrix_default["b", "-", "i"], 1.36074, rel_tol=1e-03)
+        assert math.isclose(matrix_default["b", "-", "j"], 1.45179, rel_tol=1e-03)
+        assert math.isclose(matrix_default["c", "Y", "j"], 1.43649, rel_tol=1e-03)
+        assert math.isclose(matrix_default["-", "X", "-"], -3.45639, rel_tol=1e-03)
 
-    #    assert math.isclose(matrix_distance["a", "X", "j"], 1.38461, rel_tol=1e-04)
-    #    assert math.isclose(matrix_distance["c", "X", "-"], 0.61538, rel_tol=1e-04)
-    #    assert math.isclose(matrix_distance["b", "-", "i"], 0.53571, rel_tol=1e-04)
-    #    assert math.isclose(matrix_distance["b", "-", "j"], 0.46153, rel_tol=1e-04)
-    #    assert math.isclose(matrix_distance["c", "Y", "j"], 0.74074, rel_tol=1e-04)
-    #    assert math.isclose(matrix_distance["-", "X", "-"], -0.96296, rel_tol=1e-04)
+        assert math.isclose(matrix_dt["a", "Y", "j"], 8.0, rel_tol=1e-03)
+        assert math.isclose(matrix_dt["a", "X", "j"], 0.0, rel_tol=1e-03)
+        assert math.isclose(matrix_dt["c", "X", "-"], 0.0, rel_tol=1e-03)
+        assert math.isclose(matrix_dt["b", "-", "i"], -4.0, rel_tol=1e-03)
+        assert math.isclose(matrix_dt["b", "-", "j"], -8.0, rel_tol=1e-03)
+        assert math.isclose(matrix_dt["c", "Y", "j"], -6.0, rel_tol=1e-03)
+        assert math.isclose(matrix_dt["-", "X", "-"], 0.0, rel_tol=1e-03)
+
+        assert math.isclose(matrix_et["a", "Y", "j"], 8.0, rel_tol=1e-03)
+        assert math.isclose(matrix_et["a", "X", "j"], 0.0, rel_tol=1e-03)
+        assert math.isclose(matrix_et["c", "X", "-"], -7.0, rel_tol=1e-03)
+        assert math.isclose(matrix_et["b", "-", "i"], -3.0, rel_tol=1e-03)
+        assert math.isclose(matrix_et["b", "-", "j"], 3.0, rel_tol=1e-03)
+        assert math.isclose(matrix_et["c", "Y", "j"], 7.0, rel_tol=1e-03)
+        assert math.isclose(matrix_et["-", "X", "-"], -4.5, rel_tol=1e-03)
+
+        assert math.isclose(matrix_kn["a", "Y", "j"], 8.0, rel_tol=1e-03)
+        assert math.isclose(matrix_kn["a", "X", "j"], 1.86666, rel_tol=1e-03)
+        assert math.isclose(matrix_kn["c", "X", "-"], 0.93333, rel_tol=1e-03)
+        assert math.isclose(matrix_kn["b", "-", "i"], 1.46666, rel_tol=1e-03)
+        assert math.isclose(matrix_kn["b", "-", "j"], 1.2, rel_tol=1e-03)
+        assert math.isclose(matrix_kn["c", "Y", "j"], 1.6, rel_tol=1e-03)
+        assert math.isclose(matrix_kn["-", "X", "-"], 0.06666, rel_tol=1e-03)
+
+        assert math.isclose(matrix_br["a", "Y", "j"], 8.0, rel_tol=1e-03)
+        assert math.isclose(matrix_br["a", "X", "j"], 2.83974, rel_tol=1e-03)
+        assert math.isclose(matrix_br["c", "X", "-"], 0.48655, rel_tol=1e-03)
+        assert math.isclose(matrix_br["b", "-", "i"], 1.36074, rel_tol=1e-03)
+        assert math.isclose(matrix_br["b", "-", "j"], 1.45179, rel_tol=1e-03)
+        assert math.isclose(matrix_br["c", "Y", "j"], 1.43649, rel_tol=1e-03)
+        assert math.isclose(matrix_br["-", "X", "-"], -3.45639, rel_tol=1e-03)
 
     def test_multiwise_from_subvectors(self):
         """
