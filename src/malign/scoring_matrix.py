@@ -3,21 +3,19 @@ Module for scoring matrices.
 """
 
 # Import Python standard libraries
-from collections import defaultdict
 import copy
 import itertools
 import json
 
 # Import 3rd-party libraries
-import numpy as np
-from tabulate import tabulate
-
-from sklearn.experimental import enable_iterative_imputer
+from sklearn.ensemble import ExtraTreesRegressor
+from sklearn.experimental import enable_iterative_imputer # pylint: disable=unused-import
 from sklearn.impute import SimpleImputer, IterativeImputer
 from sklearn.linear_model import BayesianRidge
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.neighbors import KNeighborsRegressor
+from sklearn.tree import DecisionTreeRegressor
+from tabulate import tabulate
+import numpy as np
 
 
 class ScoringMatrix:
@@ -25,27 +23,37 @@ class ScoringMatrix:
     Class for sequence alignment scoring matrices.
 
     A scoring matrix is implemented to work as a Python dictionary and, in
-    fact, it should be allowed to use a plain dictionary instead of a
-    ScoringMatrix. The class provides facilities for dealing with the
-    multidimensionality of the matrices for multiple alignmentes used in
-    this library, that is:
+    fact, the alignment methods should be written as expecting any
+    data structure that works like a dictionary, via the `__get__()`
+    method.
 
-      - a unique domain for each sequence (even if the domains are
-        equal)
-      - asymmetric information
-      - gaps are full, normal "symbols"
+    The class, however, provides a number of facilities for dealing with the
+    multidimensionality of the matrices for multiple alignment on
+    multiple domains, as intended by the library. Those are maily:
 
-    The object especially facilitates dealing with sparse matrices/vectors and
+      - allowing and mandating a unique domain for each sequence, even in
+        cases where the domains are equal
+      - allow assymetric scoring value
+      - treat gaps as full, normal "symbols"
+
+    The class especially facilitates dealing with sparse matrices/vectors and
     with submatrices, both for querying and for building.
+
+    The `gap` symbol is a mandatory property and must be shared by all
+    domains. By design, exclusive gap alignment vectors (that is, keys
+    composed only of gaps in all the provided domains) will have a value of
+    0.0.
+
+    For incomplete vectors relating to missing or non-informed domains, these
+    must be specified by using a `None` value in the key.
     """
 
     def __init__(self, scores, **kwargs):
         """
         Initialize a scoring matrix.
 
-        Either the `filename` or a combination of `scores` and `submatrices` must be
-        provided. At least one of the values of `scores` and `submatrices` must be
-        provided.
+        Either a dictionary of scores or a filename must be provided in
+        `scores`.
 
         Parameters
         ==========
@@ -54,56 +62,54 @@ class ScoringMatrix:
             Either a string with the path to a serialized matrix in JSON format,
             or a scoring dictionary, with tuples of strings as keys (respecting
             the order that will be used when using the matrix) and floating
-            points as values. Exclusive-gap alignments (that is, keys
-            composed only of gaps) will be overriden to a value of 0.0 if
-            provided. Unused domains are indicated by `None` values in the keys.
-            Defaults to `None`.
+            points as values.
         domains : list of lists of strings
             A list of lists of strings, with the set of symbols ("domain") that
-            composes each domain that will be used for alignment. If provided,
-            the domain lists will be sorted. If not provided, it will be
-            computed from the `scores`, assuming that all symbols are used
-            at least once. Note that, by definition, the gap symbol must be
-            part of the domain (unless it is explicitly assumed that the
-            domain does not allow gaps).
+            composes each domain that will be used for alignment. If not
+            provided, it will be computed from the `scores`, assuming that
+            all symbols are used at least once; the only symbol automatically
+            added to each domain, if not present in `scores`, is the gap.
+            Note that by definition, as it is treated as a normal value, the
+            gap symbol must be part of each domain unless it explicitly
+            assumed that the domain does not allow gaps.
         gap : str
             The string to use as a gap symbol. Defaults to `-`.
         impute_method : string or None
             The method used to fill empty elements in the matrix, using
             values computed from the ones provided. If set to `None`, the
-            matrix will not be filled. Choices are `"standard"` and `"distance"`.
-            Defaults to the `"standard"` method.
+            matrix will not be filled. Choices are `mean`, `median`,
+            `decision_tree`, `extra_trees`, `k_neighbors`, and `bayesian_ridge`.
+            If not provided, will default to `mean`.
         """
 
-        # If a filename was provided, load a serialized matrix; otherwise, initialize
-        # from user provided `scores`
+        # If a filename was provided, load a serialized matrix; otherwise,
+        # initialize from the user-provided `scores`
         if isinstance(scores, str):
             self._load(scores)
         else:
-            # Extract additional values; note that these, as everything else, are
-            # not considered when loading from disk
-            self._impute_method = kwargs.get("impute_method", "default")
+            # Extract additional values; note that these parameters
+            # are not considered when loading from disk
+            self._impute_method = kwargs.get("impute_method", "mean")
             self.gap = kwargs.get("gap", "-")
 
-            # Extract the domains or build them, if they were not provided;
-            # during extraction, `None`s are removed as the user or the library might
-            # be passing sub-matrices as well (as when creating an identity matrix,
-            # when it makes more sense to provide the sub-matrix identities)
+            # Extract the domains or build them, if they were not provided.
             self.domains = kwargs.get("domains", None)
 
+            # Collect domains from scores. Note that the gap symbol is the
+            # only one automatically added to each domain, and that
+            # `None`s are discarded as the user or the library might be
+            # passing sub-matrices as well (as when creating an
+            # identity matrix, when it makes more sense to provide the
+            # sub-matrix identities.
             if not self.domains:
-                # Collect domain from scores; if no `scores` were provided but
-                # only `sub_matrices`, we need to initialize `self.domains` to the
-                # length we can derive from the `sub_matrices` keys
-                self.domains = list(zip(*scores.keys()))
-
-                # Make sorted lists, making sure the gap is there
                 self.domains = [
                     set([symbol for symbol in domain if symbol] + [self.gap])
-                    for domain in self.domains
+                    for domain in zip(*scores.keys())
                 ]
 
-            # Organize the domains
+            # Organize the domains; as this is applied to both user-provide
+            # and code-derived lists, we apply `set` and `sorted` in all
+            # cases to simplify the code
             self.domains = [sorted(set(domain)) for domain in self.domains]
 
             # Initialize from the scores
@@ -117,17 +123,17 @@ class ScoringMatrix:
         # Make sure all `scores` report the same number of domains, store
         # the number of domains and an internal variable with the range (which
         # is used multiple times; the one facing the user is `self.num_domains`)
-        # NOTE: the comma after `self.num_domains` is used to unpack the
-        # `domains` set, which at this point we know contains a single item
-        self.num_domains = {len(key) for key in scores}
-        if len(self.num_domains) > 1:
-            raise ValueError("Different domain-lengths in `scores`.")
-        self.num_domains, = self.num_domains
+        self.num_domains = len(self.domains)
         self._dr = tuple(range(self.num_domains))
 
-        # Make sure the domains contain all symbols used in `scores`; while this would
-        # not be strictly necessary when the domains are collected automatically,
-        # it is still good to keep a simpler loop for that
+        key_lens = {len(key) for key in scores}
+        if len(key_lens) > 1:
+            raise ValueError("Different domain-lengths in `scores`.")
+
+        # Make sure the domains contain all symbols used in `scores`; while
+        # this would not be strictly necessary when the domains are collected
+        # automatically, it is still good to keep a simpler loop for that
+        # in all circumstances
         scores_domains = list(zip(*scores.keys()))
         found = [
             all([symbol in ref_domain for symbol in scores_domain if symbol])
@@ -142,9 +148,17 @@ class ScoringMatrix:
         self.scores[tuple([self.gap] * self.num_domains)] = 0.0
 
         # Fill the matrix with the appropriate method if requested.
-        # TODO: check before-hand if it is necessary
-        # TODO: should be a general method that can applied when loaded from disk as well
         if self._impute_method:
+            if self._impute_method not in [
+                "mean",
+                "median",
+                "decision_tree",
+                "extra_trees",
+                "k_neighbors",
+                "bayesian_ridge",
+            ]:
+                raise ValueError("Unknown imputation method.")
+
             self._fill_matrix()
 
     def _fill_matrix(self):
@@ -152,24 +166,14 @@ class ScoringMatrix:
         Internal function for filling a matrix with the `standard` method.
         """
 
-        if self._impute_method not in [
-            "decision_tree",
-            "extra_trees",
-            "k_neighbors",
-            "bayesian_ridge",
-            "mean",
-            "median",
-            "default",
-        ]:
-            raise ValueError("Unknown imputation method.")
-
-        # We perform matrix imputation on multi-hot vectors, with one true position
-        # for each domain. `None`, as used for submatrices, is always mapped to
-        # the first site of its domain; the gap symbol will be part of the sorted
-        # list of symbols, if found. In order to do that, we build an initial list
-        # of all domain/values, so we can fill the vectors. We call it `encoder` due
-        # to analogy with data analysis pipelines, even though it is not strictly
-        # an encoder but an auxiliary data structure.
+        # We perform matrix imputation on multi-hot vectors, with one true
+        # position for each domain. `None`, as used for submatrices, is always
+        # mapped to the first site of its domain; the gap symbol will be part
+        # of the sorted list of symbols, if found. In order to do that, we
+        # build an initial list of all domain/values, so we can fill the
+        # vectors. We call it `encoder` due to analogy with data analysis
+        # pipelines, even though it is not strictly an encoder but an auxiliary
+        # data structure.
         encoder = list(
             itertools.chain.from_iterable(
                 [
@@ -184,10 +188,9 @@ class ScoringMatrix:
         train_matrix = []
         imp_matrix = []
         for cat_vector in itertools.product(*domains_with_none):
-            # We need to add `None`s in order to account for submatrices, but also
-            # need to make sure that at least two non-`None`s are found (we need at
-            # least to sequences to have an alignment)
-            # TODO: if we only need pairwise, should we change to ==2? or have as an option?
+            # We need to add `None`s in order to account for submatrices,
+            # but also need to make sure that at least two non-`None`s are
+            # found (we need at least to sequences to have an alignment)
             if len([val for val in cat_vector if val]) < 2:
                 continue
 
@@ -199,8 +202,7 @@ class ScoringMatrix:
             else:
                 imp_matrix.append(mh_vector + [np.nan])
 
-        # TODO: better code, leave if there is no imp_matrix
-        # TODO: collect submatrix by first collecting all submatrix-like, and adding None later
+        # If the imputation matrix is empty, there is nothing to do
         if not imp_matrix:
             return
 
@@ -224,18 +226,16 @@ class ScoringMatrix:
             # Currently default to `mean
             imputer = SimpleImputer(missing_values=np.nan, strategy="mean")
 
-        print("fitting...")
         imputer.fit(train_matrix)
-        print("transforming...")
         trans_matrix = imputer.transform(imp_matrix)
 
         # Reverse from the transformed matrix and store the value
         for row in trans_matrix:
             mh_vector, value = row[:-1], row[-1]
 
-            # `encoder[idx]` is a tuple (position, character), but we only need the
-            # character as we can trust the code not to give us more than one
-            # character per poistion
+            # `encoder[idx]` is a tuple (position, character), but we only need
+            # the character as we can trust the code not to give us more than
+            # one character per position
             cat_vector = [
                 encoder[idx][1] for idx, value in enumerate(mh_vector) if value
             ]
@@ -246,8 +246,8 @@ class ScoringMatrix:
         """
         Internal function for loading a serialized matrix from file.
 
-        This function is not supposed to be used directly by the user, but called
-        by `__init__()`.
+        This function is not supposed to be used directly by the user, but
+        called by `__init__()`.
         """
 
         with open(filename) as json_handler:
@@ -258,6 +258,7 @@ class ScoringMatrix:
             self.domains = serial_data["domains"].copy()
 
             # Make sure values are floats
+            # TODO: should "NULL" be "0000000000"?
             self.scores = {
                 tuple(
                     [
@@ -272,11 +273,13 @@ class ScoringMatrix:
         """
         Serialize a matrix to disk.
 
-        Note that, due limits in serializing with JSON, which do not allow lists
-        as keys, the `" / "` symbol (note the spaces) is not allowed.
+        Note that, due limits in serializing with JSON, which do not allow
+        lists as keys, the `" / "` symbol used for serialization (note the
+        spaces) is not allowed.
 
         Parameters
         ==========
+
         filename : str
             Path where to write serialized data.
         """
@@ -289,8 +292,9 @@ class ScoringMatrix:
         # of the key as per the JSON standard, with a custom element, which
         # must be mapped back when loading.
         # As we only operate on strings, to facilitate human edition/inspection
-        # we map the `None`s to numeric zero value. Note that we need our custom
-        # sorting function as we cannot otherwise sort keys with Nones and strings.
+        # we map the `None`s to numeric zero value. Note that we need our
+        # custom sorting function as we cannot otherwise sort keys with Nones
+        # and strings.
         def _allow_none_key(obj):
             return tuple(["0000000000" if k is None else k for k in obj])
 
@@ -299,51 +303,48 @@ class ScoringMatrix:
             for key in sorted(self.scores, key=_allow_none_key)
         }
 
-        # Build serialized data
-        serial_data = {
-            "domains": self.domains,
-            "gap": self.gap,
-            "domain_range": list(self._dr),
-            "scores": _scores,
-        }
-
-        # Open handler and write to disk
+        # Open handler, build serialized data, and write to disk
         with open(filename, "w") as json_handler:
+            serial_data = {
+                "domains": self.domains,
+                "gap": self.gap,
+                "domain_range": list(self._dr),
+                "scores": _scores,
+            }
+
             json.dump(serial_data, json_handler, indent=4, ensure_ascii=False)
 
-    # TODO: rename `domain` to `submatrix` where appropriate
     # TODO: should cache?
     def compute_submatrices(self, domains):
         """
         Compute submatrices from a collection of domains.
 
-        Sub-matrices are useful, when compared to the possibility of addressing a
-        normal matrix with `None` values in keys, in simplifying computation and
-        debugging, as well as in some methods for smoothing.
+        Sub-matrices are useful, when compared to the possibility of addressing
+        a normal matrix with `None` values in keys, in simplifying computation
+        and debugging, as well as in some methods for smoothing.
         """
 
         sub_matrix_scores = {}
 
-        for sub_matrix in domains:
+        for sub_domain in domains:
             # Trigger the computation/completion of the domain
             # TODO: extend documentation to note that this assumes the matrix has been filled
             # TODO: maybe some flag? check if filled indeed?
-            #        self._fill_submatrix(sub_matrix)
 
             # Collect all scores for the given domain
             sub_scores = {}
             for key, value in self.scores.items():
-                # Make sure all entries of domain exist...
-                check = [key[idx] is not None for idx in sub_matrix]
+                # Make sure that all entries of domain exist...
+                check = [key[idx] is not None for idx in sub_domain]
                 # ...and all others don't
-                check += [key[idx] is None for idx in self._dr if idx not in sub_matrix]
+                check += [key[idx] is None for idx in self._dr if idx not in sub_domain]
 
                 if all(check):
                     sub_key = tuple([k for k in key if k is not None])
                     sub_scores[sub_key] = value
 
-            # Create the ScoringMatrix
-            sub_matrix_scores[sub_matrix] = ScoringMatrix(sub_scores)
+            # Create the new ScoringMatrix
+            sub_matrix_scores[sub_domain] = ScoringMatrix(sub_scores)
 
         return sub_matrix_scores
 
@@ -353,6 +354,7 @@ class ScoringMatrix:
 
         Returns
         =======
+
         matrix : ScoringMatrix
             A copy of the current ScoringMatrix.
         """
@@ -360,7 +362,6 @@ class ScoringMatrix:
 
     # TODO: currently only working for 2 or 3 domains
     # TODO: use more options from tabulate
-    # TODO: check about identity matrix? from domains with a method?
     def tabulate(self):
         """
         Build a string with a tabulated representation of the matrix.
@@ -428,7 +429,6 @@ class ScoringMatrix:
 
         return self.scores[tuple(key)]
 
-    # TODO: make sure this is only available for debug, etc.
     def __setitem__(self, key, value):
         # We need to treat `None`, as usual
         matches = [k in domain for k, domain in zip(key, self.domains) if k is not None]
