@@ -67,14 +67,14 @@ class TestMalignResults(unittest.TestCase):
             #    ('c', 'Y') :  7.0,
         }
 
-        matrix_std = malign.ScoringMatrix(vectors)
-        #    matrix_fill = malign.ScoringMatrix(vectors, impute_method="distance")
+        matrix_def = malign.ScoringMatrix(vectors)
+        matrix_bay = malign.ScoringMatrix(vectors, impute_method="bayesian_ridge")
 
-        assert isclose(matrix_std["a", "-"], 0.00118, rel_tol=1e-03)
-        assert isclose(matrix_std["c", "Y"], 0.00098, rel_tol=1e-03)
+        assert isclose(matrix_def["a", "-"], 0.0, rel_tol=1e-03)
+        assert isclose(matrix_def["c", "Y"], 0.0, rel_tol=1e-03)
 
-    #    assert isclose(matrix_fill["a", "-"], 1.0, rel_tol=1e-03)
-    #    assert isclose(matrix_fill["c", "Y"], 0.8, rel_tol=1e-03)
+        assert isclose(matrix_bay["a", "-"], 0.001181, rel_tol=1e-03)
+        assert isclose(matrix_bay["c", "Y"], 0.000980, rel_tol=1e-03)
 
     def test_matrix_from_sub_matrices(self):
         """
@@ -107,9 +107,9 @@ class TestMalignResults(unittest.TestCase):
 
         matrix = malign.ScoringMatrix(scores)
 
-        assert isclose(matrix["-", "-", "i"], -1.33253, rel_tol=1e-05)
-        assert isclose(matrix["b", "X", "i"], -1.25966, rel_tol=1e-05)
-        assert isclose(matrix["c", "Y", "j"], 6.80505, rel_tol=1e-05)
+        assert isclose(matrix["-", "-", "i"], 0.5, rel_tol=1e-05)
+        assert isclose(matrix["b", "X", "i"], 0.5, rel_tol=1e-05)
+        assert isclose(matrix["c", "Y", "j"], 0.5, rel_tol=1e-05)
 
     def test_identity_matrix(self):
         """
@@ -151,8 +151,8 @@ class TestMalignResults(unittest.TestCase):
         matrix = malign.ScoringMatrix(scores)
 
         assert isclose(matrix["a", "A", "2"], 4.0, rel_tol=1e-05)  # provided
-        assert isclose(matrix["-", "-", "3"], -7.51025, rel_tol=1e-05)
-        assert isclose(matrix["c", "-", "4"], -2.01180, rel_tol=1e-05)
+        assert isclose(matrix["-", "-", "3"], -7.05, rel_tol=1e-05)
+        assert isclose(matrix["c", "-", "4"], -7.05, rel_tol=1e-05)
 
     def test_dumb_alignment(self):
         """
@@ -240,17 +240,19 @@ class TestMalignResults(unittest.TestCase):
         }
         scores = {**scores_ita_rus, **scores_ita_grk}
 
-        full_matrix = malign.ScoringMatrix(scores)
+        full_matrix = malign.ScoringMatrix(scores, impute_method="bayesian_ridge")
         full_matrix["o", "в", "ο"] = -4
         full_matrix["i", "-", "Ι"] = -4
         full_matrix["c", "к", "κ"] = 10
 
         seqs = ["Giacomo", "Яков", "Ιακωβος"]
         nw_alms = malign.multi_align(seqs, method="anw", k=4, matrix=full_matrix)
+        yenksp_alms = malign.multi_align(seqs, method="yenksp", k=2, matrix=full_matrix)
+
+        # TODO: why are we getting the same score?
         assert tuple(nw_alms[0]["seqs"][1]) == ("Я", "к", "о", "в", "-", "-", "-")
         assert isclose(nw_alms[0]["score"], 2.12027, rel_tol=1e-05)
 
-        yenksp_alms = malign.multi_align(seqs, method="yenksp", k=2, matrix=full_matrix)
         assert tuple(yenksp_alms[0]["seqs"][1]) == ("Я", "-", "-", "к", "о", "в", "-")
         assert isclose(yenksp_alms[0]["score"], 2.12027, rel_tol=1e-05)
 

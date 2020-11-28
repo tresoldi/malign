@@ -13,7 +13,7 @@ import numpy as np
 from tabulate import tabulate
 
 from sklearn.experimental import enable_iterative_imputer
-from sklearn.impute import IterativeImputer
+from sklearn.impute import SimpleImputer, IterativeImputer
 from sklearn.linear_model import BayesianRidge
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import ExtraTreesRegressor
@@ -157,6 +157,8 @@ class ScoringMatrix:
             "extra_trees",
             "k_neighbors",
             "bayesian_ridge",
+            "mean",
+            "median",
             "default",
         ]:
             raise ValueError("Unknown imputation method.")
@@ -216,9 +218,11 @@ class ScoringMatrix:
         elif self._impute_method == "bayesian_ridge":
             estimator = BayesianRidge()
             imputer = IterativeImputer(random_state=0, estimator=estimator)
+        elif self._impute_method in ["mean", "median"]:
+            imputer = SimpleImputer(missing_values=np.nan, strategy=self._impute_method)
         else:
-            # TODO: should be a simple imputer
-            imputer = IterativeImputer(max_iter=3, random_state=0)
+            # Currently default to `mean
+            imputer = SimpleImputer(missing_values=np.nan, strategy="mean")
 
         print("fitting...")
         imputer.fit(train_matrix)
