@@ -268,16 +268,13 @@ def yenksp_align(seq_a, seq_b, k=4, matrix=None, **kwargs):
     if not matrix:
         matrix = utils.identity_matrix([seq_a, seq_b])
 
-    gap = kwargs.get("gap", "-")
-    if gap != matrix.gap:
-        raise ValueError("Different gap symbols.")
-
     # Get the paths extremes, if not provided
     ne_loc = kwargs.get("ne_loc", (0, 0))
     sw_loc = kwargs.get("sw_loc", (len(seq_a), len(seq_b)))
 
     # Compute the graph for the alignment
-    graph = compute_graph(seq_a, seq_b, matrix, gap)
+    # TODO: deal matrix.gap
+    graph = compute_graph(seq_a, seq_b, matrix, matrix.gap)
 
     # Align from the graph and return
     return align(graph, (ne_loc, sw_loc), seq_a, seq_b, matrix, n_paths=k)

@@ -4,18 +4,29 @@ Module for computing dumb (pure gap padding) alignments.
 
 # Import other modules
 import malign.utils as utils
+from .scoring_matrix import ScoringMatrix
+
+from typing import Sequence, Hashable, Optional
 
 
-def dumb_malign(seqs, gap="-", **kwargs):
+def dumb_malign(
+    seqs: Sequence[Sequence[Hashable]],
+    gap: Hashable = "-",
+    matrix: Optional[ScoringMatrix] = None,
+):
     """
     Perform a *dumb* multiple alignment.
 
     This method is implemented for testing purposes, as it just pads gaps as necessary
     in order to return a single alignment.
+
+    @param seqs:
+    @param gap:
+    @param matrix:
+    @return:
     """
 
     # Get matrix, defaulting to an identity one
-    matrix = kwargs.get("matrix", None)
     if not matrix:
         matrix = utils.identity_matrix(seqs)
 

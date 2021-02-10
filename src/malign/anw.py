@@ -1,12 +1,14 @@
 """
-Module for computing Needleman–Wunsch alignments.
+Module for computing asymmetric Needleman–Wunsch alignments.
 """
 
 # Import Python standard libraries
 import itertools
+from typing import Optional, Hashable, Sequence, List, Tuple, Dict
 
 # Import from package
-import malign.utils as utils
+from .utils import score_alignment, sort_alignments
+from .scoring_matrix import ScoringMatrix
 
 # Defines the map for directions; keys are tuples of three booleans,
 # resulting from comparison of direction scores with the best scores,
@@ -24,19 +26,19 @@ DIRECTION_MAP = {
 }
 
 
-def nw_grids(seq_a, seq_b, scorer, gap):
+def nw_grids(
+        seq_a: List[Hashable], seq_b: List[Hashable], scorer: ScoringMatrix
+) -> Tuple[List[List[float]], List[List[Tuple[bool, bool, bool]]]]:
     """
     Build the Needleman-Wunsch grids
 
     Note that the sequences must already have the initial gap added to them at this
     point.
 
-    Parameters
-    ==========
-    seq_a : str or list or tuple
-        First sequence for the pairwise alignment.
-    seq_b : str or list or tuple
-        Second sequence for the pairwise alignment.
+    @param seq_a: First sequence for the pairwise alignment.
+    @param seq_b: Second sequence for the pairwise alignment.
+    @param scorer: The scoring matrix for the pairwise alignement.
+    @return:
     """
 
     # cache lengths
@@ -45,11 +47,13 @@ def nw_grids(seq_a, seq_b, scorer, gap):
     # Initialize (seq_a x seq_b) grids, one for the scores (`s_grid`) and one
     # for the directions (`d_grid`). Note that `seq_a` is modelled at the top
     # (i.e., columns), so the indexing is performed with `grid[b][a]`
-    s_grid = [[None] * len_a for _ in seq_b]
-    d_grid = [[None] * len_a for _ in seq_b]
+    s_grid: List[List[float]] = [[0.0] * len_a for _ in seq_b]
+    d_grid: List[List[Tuple[bool, bool, bool]]] = [
+        [(False, False, False)] * len_a for _ in seq_b
+    ]
 
     # Fill first row and column of both grids
-    s_grid[0][0] = scorer[gap, gap]
+    s_grid[0][0] = scorer[scorer.gap, scorer.gap]
     d_grid[0][0] = (False, False, False)  # no movement
     for i in range(1, len_a):
         s_grid[0][i] = -i
@@ -64,8 +68,8 @@ def nw_grids(seq_a, seq_b, scorer, gap):
     for i, j in itertools.product(range(1, len_a), range(1, len_b)):
         # compute direction scorers
         diag = s_grid[j - 1][i - 1] + scorer[seq_a[i], seq_b[j]]
-        horz = s_grid[j][i - 1] + scorer[seq_a[i], gap]
-        vert = s_grid[j - 1][i] + scorer[gap, seq_b[j]]
+        horz = s_grid[j][i - 1] + scorer[seq_a[i], scorer.gap]
+        vert = s_grid[j - 1][i] + scorer[scorer.gap, seq_b[j]]
 
         # get best score and matching tuple
         best_score = max([diag, horz, vert])
@@ -78,7 +82,12 @@ def nw_grids(seq_a, seq_b, scorer, gap):
     return s_grid, d_grid
 
 
-def _nw_product(prev_alms, char_a, char_b, paths):
+def _nw_product(
+        prev_alms: List[Dict[str, List[Hashable]]],
+        char_a: Hashable,
+        char_b: Hashable,
+        paths: List[Dict[Hashable, List[Hashable]]],
+) -> List[Dict[str, List[Hashable]]]:
     """
     Internal function for building a product of paths.
 
@@ -90,11 +99,19 @@ def _nw_product(prev_alms, char_a, char_b, paths):
             {"a": [*alm["a"], char_a, *path["a"]], "b": [*alm["b"], char_b, *path["b"]]}
             for path in paths
         ]
+
     return ret_alms
 
 
 # pylint: disable=too-many-branches
-def nw_backtrace(seq_a, seq_b, d_grid, i=None, j=None, **kwargs):
+def nw_backtrace(
+        seq_a: List[Hashable],
+        seq_b: List[Hashable],
+        d_grid: List[List[Tuple[bool, bool, bool]]],
+        gap: Hashable,
+        i: Optional[int] = None,
+        j: Optional[int] = None,
+) -> List[Dict[Hashable, List[Hashable]]]:
     """
     Run the Needleman-Wunsch backtrace operation.
 
@@ -103,26 +120,25 @@ def nw_backtrace(seq_a, seq_b, d_grid, i=None, j=None, **kwargs):
     caller to reverse it (if so desired).
 
     As this function will only operate pairwise, for easiness of debugging and
-    inspection the returned structure does not follow the approach used alsewhere of
+    inspection the returned structure does not follow the approach used elsewhere of
     a list of sequences, but it is a dictionary with `a` and `b` keys.
 
-    Parameters
-    ==========
-    seq_a : str or list or tuple
-        First sequence for the pairwise alignment.
-    seq_b : str or list or tuple
-        Second sequence for the pairwise alignment.
-    d_grid: dict
-        A direction grid, as returned from `nw_grids`.
+    @param seq_a: First sequence for the pairwise alignment.
+    @param seq_b: Second sequence for the pairwise alignment.
+    @param d_grid: A direction grid, as returned from `nw_grids()`.
+    @param gap:
+    @param i:
+    @param j:
+    @return:
     """
 
     # Get parameters, and default for the full alignment, if (i, j) is not provided
-    gap = kwargs.get("gap", "-")
     if not i and not j:
         i = len(seq_a) - 1
         j = len(seq_b) - 1
 
     # Define empty, initial alignment collection with a single alignment
+    # TODO: as it is pairwise, we don´t really need "a" and "b" and can index a normal list
     alms = [{"a": [], "b": []}]
 
     # Does the backtrace, using recursion when necessary and changing in
@@ -148,8 +164,8 @@ def nw_backtrace(seq_a, seq_b, d_grid, i=None, j=None, **kwargs):
             j = j - 1
         elif d_grid[j][i] == (True, False, True):
             # diagonal and vertical
-            diag_paths = nw_backtrace(seq_a, seq_b, d_grid, i - 1, j - 1)
-            vert_paths = nw_backtrace(seq_a, seq_b, d_grid, i, j - 1)
+            diag_paths = nw_backtrace(seq_a, seq_b, d_grid, gap, i - 1, j - 1)
+            vert_paths = nw_backtrace(seq_a, seq_b, d_grid, gap, i, j - 1)
 
             ret_alms = _nw_product(alms, seq_a[i], seq_b[j], diag_paths)
             ret_alms += _nw_product(alms, gap, seq_b[j], vert_paths)
@@ -157,8 +173,8 @@ def nw_backtrace(seq_a, seq_b, d_grid, i=None, j=None, **kwargs):
             return ret_alms
         elif d_grid[j][i] == (True, True, False):
             # diagonal and horizontal
-            diag_paths = nw_backtrace(seq_a, seq_b, d_grid, i - 1, j - 1)
-            horz_paths = nw_backtrace(seq_a, seq_b, d_grid, i - 1, j)
+            diag_paths = nw_backtrace(seq_a, seq_b, d_grid, gap, i - 1, j - 1)
+            horz_paths = nw_backtrace(seq_a, seq_b, d_grid, gap, i - 1, j)
 
             ret_alms = _nw_product(alms, seq_a[i], seq_b[j], diag_paths)
             ret_alms += _nw_product(alms, seq_a[i], gap, horz_paths)
@@ -166,8 +182,8 @@ def nw_backtrace(seq_a, seq_b, d_grid, i=None, j=None, **kwargs):
             return ret_alms
         elif d_grid[j][i] == (False, True, True):
             # vertical and horizontal
-            vert_paths = nw_backtrace(seq_a, seq_b, d_grid, i, j - 1)
-            horz_paths = nw_backtrace(seq_a, seq_b, d_grid, i - 1, j)
+            vert_paths = nw_backtrace(seq_a, seq_b, d_grid, gap, i, j - 1)
+            horz_paths = nw_backtrace(seq_a, seq_b, d_grid, gap, i - 1, j)
 
             ret_alms = _nw_product(alms, gap, seq_b[j], vert_paths)
             ret_alms += _nw_product(alms, seq_a[i], gap, horz_paths)
@@ -175,9 +191,9 @@ def nw_backtrace(seq_a, seq_b, d_grid, i=None, j=None, **kwargs):
             return ret_alms
         elif d_grid[j][i] == (True, True, True):
             # diagonal, vertical, and horizontal
-            diag_paths = nw_backtrace(seq_a, seq_b, d_grid, i - 1, j - 1)
-            vert_paths = nw_backtrace(seq_a, seq_b, d_grid, i, j - 1)
-            horz_paths = nw_backtrace(seq_a, seq_b, d_grid, i - 1, j)
+            diag_paths = nw_backtrace(seq_a, seq_b, d_grid, gap, i - 1, j - 1)
+            vert_paths = nw_backtrace(seq_a, seq_b, d_grid, gap, i, j - 1)
+            horz_paths = nw_backtrace(seq_a, seq_b, d_grid, gap, i - 1, j)
 
             ret_alms = _nw_product(alms, seq_a[i], seq_b[j], diag_paths)
             ret_alms += _nw_product(alms, gap, seq_b[j], vert_paths)
@@ -198,56 +214,43 @@ def nw_backtrace(seq_a, seq_b, d_grid, i=None, j=None, **kwargs):
     return alms
 
 
-# Note that we implement **kwargs also for having a common interface
-def nw_align(seq_a, seq_b, matrix, gap="-", **kwargs):
+def nw_align(
+        seq_a: Sequence[Hashable],
+        seq_b: Sequence[Hashable],
+        matrix: ScoringMatrix,
+        k: Optional[int] = None,
+):
     """
     Perform pairwise alignment with the Asymmetric Needleman-Wunsch method.
 
-    Parameters
-    ==========
-    seq_a : list
-        The first sequence to be aligned.
-    seq_b : list
-        The second sequence to be aligned.
-    matrix : dict or ScoringMatrix
-        The matrix for the asymmetric scoring. Note that the order of the domains must
+    @param seq_a: The first sequence to be aligned.
+    @param seq_b: The second sequence to be aligned.
+    @param matrix: The matrix for the asymmetric scoring. Note that the order of the domains must
         follow the order of the sequences provided, that is, the matrix should be
-        addressed with [seq_a_symbol, seq_b_symbol]. The implementation assumes the
+        addressed with `(seq_a_symbol, seq_b_symbol)`. The implementation assumes the
         matrix has already been filled or will be automatically filled if
         necessary (with inference of missing values).
-    gap : string
-        The symbol to be used for gap representation. If `matrix` is a ScoringMatrix,
-        it must match the gap symbol specified in it. Defaults to `"-"`.
-    k : int
-        Number of alignments to include in return. Note that is the upper limit, as it
+    @param k: Number of alignments to include in return. Note that is the upper limit, as it
         impossible to guarantee that there will be as many alignments as requested (due
         to both the sequences and the scoring matrix) and that this implementation of
         the Needleman-Wunsch algorithm is not intended for collection of as many
         k-best alignments as possible (if so desired, the `yenksp` method is
         recommended). Defaults to `None`, meaning that all the collected alignments
         will be returned.
+    @return:
     """
-
-    # Get arguments
-    k = kwargs.get("k", None)
-
-    # Validate parameters
-    if not gap:
-        raise ValueError("Gap symbol must be a non-empty string.")
-    if not isinstance(matrix, dict):  # ScoringMatrix
-        if gap != matrix.gap:
-            raise ValueError("Different gap symbols.")
 
     # Add initial gaps; note that this also makes a
     # copy of the contents of each sequence, so we preserve the original
     # memory in-place
-    seq_a = [gap] + list(seq_a)
-    seq_b = [gap] + list(seq_b)
+    seq_a = [matrix.gap] + list(seq_a)
+    seq_b = [matrix.gap] + list(seq_b)
 
     # Build Needleman-Wunsch grids; note that the scoring grid (the first value returned
     # by `nw_grids()`) is not used in this routine, as the scoring is performed with the
     # more complete `score_alignment()` function.
-    _, d_grid = nw_grids(seq_a, seq_b, matrix, gap)
+    # TODO: do we really need to pass matrix.gap instead of reading it from there? the method is more general here...
+    _, d_grid = nw_grids(seq_a, seq_b, matrix)
 
     # Obtain the alignments from backtrace, and them along with a score;
     # sequences are reversed after it with `[::-1]`, as NW follows a northwest-direction;
@@ -256,10 +259,10 @@ def nw_align(seq_a, seq_b, matrix, gap="-", **kwargs):
     alms = [
         {
             "seqs": [alm["a"][::-1], alm["b"][::-1]],
-            "score": utils.score_alignment([alm["a"], alm["b"]], matrix),
+            "score": score_alignment([alm["a"], alm["b"]], matrix),
         }
-        for alm in nw_backtrace(seq_a, seq_b, d_grid)
+        for alm in nw_backtrace(seq_a, seq_b, d_grid, matrix.gap)
     ]
 
     # Sort and return
-    return utils.sort_alignments(alms)[:k]
+    return sort_alignments(alms)[:k]

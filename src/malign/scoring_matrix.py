@@ -79,15 +79,13 @@ class ScoringMatrix:
             Defaults to `mean`.
         """
 
+        # Set values, so that the matrix can be used even empty
+        self.impute_method = impute_method
+        self.gap = gap
+
         # If `scores` is not provided, we initialize an empty scorer (which will likely load from disk).
-        # TODO: not reading anything, not even `gap`; should this be changed?
         # TODO: can this check be removed?
         if scores:
-            # Extract additional values; note that these parameters
-            # are not considered when loading from disk
-            self.impute_method = impute_method
-            self.gap = gap
-
             # Extract the domains (or build them, if they were not provided) and
             # make sure they are sorted and comparable.
             self._init_domains(domains, scores)
@@ -421,7 +419,7 @@ class ScoringMatrix:
 
     # TODO: decide/inform on what to do when a sub-domain is requested and it has
     #       not been computed.
-    def __getitem__(self, key: Tuple[Hashable]) -> float:
+    def __getitem__(self, key: Tuple[Hashable, ...]) -> float:
         """
         Return the score associated with a tuple of alignments per domain.
 
@@ -434,7 +432,7 @@ class ScoringMatrix:
 
         return self.scores[tuple(key)]
 
-    def __setitem__(self, key: Tuple[Hashable], value: float) -> None:
+    def __setitem__(self, key: Tuple[Hashable, ...], value: float) -> None:
         """
         Set the value of a key in the multidimensional matrix.
 

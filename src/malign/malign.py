@@ -16,7 +16,7 @@ from .scoring_matrix import ScoringMatrix
 
 
 def _build_candidates(
-        potential_alms: Dict[int, Set[Tuple[Hashable, ...]]], matrix: ScoringMatrix
+    potential_alms: Dict[int, Set[Tuple[Hashable, ...]]], matrix: ScoringMatrix
 ) -> Set[Tuple[Tuple[Hashable, ...]]]:
     """
     Internal function used by `_malign()`.
@@ -59,11 +59,10 @@ def _build_candidates(
 # TODO: return type of alignment
 # pylint: disable=too-many-locals
 def _collect_alignments(
-        seqs: List[List[Hashable]],
-        matrix: ScoringMatrix,
-        pw_func,
-        gap: Hashable,
-        k: Optional[int] = None,
+    seqs: List[List[Hashable]],
+    matrix: ScoringMatrix,
+    pw_func,
+    k: Optional[int] = None,
 ):
     """
     Internal function for multiwise alignment.
@@ -78,8 +77,6 @@ def _collect_alignments(
     @param matrix: The matrix used for scoring the alignment. If provided, must match in length the
         number of sequences in `seqs`.
     @param pw_func:
-    @param gap: The symbol to be used for gap representation. If `matrix` is a ScoringMatrix,
-        it must match the gap symbol specified in it.
     @param k: The maximum number of alignments to return. As there is no guarantee that the
         method being used or the sequences provided allow for `k` different alignments,
         the actual number might be less than `k`. If `None`, it will allow each pairwise
@@ -105,9 +102,7 @@ def _collect_alignments(
     potential = defaultdict(lambda: defaultdict(set))
     for idx_x, idx_y in domains:
         # Run pairwise alignment
-        alms = pw_func(
-            seqs[idx_x], seqs[idx_y], k=k, gap=gap, matrix=sub_matrix[idx_x, idx_y]
-        )
+        alms = pw_func(seqs[idx_x], seqs[idx_y], k=k, matrix=sub_matrix[idx_x, idx_y])
 
         # Store in `potential` by length
         for alm in alms:
@@ -149,7 +144,7 @@ def _collect_alignments(
                     alm_idx = 1  # seqs[seq_idx] is the second element
 
                 # Align and add only those with the requested length
-                for alm in pw_func(seq_a, seq_b, gap=gap, k=k, matrix=mtx):
+                for alm in pw_func(seq_a, seq_b, k=k, matrix=mtx):
                     if len(alm["seqs"][alm_idx]) == length:
                         potential[length][seq_idx].add(tuple(alm["seqs"][alm_idx]))
 
@@ -169,11 +164,10 @@ def _collect_alignments(
 # TODO: alm object in return
 # TODO: accept List[Sequence]?
 def multi_align(
-        seqs: List[List[Hashable]],
-        method: str,
-        matrix: Optional[ScoringMatrix] = None,
-        k: int = 1,
-        gap: Hashable = "-",
+    seqs: List[List[Hashable]],
+    method: str,
+    matrix: Optional[ScoringMatrix] = None,
+    k: int = 1,
 ):
     """
     Compute multiple alignments for a list of sequences.
@@ -192,8 +186,6 @@ def multi_align(
     @param k: The maximum number of alignments to return. As there is no guarantee that the
         method being used or the sequences provided allow for `k` different alignments,
         the actual number might be less than `k`. Defaults to 1.
-    @param gap: The symbol to be used for gap representation. If `matrix` is a ScoringMatrix,
-        it must match the gap symbol specified in it. Defaults to `"-"`.
     @return:
     """
 
@@ -201,18 +193,12 @@ def multi_align(
     # Note that, while not recommended, this even allows to mix different iterable
     # types in `seqs`. The conversion also guarantees that a copy is made, for
     # immutability.
-    seqs = [list(seq) for seq in seqs]
+    # TODO: rename different `seqs`
+    seqs: List[List[Hashable]] = [list(seq) for seq in seqs]
 
     # Get the user-provided matrix, or compute an identity one
     if not matrix:
         matrix = identity_matrix(seqs, match=+1, gap_score=-1)
-
-    # Get parameters and validate them
-    if not gap:
-        raise ValueError("Gap symbol must be a non-empty string.")
-
-    if gap != matrix.gap:
-        raise ValueError("Different gap symbols.")
 
     if k < 1:
         raise ValueError("At least one alignment must be returned.")
@@ -223,7 +209,7 @@ def multi_align(
     # Run alignment method; note that the `dumb` method does not rely in expansion
     # from pairwise alingments with `_malign` as others
     if method == "dumb":
-        alms = dumb_malign(seqs, gap=gap)
+        alms = dumb_malign(seqs, gap=matrix.gap)
     else:
         if method == "anw":
             pairwise_func = nw_align
@@ -234,6 +220,6 @@ def multi_align(
             pairwise_func = yenksp_align
             pw_k = k ** 2
 
-        alms = _collect_alignments(seqs, matrix, pw_func=pairwise_func, gap=gap, k=pw_k)
+        alms = _collect_alignments(seqs, matrix, pw_func=pairwise_func, k=pw_k)
 
     return alms[:k]
