@@ -9,7 +9,9 @@ import json
 
 # Import 3rd-party libraries
 from sklearn.ensemble import ExtraTreesRegressor
-from sklearn.experimental import enable_iterative_imputer # pylint: disable=unused-import
+from sklearn.experimental import (
+    enable_iterative_imputer,
+)  # pylint: disable=unused-import
 from sklearn.impute import SimpleImputer, IterativeImputer
 from sklearn.linear_model import BayesianRidge
 from sklearn.neighbors import KNeighborsRegressor
@@ -250,7 +252,7 @@ class ScoringMatrix:
         called by `__init__()`.
         """
 
-        with open(filename) as json_handler:
+        with open(filename, encoding="utf-8") as json_handler:
             serial_data = json.load(json_handler)
 
             self.gap = serial_data["gap"]
@@ -304,7 +306,7 @@ class ScoringMatrix:
         }
 
         # Open handler, build serialized data, and write to disk
-        with open(filename, "w") as json_handler:
+        with open(filename, "w", encoding="utf-8") as json_handler:
             serial_data = {
                 "domains": self.domains,
                 "gap": self.gap,
