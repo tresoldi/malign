@@ -4,15 +4,19 @@ Module with functions for the k-best pairwise alignment.
 
 # Import Python standard libraries
 from itertools import islice
+from typing import Sequence, Hashable, Optional, Tuple, List
 
 # Import 3rd party libraries
 import networkx as nx
 
 # Import other modules
 import malign.utils as utils
+from .scoring_matrix import ScoringMatrix
 
 
-def compute_graph(seq_a, seq_b, matrix=None, gap="-"):
+def compute_graph(
+    seq_a: Sequence[Hashable], seq_b: Sequence[Hashable], matrix: ScoringMatrix
+) -> nx.DiGraph:
     """
     Computes a weighted directed graph for alignment.
 
@@ -32,16 +36,10 @@ def compute_graph(seq_a, seq_b, matrix=None, gap="-"):
     the second sequence (`seq_b`) in terms of the first one (`seq_a`).
     Sequences can include gap symbols.
 
-    Parameters
-    ==========
-
-    seq_a : list
-        A list of hasheable elements to be aligned. The pairwise alignment
+    @param seq_a: A list of hashable elements to be aligned. The pairwise alignment
         is build in terms of this first sequence.
-    seq_b : list
-        A list of hasheable elements to be aligned.
-    matrix: ScoringMatrix
-        A ScoringMatrix the alignments. Dictionary keys
+    @param seq_b: A list of hashable elements to be aligned.
+    @param matrix: A ScoringMatrix the alignments. Dictionary keys
         are tuples in the format (`seq_a character`, `seq_b character`),
         dictionary values are numbers holding the
         score (the higher the score, the more favoured will the
@@ -50,11 +48,7 @@ def compute_graph(seq_a, seq_b, matrix=None, gap="-"):
         a default one will be built. The implementation assumes the
         matrix has already been filled or will be automatically filled if
         necessary (with inference of missing values).
-
-    Returns
-    =======
-    graph : networkx graph
-        A Diretional Graph with alignment sites as nodes and transitions
+    @return: A Diretional Graph with alignment sites as nodes and transitions
         as weighted edges.
     """
 
@@ -72,8 +66,8 @@ def compute_graph(seq_a, seq_b, matrix=None, gap="-"):
     # NOTE: the "+" operation on lists here allows us to, in a single step,
     # add the necessary alignment gap and make an in-memory copy of both
     # sequences, preserving the original ones.
-    seq_a = [gap] + list(seq_a)
-    seq_b = [gap] + list(seq_b)
+    seq_a = [matrix.gap] + list(seq_a)
+    seq_b = [matrix.gap] + list(seq_b)
 
     # Build the directional graph and add edges iterating from the bottom
     # right to the top left corner (as in NW).
@@ -101,15 +95,15 @@ def compute_graph(seq_a, seq_b, matrix=None, gap="-"):
             elif i == 0:
                 dig_score = None
                 hor_score = None
-                ver_score = matrix[symbol_a, gap]
+                ver_score = matrix[symbol_a, matrix.gap]
             elif j == 0:
                 dig_score = None
-                hor_score = matrix[gap, symbol_b]
+                hor_score = matrix[matrix.gap, symbol_b]
                 ver_score = None
             else:
                 dig_score = matrix[symbol_a, symbol_b]
-                hor_score = matrix[gap, symbol_b]
-                ver_score = matrix[symbol_a, gap]
+                hor_score = matrix[matrix.gap, symbol_b]
+                ver_score = matrix[symbol_a, matrix.gap]
 
             # Add edges (and nodes automatically); note that this, as expected, will
             # not add or adjust the top left cell (0, 0).
@@ -123,7 +117,12 @@ def compute_graph(seq_a, seq_b, matrix=None, gap="-"):
     return graph
 
 
-def build_align(path, seq_a, seq_b, gap="-"):
+def build_align(
+    path: List[Tuple[int, int]],
+    seq_a: Sequence[Hashable],
+    seq_b: Sequence[Hashable],
+    gap: Hashable = "-",
+):
     """
     Builds a pairwise alignment from a path of sequence indexes.
 
@@ -176,51 +175,46 @@ def build_align(path, seq_a, seq_b, gap="-"):
             alm_a.append(seq_a.pop(0))
             alm_b.append(seq_b.pop(0))
 
+    # TODO: Remove "seqs" once the alignment object is written
     return {"seqs": [alm_a, alm_b]}
 
 
-def align(graph, nodes, seq_a, seq_b, matrix, **kwargs):
+# TODO: return type
+def align(
+    graph: nx.DiGraph,
+    ne_loc: Tuple[int, int],
+    sw_loc: Tuple[int, int],
+    seq_a: Sequence[Hashable],
+    seq_b: Sequence[Hashable],
+    matrix: ScoringMatrix,
+    n_paths: Optional[int] = None,
+):
     """
     Return the `k` best alignments in terms of costs.
 
     The function with take a path as source and target nodes in a graph,
     score the best alignments in terms of transition weights and gap
     penalties, and return the `k` best alignments. As an NP hard problem,
-    it is not mathmatically guaranteed that the best path will be found
+    it is not mathematically guaranteed that the best path will be found
     unless the search pass, defined by `n_paths`, includes all possible
     paths.
 
-    Parameters
-    ==========
-    graph : networkx object
-        A directed weighted graph for the alignment, as returned by
+    @param graph: A directed weighted graph for the alignment, as returned by
         compute_graph().
-    nodes : list
-        A list of two graph labels in the format `(source, target)`,
-        indicating the alignment path source and target.
-    seq_a : list
-        A list of elements used as the first sequence (on the vertical
+    @param ne_loc:
+    @param sw_loc:
+    @param seq_a: A list of elements used as the first sequence (on the vertical
         border).
-    seq_b : list
-        A list of elements used as the second sequences (on the horizontal
+    @param seq_b: A list of elements used as the second sequences (on the horizontal
         border).
-    gap : str
-        A string used as gap symbol. Defaults to `"-"`.
-    n_paths : int
-        The number of alignment paths to be collected for scoring. If
+    @param matrix:
+    @param n_paths: The number of alignment paths to be collected for scoring. If
         not provided, a default value will be calculated based on the
         length of the sequences and the complexity of the graph.
-
-    Returns
-    =======
-    alms : list
-        A sorted list of best alignments in the format `[alm, cost]`,
+    @return: A sorted list of best alignments in the format `[alm, cost]`,
         with `alm` as a list of aligned sequences and `cost` the
         computed alignment cost including transitions and penalties.
     """
-
-    # Get arguments with defaults
-    gap = kwargs.get("gap", "-")
 
     # Given that `networkx` does not return the sum of edge weights and
     # that we need to perform individual score adjustments for
@@ -230,18 +224,18 @@ def align(graph, nodes, seq_a, seq_b, matrix, **kwargs):
     # to collect is difficult to determine beforehand, so whether the
     # user is allowed to provide it or we determine it with this simple
     # operation.
-    n_paths = kwargs.get("n_paths", min(len(seq_a), len(seq_b)))
+    n_paths = n_paths or min(len(seq_a), len(seq_b))
 
     # Compute the paths from `networkx`; note that this is an iterator,
     # which is sliced and converted to a list in the loop below
-    paths = nx.shortest_simple_paths(graph, nodes[0], nodes[1], weight="weight")
+    paths = nx.shortest_simple_paths(graph, ne_loc, sw_loc, weight="weight")
 
     # Iterate over the collected paths, collecting the corresponding
     # alignments and weights so we can sort after the loop
     alignments = []
     for path in list(islice(paths, n_paths)):
         # Build sequential representation of the alignment alignment
-        alignment = build_align(path, seq_a, seq_b, gap=gap)
+        alignment = build_align(path, seq_a, seq_b, gap=matrix.gap)
         alignment["score"] = utils.score_alignment(alignment["seqs"], matrix)
         alignments.append(alignment)
 
@@ -249,19 +243,33 @@ def align(graph, nodes, seq_a, seq_b, matrix, **kwargs):
     return utils.sort_alignments(alignments)
 
 
-def yenksp_align(seq_a, seq_b, k=4, matrix=None, **kwargs):
+# TODO: return type
+def yenksp_align(
+    seq_a: Sequence[Hashable],
+    seq_b: Sequence[Hashable],
+    k: Optional[int] = 4,
+    matrix: Optional[ScoringMatrix] = None,
+    ne_loc: Tuple[int, int] = (0, 0),
+    sw_loc: Optional[Tuple[int, int]] = None,
+):
     """
     Perform pairwise alignment with the Yen K Shortest Paths method.
 
-    Parameters
-    ==========
-
-    k: int or None
-        The number of paths to compute. The method can compute all possible paths
+    @param seq_a: The first sequence to be aligned.
+    @param seq_b: The second sequence to be aligned.
+    @param k: The number of paths to compute. The method can compute all possible paths
         by explicitly passing `None` as a value, but this might be prohibitively
         expansive depending on the length of the sequences and the complexity
         of the alphabets/matrix. Defaults to 4 (that is, twice the number of
         sequences).
+    @param matrix: The matrix for the asymmetric scoring. Note that the order of the domains must
+        follow the order of the sequences provided, that is, the matrix should be
+        addressed with `(seq_a_symbol, seq_b_symbol)`. The implementation assumes the
+        matrix has already been filled or will be automatically filled if
+        necessary (with inference of missing values).
+    @param ne_loc:
+    @param sw_loc:
+    @return:
     """
 
     # Obtain parameters
@@ -269,12 +277,10 @@ def yenksp_align(seq_a, seq_b, k=4, matrix=None, **kwargs):
         matrix = utils.identity_matrix([seq_a, seq_b])
 
     # Get the paths extremes, if not provided
-    ne_loc = kwargs.get("ne_loc", (0, 0))
-    sw_loc = kwargs.get("sw_loc", (len(seq_a), len(seq_b)))
+    sw_loc = sw_loc or (len(seq_a), len(seq_b))
 
     # Compute the graph for the alignment
-    # TODO: deal matrix.gap
-    graph = compute_graph(seq_a, seq_b, matrix, matrix.gap)
+    graph = compute_graph(seq_a, seq_b, matrix)
 
     # Align from the graph and return
-    return align(graph, (ne_loc, sw_loc), seq_a, seq_b, matrix, n_paths=k)
+    return align(graph, ne_loc, sw_loc, seq_a, seq_b, matrix, n_paths=k)

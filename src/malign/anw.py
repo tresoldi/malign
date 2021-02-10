@@ -27,7 +27,7 @@ DIRECTION_MAP = {
 
 
 def nw_grids(
-        seq_a: List[Hashable], seq_b: List[Hashable], scorer: ScoringMatrix
+    seq_a: List[Hashable], seq_b: List[Hashable], scorer: ScoringMatrix
 ) -> Tuple[List[List[float]], List[List[Tuple[bool, bool, bool]]]]:
     """
     Build the Needleman-Wunsch grids
@@ -83,10 +83,10 @@ def nw_grids(
 
 
 def _nw_product(
-        prev_alms: List[Dict[str, List[Hashable]]],
-        char_a: Hashable,
-        char_b: Hashable,
-        paths: List[Dict[Hashable, List[Hashable]]],
+    prev_alms: List[Dict[str, List[Hashable]]],
+    char_a: Hashable,
+    char_b: Hashable,
+    paths: List[Dict[Hashable, List[Hashable]]],
 ) -> List[Dict[str, List[Hashable]]]:
     """
     Internal function for building a product of paths.
@@ -105,12 +105,12 @@ def _nw_product(
 
 # pylint: disable=too-many-branches
 def nw_backtrace(
-        seq_a: List[Hashable],
-        seq_b: List[Hashable],
-        d_grid: List[List[Tuple[bool, bool, bool]]],
-        gap: Hashable,
-        i: Optional[int] = None,
-        j: Optional[int] = None,
+    seq_a: List[Hashable],
+    seq_b: List[Hashable],
+    d_grid: List[List[Tuple[bool, bool, bool]]],
+    gap: Hashable,
+    i: Optional[int] = None,
+    j: Optional[int] = None,
 ) -> List[Dict[Hashable, List[Hashable]]]:
     """
     Run the Needleman-Wunsch backtrace operation.
@@ -215,10 +215,10 @@ def nw_backtrace(
 
 
 def nw_align(
-        seq_a: Sequence[Hashable],
-        seq_b: Sequence[Hashable],
-        matrix: ScoringMatrix,
-        k: Optional[int] = None,
+    seq_a: Sequence[Hashable],
+    seq_b: Sequence[Hashable],
+    matrix: ScoringMatrix,
+    k: Optional[int] = None,
 ):
     """
     Perform pairwise alignment with the Asymmetric Needleman-Wunsch method.
