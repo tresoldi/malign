@@ -6,6 +6,7 @@ Module for scoring matrices.
 import copy
 import itertools
 import json
+from typing import Hashable, Tuple, Dict, List, Optional
 
 # Import 3rd-party libraries
 from sklearn.ensemble import ExtraTreesRegressor
@@ -31,11 +32,11 @@ class ScoringMatrix:
 
     The class, however, provides a number of facilities for dealing with the
     multidimensionality of the matrices for multiple alignment on
-    multiple domains, as intended by the library. Those are maily:
+    multiple domains, as intended by the library. Those are mainly:
 
       - allowing and mandating a unique domain for each sequence, even in
         cases where the domains are equal
-      - allow assymetric scoring value
+      - allow asymmetric scoring value
       - treat gaps as full, normal "symbols"
 
     The class especially facilitates dealing with sparse matrices/vectors and
@@ -50,81 +51,95 @@ class ScoringMatrix:
     must be specified by using a `None` value in the key.
     """
 
-    def __init__(self, scores, **kwargs):
+    def __init__(
+        self,
+        scores: Dict[Tuple[Hashable, ...], float] = None,
+        domains: Optional[List[List[Hashable]]] = None,
+        gap: Hashable = "-",
+        impute_method: Optional[str] = "mean",
+    ):
         """
         Initialize a scoring matrix.
 
-        Either a dictionary of scores or a filename must be provided in
-        `scores`.
-
-        Parameters
-        ==========
-
-        scores : str or dict
-            Either a string with the path to a serialized matrix in JSON format,
-            or a scoring dictionary, with tuples of strings as keys (respecting
-            the order that will be used when using the matrix) and floating
-            points as values.
-        domains : list of lists of strings
-            A list of lists of strings, with the set of symbols ("domain") that
-            composes each domain that will be used for alignment. If not
-            provided, it will be computed from the `scores`, assuming that
-            all symbols are used at least once; the only symbol automatically
-            added to each domain, if not present in `scores`, is the gap.
-            Note that by definition, as it is treated as a normal value, the
-            gap symbol must be part of each domain unless it explicitly
-            assumed that the domain does not allow gaps.
-        gap : str
-            The string to use as a gap symbol. Defaults to `-`.
-        impute_method : string or None
-            The method used to fill empty elements in the matrix, using
-            values computed from the ones provided. If set to `None`, the
-            matrix will not be filled. Choices are `mean`, `median`,
-            `decision_tree`, `extra_trees`, `k_neighbors`, and `bayesian_ridge`.
-            If not provided, will default to `mean`.
+        @param scores: An optional scoring dictionary, with tuples of hashable elements, usually
+            strings, as keys (respecting the order that will be used when using the matrix) and
+            floating points as values. If not provided, a blank ScoringMatrix will be initialized,
+            and all other initialization arguments will be disregarded.
+        @param domains: A list of lists of hashable elements, with the set of symbols ("domain") that
+            composes each domain that will be used for alignment. If not provided, it will be
+            computed from the `scores`, assuming that all symbols are used at least once; the
+            only symbol automatically added to each domain, if not found in `scores`, is the `gap`.
+            Note that by definition, as it is treated as a normal value, the gap symbol must be
+            part of each domain unless it is explicitly assumed that the domain does not allow gaps.
+        @param gap: The hashable element to use as a gap symbol. Defaults to `"-"`.
+        @param impute_method: An optional string with the name of the method used to fill empty
+            elements in the matrix, using values imputed from the ones that are provided. If not
+            set (i.e., if equal to `None`), the matrix will not be filled. Choices are `mean`,
+            `median`, `decision_tree`, `extra_trees`, `k_neighbors`, and `bayesian_ridge`.
+            Defaults to `mean`.
         """
 
-        # If a filename was provided, load a serialized matrix; otherwise,
-        # initialize from the user-provided `scores`
-        if isinstance(scores, str):
-            self._load(scores)
-        else:
+        # If `scores` is not provided, we initialize an empty scorer (which will likely load from disk).
+        # TODO: not reading anything, not even `gap`; should this be changed?
+        # TODO: can this check be removed?
+        if scores:
             # Extract additional values; note that these parameters
             # are not considered when loading from disk
-            self._impute_method = kwargs.get("impute_method", "mean")
-            self.gap = kwargs.get("gap", "-")
+            self.impute_method = impute_method
+            self.gap = gap
 
-            # Extract the domains or build them, if they were not provided.
-            self.domains = kwargs.get("domains", None)
+            # Extract the domains (or build them, if they were not provided) and
+            # make sure they are sorted and comparable.
+            self._init_domains(domains, scores)
 
+            # Initialize from the scores
+            self._init_from_scores(scores)
+
+    def _init_domains(
+        self,
+        domains: Optional[List[List[Hashable]]],
+        scores: Dict[Tuple[Hashable, ...], float],
+    ):
+        """
+        Internal method for initializing domains from user-provided arguments.
+
+        @param domains: The `domains` argument passed to `.__init__()`.
+        @param scores: The `scores` argument passed to `.__init__()`.
+        """
+
+        if domains is not None:
+            self.domains = domains
+        else:
             # Collect domains from scores. Note that the gap symbol is the
             # only one automatically added to each domain, and that
             # `None`s are discarded as the user or the library might be
             # passing sub-matrices as well (as when creating an
             # identity matrix, when it makes more sense to provide the
             # sub-matrix identities.
-            if not self.domains:
-                self.domains = [
-                    set([symbol for symbol in domain if symbol] + [self.gap])
-                    for domain in zip(*scores.keys())
-                ]
+            self.domains = [
+                set([symbol for symbol in domain if symbol] + [self.gap])
+                for domain in zip(*scores.keys())
+            ]
 
-            # Organize the domains; as this is applied to both user-provide
-            # and code-derived lists, we apply `set` and `sorted` in all
-            # cases to simplify the code
-            self.domains = [sorted(set(domain)) for domain in self.domains]
+        # Organize the domains; as this is applied to both user-provide
+        # and code-derived lists, we apply `set` and `sorted` in all
+        # cases to simplify the code
+        self.domains = [sorted(set(domain)) for domain in self.domains]
 
-            # Initialize from the scores
-            self._init_from_scores(scores)
-
-    def _init_from_scores(self, scores):
+    def _init_from_scores(self, scores: Dict[Tuple[Hashable, ...], float]):
         """
-        Internal function for initializing from user-provided scores.
+        Internal method for initializing from user-provided scores.
+
+        The method assumes that domains have already been initialized by an internal
+        call to `._init_domains()`.
+
+        @param scores: The `scores` argument passed to `.__init__()`.
         """
 
         # Make sure all `scores` report the same number of domains, store
         # the number of domains and an internal variable with the range (which
         # is used multiple times; the one facing the user is `self.num_domains`)
+        # TODO: remove "domain range" (._dr) or, at least, expand the name
         self.num_domains = len(self.domains)
         self._dr = tuple(range(self.num_domains))
 
@@ -150,8 +165,8 @@ class ScoringMatrix:
         self.scores[tuple([self.gap] * self.num_domains)] = 0.0
 
         # Fill the matrix with the appropriate method if requested.
-        if self._impute_method:
-            if self._impute_method not in [
+        if self.impute_method:
+            if self.impute_method not in [
                 "mean",
                 "median",
                 "decision_tree",
@@ -165,7 +180,7 @@ class ScoringMatrix:
 
     def _fill_matrix(self):
         """
-        Internal function for filling a matrix with the `standard` method.
+        Internal function for filling a matrix with an imputation method.
         """
 
         # We perform matrix imputation on multi-hot vectors, with one true
@@ -185,7 +200,7 @@ class ScoringMatrix:
             )
         )
 
-        # Fill the matrix for inputation for each possible combination
+        # Fill the matrix for imputation for each possible combination
         domains_with_none = [[None] + domain for domain in self.domains]
         train_matrix = []
         imp_matrix = []
@@ -210,22 +225,22 @@ class ScoringMatrix:
 
         # Instantiate the imputer, train it, and fill the matrix
         # TODO: allow setting more options when initializing, such num estimators and random state
-        if self._impute_method == "decision_tree":
+        if self.impute_method == "decision_tree":
             estimator = DecisionTreeRegressor(max_features="sqrt", random_state=0)
             imputer = IterativeImputer(random_state=0, estimator=estimator)
-        elif self._impute_method == "extra_trees":
+        elif self.impute_method == "extra_trees":
             estimator = ExtraTreesRegressor(n_estimators=10, random_state=0)
             imputer = IterativeImputer(random_state=0, estimator=estimator)
-        elif self._impute_method == "k_neighbors":
+        elif self.impute_method == "k_neighbors":
             estimator = KNeighborsRegressor(n_neighbors=15)
             imputer = IterativeImputer(random_state=0, estimator=estimator)
-        elif self._impute_method == "bayesian_ridge":
+        elif self.impute_method == "bayesian_ridge":
             estimator = BayesianRidge()
             imputer = IterativeImputer(random_state=0, estimator=estimator)
-        elif self._impute_method in ["mean", "median"]:
-            imputer = SimpleImputer(missing_values=np.nan, strategy=self._impute_method)
+        elif self.impute_method in ["mean", "median"]:
+            imputer = SimpleImputer(missing_values=np.nan, strategy=self.impute_method)
         else:
-            # Currently default to `mean
+            # Currently default to `mean`
             imputer = SimpleImputer(missing_values=np.nan, strategy="mean")
 
         imputer.fit(train_matrix)
@@ -244,12 +259,14 @@ class ScoringMatrix:
 
             self.scores[tuple(cat_vector)] = value
 
-    def _load(self, filename):
+    # TODO: allow to return a ScoringMatrix, so we have `ScoringMatrix().load(filename)`
+    # TODO: make sure it works with types other than strings, at least integers
+    # TODO: better solution than JSON for serializing? perhaps just pickle?
+    def load(self, filename: str) -> None:
         """
         Internal function for loading a serialized matrix from file.
 
-        This function is not supposed to be used directly by the user, but
-        called by `__init__()`.
+        @param filename: Path to the file holding the matrix to be loaded.
         """
 
         with open(filename, encoding="utf-8") as json_handler:
@@ -260,7 +277,7 @@ class ScoringMatrix:
             self.domains = serial_data["domains"].copy()
 
             # Make sure values are floats
-            # TODO: should "NULL" be "0000000000"?
+            # TODO: should "NULL" be "0000000000"? "NULL" could be a symbol...
             self.scores = {
                 tuple(
                     [
@@ -271,7 +288,7 @@ class ScoringMatrix:
                 for key, value in serial_data["scores"].items()
             }
 
-    def save(self, filename):
+    def save(self, filename: str) -> None:
         """
         Serialize a matrix to disk.
 
@@ -279,11 +296,7 @@ class ScoringMatrix:
         lists as keys, the `" / "` symbol used for serialization (note the
         spaces) is not allowed.
 
-        Parameters
-        ==========
-
-        filename : str
-            Path where to write serialized data.
+        @param filename: Path to the file where to write the serialized matrix.
         """
 
         # Make sure the reserved symbol is not used
@@ -316,8 +329,9 @@ class ScoringMatrix:
 
             json.dump(serial_data, json_handler, indent=4, ensure_ascii=False)
 
-    # TODO: should cache?
-    def compute_submatrices(self, domains):
+    # TODO: should cache? should be internal?
+    # TODO: accept only list or sequence?
+    def compute_submatrices(self, domains: List[Tuple[int, ...]]):
         """
         Compute submatrices from a collection of domains.
 
@@ -326,7 +340,7 @@ class ScoringMatrix:
         and debugging, as well as in some methods for smoothing.
         """
 
-        sub_matrix_scores = {}
+        sub_matrix_scores: Dict[Tuple[Hashable, ...], ScoringMatrix] = {}
 
         for sub_domain in domains:
             # Trigger the computation/completion of the domain
@@ -334,7 +348,7 @@ class ScoringMatrix:
             # TODO: maybe some flag? check if filled indeed?
 
             # Collect all scores for the given domain
-            sub_scores = {}
+            sub_scores: Dict[Tuple[Hashable, ...], float] = {}
             for key, value in self.scores.items():
                 # Make sure that all entries of domain exist...
                 check = [key[idx] is not None for idx in sub_domain]
@@ -350,6 +364,7 @@ class ScoringMatrix:
 
         return sub_matrix_scores
 
+    # TODO: use __copy__ and __deepcopy__ properly
     def copy(self):
         """
         Return a copy of the current matrix object.
@@ -360,24 +375,22 @@ class ScoringMatrix:
         matrix : ScoringMatrix
             A copy of the current ScoringMatrix.
         """
+
+        # TODO: can we perform the copy manually?
         return copy.deepcopy(self)
 
     # TODO: currently only working for 2 or 3 domains
     # TODO: use more options from tabulate
-    def tabulate(self):
+    def tabulate(self) -> str:
         """
         Build a string with a tabulated representation of the matrix.
 
-        Returns
-        =======
-        table : str
-            A string with the representation of the matrix, intended for human
-            consuption.
+        @return: A string with a tabular representation of the matrix, intended for human
+            inspection.
         """
 
         rows = []
         if self.num_domains == 2:
-
             for symbol_a in self.domains[0]:
                 row = [symbol_a] + [
                     self.scores[symbol_a, symbol_b] for symbol_b in self.domains[1]
@@ -406,33 +419,29 @@ class ScoringMatrix:
 
         return tabulate(rows, headers=headers, tablefmt="github")
 
-    def __getitem__(self, key):
+    # TODO: decide/inform on what to do when a sub-domain is requested and it has
+    #       not been computed.
+    def __getitem__(self, key: Tuple[Hashable]) -> float:
         """
         Return the score associated with a tuple of alignments per domain.
 
         Sub-domains can be specified by passing a `None` to the positions the key
-        does not apply.
+        does not apply, e.g. `("a", "b", None)`.
 
-        If a sub-domain is requested and it has not been computed so far,
-        it will be inferred and cached for reuse.
-
-        Parameters
-        ==========
-
-        key : tuple of strings
-            The element in the multidimensional matrix to be queried.
-
-        Returns
-        =======
-
-        value : float
-            The value associated with the element.
+        @param key: The element in the multidimensional matrix to be queried.
+        @return: The value associated with the requested element.
         """
 
         return self.scores[tuple(key)]
 
-    def __setitem__(self, key, value):
-        # We need to treat `None`, as usual
+    def __setitem__(self, key: Tuple[Hashable], value: float) -> None:
+        """
+        Set the value of a key in the multidimensional matrix.
+
+        @param key: The element in the multidimensional matrix whose value will be set or changed.
+        @param value: The value to which set the element.
+        """
+
         matches = [k in domain for k, domain in zip(key, self.domains) if k is not None]
         if not all(matches):
             raise ValueError("`key` uses symbol(s) not in domain.")
