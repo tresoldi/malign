@@ -2,3 +2,4 @@ catcoocc
 networkx==2.2
 tabulate
 sklearn
+numpy

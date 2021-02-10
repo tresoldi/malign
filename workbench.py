@@ -71,7 +71,8 @@ def modified_dna():
 
 
 def with_ita_rus():
-    ita_rus = malign.ScoringMatrix("docs/ita_rus.matrix")
+    ita_rus = malign.ScoringMatrix()
+    ita_rus.load("docs/ita_rus.matrix")
 
     print("--------------------- ITA_RUS #1")
     alms = malign.multi_align(["atomo", "атом"], k=2, method="anw", matrix=ita_rus)
@@ -83,7 +84,8 @@ def with_ita_rus():
 
 
 def with_ita_grk():
-    ita_grk = malign.ScoringMatrix("docs/ita_grk.matrix")
+    ita_grk = malign.ScoringMatrix()
+    ita_grk.load("docs/ita_grk.matrix")
 
     print("--------------------- ITA_GRK #1")
     alms = malign.multi_align(["atomo", "ατομο"], k=2, method="anw", matrix=ita_grk)
@@ -95,8 +97,10 @@ def with_ita_grk():
 
 
 def with_full_matrix():
-    ita_rus = malign.ScoringMatrix("docs/ita_rus.matrix")
-    ita_grk = malign.ScoringMatrix("docs/ita_grk.matrix")
+    ita_rus = malign.ScoringMatrix()
+    ita_rus.load("docs/ita_rus.matrix")
+    ita_grk = malign.ScoringMatrix()
+    ita_grk.load("docs/ita_grk.matrix")
 
     # Combine the two matrices into a single one, add some points, show a couple of examples
     # TODO: move to function
@@ -353,7 +357,8 @@ def impute_ita_rus_grk():
 
     irg_m.save("ita_rus_grk.matrix")
 
-    m2 = malign.ScoringMatrix("ita_rus_grk.matrix")
+    m2 = malign.ScoringMatrix()
+    m2.load("ita_rus_grk.matrix")
 
     for key in [
         ["c", "Я", None],
