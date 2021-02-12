@@ -220,7 +220,7 @@ def nw_align(
     seq_b: Sequence[Hashable],
     matrix: ScoringMatrix,
     k: Optional[int] = None,
-):
+) -> List[Alignment]:
     """
     Perform pairwise alignment with the Asymmetric Needleman-Wunsch method.
 
