@@ -4,29 +4,41 @@ Main module with code for alignment methods.
 
 # Import Python standard libraries
 from collections import defaultdict
+from typing import Callable, Dict, Hashable, List, Optional, Set, Tuple
 import itertools
-from typing import Hashable, List, Optional, Dict, Set, Tuple
 
 # Import other modules
+from .alignment import Alignment
 from .anw import nw_align
 from .dumb import dumb_malign
-from .yenksp import yenksp_align
-from .utils import score_alignment, sort_alignments, identity_matrix
 from .scoring_matrix import ScoringMatrix
-from .alignment import Alignment
+from .utils import identity_matrix, score_alignment, sort_alignments
+from .yenksp import yenksp_align
+
+
+# TODO: remove underscore from _build_candidates and others, use __all__
+# TODO: decide on matrix/scorer name globally
+# TODO: globally decide on types Sized, Collection, Sequence
 
 
 def _build_candidates(
-    potential_alms: Dict[int, Set[Tuple[Hashable, ...]]], matrix: ScoringMatrix
+        potential_alms: Dict[int, Set[Tuple[Hashable, ...]]], matrix: ScoringMatrix
 ) -> Set[Tuple[Tuple[Hashable, ...]]]:
     """
     Internal function used by `_malign()`.
 
     This function takes a collection of individual sequence alignments, grouped by
     lengths in `potential_alms`, and a scoring `matrix`, and returns all potential
-    alignments that can be constructed from it.
+    alignments that can be constructed from it. It can be consider an informed "product" of
+    all potential alignments.
 
     Note that the function does not score the alignments.
+
+    @param potential_alms: A dictionary with sequence indexes as key, and sets of all collected potential
+        alignments as values.
+    @param matrix: The scoring matrix for all potential alignments.
+    @return: A set of all the potential alignment combinations, whose valitity and score will need
+        to be checked by the calling function.
     """
 
     # Build set for collecting alignments, num_seqs is computed only once
@@ -56,15 +68,16 @@ def _build_candidates(
     return alms
 
 
-# TODO: type annotation for `pw_func`
-# TODO: return type of alignment
-# pylint: disable=too-many-locals
+# TODO: remove underscore here as well
+# TODO: have an issue allowing UPGMA/NJ
+# NOTE: type of `pw_func` is defined only as a callable that returns a list of alignments, as the full
+#       set of arguments might vary across methods
 def _collect_alignments(
-    seqs: List[List[Hashable]],
-    matrix: ScoringMatrix,
-    pw_func,
-    k: Optional[int] = None,
-):
+        seqs: List[List[Hashable]],
+        matrix: ScoringMatrix,
+        pw_func: Callable[..., List[Alignment]],
+        k: Optional[int] = None,
+) -> List[Alignment]:
     """
     Internal function for multiwise alignment.
 
@@ -77,17 +90,15 @@ def _collect_alignments(
         sequences to be aligned.
     @param matrix: The matrix used for scoring the alignment. If provided, must match in length the
         number of sequences in `seqs`.
-    @param pw_func:
+    @param pw_func: The function for the pair-wise sequence alignment.
     @param k: The maximum number of alignments to return. As there is no guarantee that the
         method being used or the sequences provided allow for `k` different alignments,
         the actual number might be less than `k`. If `None`, it will allow each pairwise
         alignment function to decide its value.
-    @return:
+    @return: A sorted list of all collected `Alignments`.
     """
 
-    # Build a list of all paired domains
-    # -> (0, 1), (0, 2), (1, 2)...
-    # TODO: use the one in utils?
+    # Build a list of all paired domains -> (0, 1), (0, 2), (1, 2)...
     domains = list(itertools.combinations(range(len(seqs)), 2))
 
     # Compute all the submatrices; while the same scores could be accessed directly
@@ -107,8 +118,9 @@ def _collect_alignments(
 
         # Store in `potential` by length
         for alm in alms:
-            potential[len(alm.seqs[0])][idx_x].add(tuple(alm.seqs[0]))
-            potential[len(alm.seqs[1])][idx_y].add(tuple(alm.seqs[1]))
+            seq_a, seq_b = tuple(alm.seqs[0]), tuple(alm.seqs[1])
+            potential[len(seq_a)][idx_x].add(seq_a)
+            potential[len(seq_b)][idx_y].add(seq_b)
 
     # Starting from the minimum length (the maximum sequence length), fill all the
     # potential alignments
@@ -128,7 +140,7 @@ def _collect_alignments(
 
         # Compute as necessary
         for seq_idx, long_idx in itertools.product(to_compute, has_longest):
-            # aling the current one with all long_idx aligned sequences
+            # align the current one with all long_idx aligned sequences
             for aligned in potential[length][long_idx]:
                 # Make sure we get the correct order; note that the calling is
                 # more complex than it would be expected as we need to account
@@ -156,19 +168,17 @@ def _collect_alignments(
             alms = alms.union(_build_candidates(potential[length], matrix))
 
     # Compute scores, sort and return
-    alms = [Alignment(seqs, score_alignment(seqs, matrix)) for seqs in alms]
+    ret_alms = [Alignment(seqs, score_alignment(seqs, matrix)) for seqs in alms]
 
-    return sort_alignments(alms)
+    return sort_alignments(ret_alms)
 
 
 # TODO: gap opening/gap extension for scoring
-# TODO: alm object in return
-# TODO: accept List[Sequence]?
 def multi_align(
-    seqs: List[List[Hashable]],
-    method: str,
-    matrix: Optional[ScoringMatrix] = None,
-    k: int = 1,
+        sequences: List[Hashable],
+        method: str,
+        matrix: Optional[ScoringMatrix] = None,
+        k: int = 1,
 ) -> List[Alignment]:
     """
     Compute multiple alignments for a list of sequences.
@@ -176,7 +186,7 @@ def multi_align(
     The function will return a sorted list of the `k` best alignments, as long as they
     can be computed.
 
-    @param seqs: A list of lists of hashable elements (usually stings) representing the
+    @param sequences: A list of lists of hashable elements (usually stings) representing the
         sequences to be aligned.
     @param method: The method to be used for alignment computation. Currently supported methods are
         `"dumb"`, `"anw"` (for "asymmetric Needleman–Wunsch"), and `"yenksp"` (for
@@ -187,15 +197,15 @@ def multi_align(
     @param k: The maximum number of alignments to return. As there is no guarantee that the
         method being used or the sequences provided allow for `k` different alignments,
         the actual number might be less than `k`. Defaults to 1.
-    @return:
+    @return: A sorted list of the `k`-most best multiple alignments. Depending on the method and the
+        data, it might be impossible to guarantee exactly `k` items.
     """
 
     # Make sure all sequences are lists, as it facilitates later manipulation.
     # Note that, while not recommended, this even allows to mix different iterable
     # types in `seqs`. The conversion also guarantees that a copy is made, for
     # immutability.
-    # TODO: rename different `seqs`
-    seqs: List[List[Hashable]] = [list(seq) for seq in seqs]
+    seqs: List[List[Hashable]] = [list(seq) for seq in sequences]
 
     # Get the user-provided matrix, or compute an identity one
     if not matrix:
@@ -215,18 +225,18 @@ def multi_align(
         # potential alignment
         alms = [dumb_malign(seqs, gap=matrix.gap)]
     else:
-        if method == "anw":
-            pairwise_func = nw_align
-            pw_k = k
-        elif method == "yenksp":
+        if method == "yenksp":
             # For `yenksp`, we will compute the twice the number of paths
             # requested, in order to get out of local minima
             pairwise_func = yenksp_align
             pw_k = k ** 2
+        else:  # anw
+            pairwise_func = nw_align
+            pw_k = k
 
-        alms = _collect_alignments(seqs, matrix, pw_func=pairwise_func, k=pw_k)
-
-        # my_alms = [Alignment(alm["seqs"], alm["score"]) for alm in alms]
-        alms = alms[:k]
+        # Collect alignments in a list, making sure we extend at most to the requested `k` (the one passed as
+        # an argument is more indicative, and its realization depends on the function, the methods, and
+        # the sequences being aligned)
+        alms = _collect_alignments(seqs, matrix, pw_func=pairwise_func, k=pw_k)[:k]
 
     return alms

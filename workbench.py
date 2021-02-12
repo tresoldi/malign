@@ -223,12 +223,12 @@ def impute():
 
     print("--------------------- IMPUTE")
     for key in [
-        ["a", "A", "2"],
-        ["-", "-", "3"],
-        ["c", "-", "4"],
-        ["a", "A", None],
-        ["a", None, "3"],
-        [None, "B", "1"],
+        ("a", "A", "2"),
+        ("-", "-", "3"),
+        ("c", "-", "4"),
+        ("a", "A", None),
+        ("a", None, "3"),
+        (None, "B", "1"),
     ]:
         print(key, m[key])
 
@@ -346,12 +346,12 @@ def impute_ita_rus_grk():
     irg_m = malign.ScoringMatrix(scores, impute_method="bayesian_ridge")
 
     for key in [
-        ["c", "Я", None],
-        ["t", None, "μ"],
-        [None, "Я", "μ"],
-        ["a", "а", "α"],
-        ["a", "а", "-"],
-        ["a", "Я", "μ"],
+        ("c", "Я", None),
+        ("t", None, "μ"),
+        (None, "Я", "μ"),
+        ("a", "а", "α"),
+        ("a", "а", "-"),
+        ("a", "Я", "μ"),
     ]:
         print(f"irg_m[{key}]", irg_m[key])
 
@@ -361,13 +361,13 @@ def impute_ita_rus_grk():
     m2.load("ita_rus_grk.matrix")
 
     for key in [
-        ["c", "Я", None],
-        ["t", None, "μ"],
-        [None, "Я", "μ"],
-        ["a", "а", "α"],
-        ["a", "а", "-"],
-        ["a", "Я", "μ"],
-        ["a", "Я", None],
+        ("c", "Я", None),
+        ("t", None, "μ"),
+        (None, "Я", "μ"),
+        ("a", "а", "α"),
+        ("a", "а", "-"),
+        ("a", "Я", "μ"),
+        ("a", "Я", None),
     ]:
         print(f"m2[{key}]", m2[key])
 
@@ -502,6 +502,15 @@ def scoring_matrix():
     print(id_matrix.tabulate())
 
 
+def debug_trigger():
+    scorer = malign.ScoringMatrix()
+    scorer.load("tests\\tiago.json")
+    seqs = ["Giacomo", "Яков", "Ιακωβος"]
+    yenksp_alms = malign.multi_align(seqs, method="yenksp", k=2, matrix=scorer)
+    print(yenksp_alms[0].seqs)
+    malign.utils.score_alignment(yenksp_alms[0].seqs, scorer)
+
+
 ############
 pairwise_dumb()
 multiwise_dumb()
@@ -516,3 +525,5 @@ yenksp(full_matrix, voldemort_matrix)
 impute()
 impute_ita_rus_grk()
 scoring_matrix()
+
+debug_trigger()
