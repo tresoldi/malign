@@ -13,10 +13,11 @@ from .dumb import dumb_malign
 from .yenksp import yenksp_align
 from .utils import score_alignment, sort_alignments, identity_matrix
 from .scoring_matrix import ScoringMatrix
+from .alignment import Alignment
 
 
 def _build_candidates(
-    potential_alms: Dict[int, Set[Tuple[Hashable, ...]]], matrix: ScoringMatrix
+        potential_alms: Dict[int, Set[Tuple[Hashable, ...]]], matrix: ScoringMatrix
 ) -> Set[Tuple[Tuple[Hashable, ...]]]:
     """
     Internal function used by `_malign()`.
@@ -43,7 +44,7 @@ def _build_candidates(
 
         # The combination of alignments might results in full-gap vectors; here we
         # remove them and make sure to only add unique alignments
-        full_gap = tuple(matrix.gap * num_seqs)
+        full_gap = tuple([matrix.gap] * num_seqs)
         vectors = list(zip(*seqs))
         if full_gap in vectors:
             vectors = [vector for vector in vectors if vector != full_gap]
@@ -59,10 +60,10 @@ def _build_candidates(
 # TODO: return type of alignment
 # pylint: disable=too-many-locals
 def _collect_alignments(
-    seqs: List[List[Hashable]],
-    matrix: ScoringMatrix,
-    pw_func,
-    k: Optional[int] = None,
+        seqs: List[List[Hashable]],
+        matrix: ScoringMatrix,
+        pw_func,
+        k: Optional[int] = None,
 ):
     """
     Internal function for multiwise alignment.
@@ -106,8 +107,8 @@ def _collect_alignments(
 
         # Store in `potential` by length
         for alm in alms:
-            potential[len(alm["seqs"][0])][idx_x].add(tuple(alm["seqs"][0]))
-            potential[len(alm["seqs"][1])][idx_y].add(tuple(alm["seqs"][1]))
+            potential[len(alm.seqs[0])][idx_x].add(tuple(alm.seqs[0]))
+            potential[len(alm.seqs[1])][idx_y].add(tuple(alm.seqs[1]))
 
     # Starting from the minimum length (the maximum sequence length), fill all the
     # potential alignments
@@ -145,8 +146,8 @@ def _collect_alignments(
 
                 # Align and add only those with the requested length
                 for alm in pw_func(seq_a, seq_b, k=k, matrix=mtx):
-                    if len(alm["seqs"][alm_idx]) == length:
-                        potential[length][seq_idx].add(tuple(alm["seqs"][alm_idx]))
+                    if len(alm.seqs[alm_idx]) == length:
+                        potential[length][seq_idx].add(tuple(alm.seqs[alm_idx]))
 
     # Build all candidate alignments, sort, and return
     alms = set()
@@ -155,7 +156,7 @@ def _collect_alignments(
             alms = alms.union(_build_candidates(potential[length], matrix))
 
     # Compute scores, sort and return
-    alms = [{"seqs": seqs, "score": score_alignment(seqs, matrix)} for seqs in alms]
+    alms = [ Alignment(seqs, score_alignment(seqs, matrix))  for seqs in alms]
 
     return sort_alignments(alms)
 
@@ -164,11 +165,11 @@ def _collect_alignments(
 # TODO: alm object in return
 # TODO: accept List[Sequence]?
 def multi_align(
-    seqs: List[List[Hashable]],
-    method: str,
-    matrix: Optional[ScoringMatrix] = None,
-    k: int = 1,
-):
+        seqs: List[List[Hashable]],
+        method: str,
+        matrix: Optional[ScoringMatrix] = None,
+        k: int = 1,
+) -> List[Alignment]:
     """
     Compute multiple alignments for a list of sequences.
 
@@ -209,7 +210,10 @@ def multi_align(
     # Run alignment method; note that the `dumb` method does not rely in expansion
     # from pairwise alingments with `_malign` as others
     if method == "dumb":
-        alms = dumb_malign(seqs, gap=matrix.gap)
+        # We create a list to keep the same signature; there is no need to
+        # consider `k` here, as the the dumb alignment will return a single
+        # potential alignment
+        alms = [dumb_malign(seqs, gap=matrix.gap)]
     else:
         if method == "anw":
             pairwise_func = nw_align
@@ -222,4 +226,7 @@ def multi_align(
 
         alms = _collect_alignments(seqs, matrix, pw_func=pairwise_func, k=pw_k)
 
-    return alms[:k]
+        #my_alms = [Alignment(alm["seqs"], alm["score"]) for alm in alms]
+        alms = alms[:k]
+
+    return alms
