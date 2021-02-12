@@ -3,22 +3,25 @@ Module for scoring matrices.
 """
 
 # Import Python standard libraries
+from typing import Dict, Hashable, List, Optional, Tuple
 import copy
 import itertools
 import json
-from typing import Hashable, Tuple, Dict, List, Optional
 
-# Import 3rd-party libraries
-from sklearn.ensemble import ExtraTreesRegressor
+# Import 3rd-party libraries; `enable_iterative_imputer` is necessary for the one in `sklearn.impute`
 from sklearn.experimental import (
     enable_iterative_imputer,
 )  # pylint: disable=unused-import
-from sklearn.impute import SimpleImputer, IterativeImputer
+from sklearn.ensemble import ExtraTreesRegressor
+from sklearn.impute import IterativeImputer, SimpleImputer
 from sklearn.linear_model import BayesianRidge
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.tree import DecisionTreeRegressor
 from tabulate import tabulate
 import numpy as np
+
+
+# TODO: study different method for loading
 
 
 class ScoringMatrix:
@@ -52,11 +55,11 @@ class ScoringMatrix:
     """
 
     def __init__(
-        self,
-        scores: Dict[Tuple[Hashable, ...], float] = None,
-        domains: Optional[List[List[Hashable]]] = None,
-        gap: Hashable = "-",
-        impute_method: Optional[str] = "mean",
+            self,
+            scores: Dict[Tuple[Hashable, ...], float] = None,
+            domains: Optional[List[List[Hashable]]] = None,
+            gap: Hashable = "-",
+            impute_method: Optional[str] = "mean",
     ):
         """
         Initialize a scoring matrix.
@@ -79,12 +82,18 @@ class ScoringMatrix:
             Defaults to `mean`.
         """
 
-        # Set values, so that the matrix can be used even empty
+        # Set properties provided by the user, so that the matrix can be used even empty
         self.impute_method = impute_method
         self.gap = gap
 
+        # Instantiate properties that will be initialized later
+        # TODO: replace `._dr` with a method reading domains
+        self.num_domains: int = -1
+        self.domains: Optional[List[List[Hashable]]] = domains
+        self.score = scores
+        self._dr: Optional[Tuple[int, ...]] = None
+
         # If `scores` is not provided, we initialize an empty scorer (which will likely load from disk).
-        # TODO: can this check be removed?
         if scores:
             # Extract the domains (or build them, if they were not provided) and
             # make sure they are sorted and comparable.
@@ -94,9 +103,9 @@ class ScoringMatrix:
             self._init_from_scores(scores)
 
     def _init_domains(
-        self,
-        domains: Optional[List[List[Hashable]]],
-        scores: Dict[Tuple[Hashable, ...], float],
+            self,
+            domains: Optional[List[List[Hashable]]],
+            scores: Dict[Tuple[Hashable, ...], float],
     ):
         """
         Internal method for initializing domains from user-provided arguments.
@@ -172,7 +181,7 @@ class ScoringMatrix:
                 "k_neighbors",
                 "bayesian_ridge",
             ]:
-                raise ValueError("Unknown imputation method.")
+                raise ValueError(f"Unknown imputation method: {self.impute_method}.")
 
             self._fill_matrix()
 
@@ -328,14 +337,17 @@ class ScoringMatrix:
             json.dump(serial_data, json_handler, indent=4, ensure_ascii=False)
 
     # TODO: should cache? should be internal?
-    # TODO: accept only list or sequence?
-    def compute_submatrices(self, domains: List[Tuple[int, ...]]):
+    # TODO: cannot annotate that it returns a dict with ScoringMatrix as values
+    def compute_submatrices(self, domains: List[Tuple[int, ...]]) -> Dict:
         """
         Compute submatrices from a collection of domains.
 
         Sub-matrices are useful, when compared to the possibility of addressing
         a normal matrix with `None` values in keys, in simplifying computation
         and debugging, as well as in some methods for smoothing.
+
+        @param domains: A list of domains for which to compute submatrices, as tuples.
+        @return: A dictionary with domain-tuples as keys and ScoringMatrices as values.
         """
 
         sub_matrix_scores: Dict[Tuple[Hashable, ...], ScoringMatrix] = {}
@@ -363,15 +375,10 @@ class ScoringMatrix:
         return sub_matrix_scores
 
     # TODO: use __copy__ and __deepcopy__ properly
+    # TODO: cannot annotate it returns a scoring matrix
     def copy(self):
         """
         Return a copy of the current matrix object.
-
-        Returns
-        =======
-
-        matrix : ScoringMatrix
-            A copy of the current ScoringMatrix.
         """
 
         # TODO: can we perform the copy manually?
@@ -419,7 +426,7 @@ class ScoringMatrix:
 
     # TODO: decide/inform on what to do when a sub-domain is requested and it has
     #       not been computed.
-    def __getitem__(self, key: Tuple[Hashable, ...]) -> float:
+    def __getitem__(self, key: Tuple[Optional[Hashable], ...]) -> float:
         """
         Return the score associated with a tuple of alignments per domain.
 
@@ -430,7 +437,7 @@ class ScoringMatrix:
         @return: The value associated with the requested element.
         """
 
-        return self.scores[tuple(key)]
+        return self.scores[key]
 
     def __setitem__(self, key: Tuple[Hashable, ...], value: float) -> None:
         """
@@ -444,4 +451,4 @@ class ScoringMatrix:
         if not all(matches):
             raise ValueError("`key` uses symbol(s) not in domain.")
 
-        self.scores[tuple(key)] = value
+        self.scores[key] = value

@@ -248,6 +248,8 @@ class TestMalignResults(unittest.TestCase):
         full_matrix["i", "-", "Ι"] = -4
         full_matrix["c", "к", "κ"] = 10
 
+        full_matrix.save("tiago.json")
+
         seqs = ["Giacomo", "Яков", "Ιακωβος"]
         nw_alms = malign.multi_align(seqs, method="anw", k=4, matrix=full_matrix)
         yenksp_alms = malign.multi_align(seqs, method="yenksp", k=2, matrix=full_matrix)
