@@ -116,7 +116,7 @@ def score_alignment(seqs: Sequence[Sequence[Hashable]], scorer, **kwargs) -> flo
 
 
 # TODO: allow customizations
-def tabulate_alms(alms):
+def tabulate_alms(alms) -> str:
     """
     Return a tabulated textual representation of alignments.
     """
@@ -147,7 +147,7 @@ def tabulate_alms(alms):
 
 # TODO: do sub-matrices and matrices at the same pass?
 # TODO: move to scoring matrix?
-def identity_matrix(seqs: Sequence[Sequence[Hashable]], **kwargs):
+def identity_matrix(seqs: Sequence[Sequence[Hashable]], **kwargs) -> ScoringMatrix:
     """
     Build an identity matrix from a list of sequences.
 

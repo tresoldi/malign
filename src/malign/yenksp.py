@@ -244,7 +244,6 @@ def align(
     return utils.sort_alignments(alignments)
 
 
-# TODO: return type
 def yenksp_align(
     seq_a: Sequence[Hashable],
     seq_b: Sequence[Hashable],
@@ -252,7 +251,7 @@ def yenksp_align(
     matrix: Optional[ScoringMatrix] = None,
     ne_loc: Tuple[int, int] = (0, 0),
     sw_loc: Optional[Tuple[int, int]] = None,
-):
+) -> List[Alignment]:
     """
     Perform pairwise alignment with the Yen K Shortest Paths method.
 

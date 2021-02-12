@@ -14,7 +14,7 @@ def dumb_malign(
     seqs: Sequence[Sequence[Hashable]],
     gap: Hashable = "-",
     matrix: Optional[ScoringMatrix] = None,
-):
+) -> Alignment:
     """
     Perform a *dumb* multiple alignment.
 
