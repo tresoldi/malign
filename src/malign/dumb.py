@@ -5,6 +5,7 @@ Module for computing dumb (pure gap padding) alignments.
 # Import other modules
 import malign.utils as utils
 from .scoring_matrix import ScoringMatrix
+from .alignment import Alignment
 
 from typing import Sequence, Hashable, Optional
 
@@ -34,7 +35,7 @@ def dumb_malign(
     max_length = max([len(seq) for seq in seqs])
 
     # Pad all sequences in `alm`
-    alm = {"seqs": []}
+    ret_seqs = []
     for seq in seqs:
         # Computer lengths and bads
         num_pad = max_length - len(seq)
@@ -45,11 +46,8 @@ def dumb_malign(
 
         # Append the padded sequence and the score, here computed from the
         # number of gaps
-        alm["seqs"].append([*left_pad, *list(seq), *right_pad])
+        ret_seqs.append([*left_pad, *list(seq), *right_pad])
 
-    # Add overall score
-    alm["score"] = utils.score_alignment(seqs, matrix)
-
-    # The `dumb` method will always return a single aligment, but we
+    # The `dumb` method will always return a single alignment, but we
     # still return a list for compatibility with other methods
-    return [alm]
+    return Alignment(ret_seqs, utils.score_alignment(ret_seqs, matrix))

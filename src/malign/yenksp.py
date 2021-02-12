@@ -12,6 +12,7 @@ import networkx as nx
 # Import other modules
 import malign.utils as utils
 from .scoring_matrix import ScoringMatrix
+from .alignment import Alignment
 
 
 def compute_graph(
@@ -122,7 +123,7 @@ def build_align(
     seq_a: Sequence[Hashable],
     seq_b: Sequence[Hashable],
     gap: Hashable = "-",
-):
+)->Tuple[Sequence[Hashable], Sequence[Hashable]]:
     """
     Builds a pairwise alignment from a path of sequence indexes.
 
@@ -176,7 +177,7 @@ def build_align(
             alm_b.append(seq_b.pop(0))
 
     # TODO: Remove "seqs" once the alignment object is written
-    return {"seqs": [alm_a, alm_b]}
+    return alm_a, alm_b
 
 
 # TODO: return type
@@ -188,7 +189,7 @@ def align(
     seq_b: Sequence[Hashable],
     matrix: ScoringMatrix,
     n_paths: Optional[int] = None,
-):
+)->List[Alignment]:
     """
     Return the `k` best alignments in terms of costs.
 
@@ -235,9 +236,9 @@ def align(
     alignments = []
     for path in list(islice(paths, n_paths)):
         # Build sequential representation of the alignment alignment
-        alignment = build_align(path, seq_a, seq_b, gap=matrix.gap)
-        alignment["score"] = utils.score_alignment(alignment["seqs"], matrix)
-        alignments.append(alignment)
+        alm_seq_a, alm_seq_b = build_align(path, seq_a, seq_b, gap=matrix.gap)
+        score = utils.score_alignment([alm_seq_a, alm_seq_b], matrix)
+        alignments.append(Alignment([alm_seq_a, alm_seq_b], score))
 
     # Sort and return
     return utils.sort_alignments(alignments)

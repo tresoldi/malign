@@ -8,13 +8,15 @@ Utility data and functions for the library.
 from collections import Counter
 from string import ascii_uppercase
 import itertools
-from typing import Iterable, Sequence, Hashable
+from typing import Iterable, Sequence, Hashable, List
 
 # Import 3rd party tools
 from tabulate import tabulate
 
 # Import from the package
 from malign.scoring_matrix import ScoringMatrix
+
+from .alignment import Alignment
 
 # TODO: Remove temporary DNA scorer holder in future versions
 DNA_MATRIX = ScoringMatrix(
@@ -64,7 +66,7 @@ def pairwise_iter(iterable: Iterable):
 
 
 # TODO: move to the alignment return object
-def sort_alignments(alms):
+def sort_alignments(alms: List[Alignment]) -> List[Alignment]:
     """
     Sorts a list of alignments in-place.
 
@@ -72,7 +74,7 @@ def sort_alignments(alms):
     competing implementations are design for each alignment method.
     """
 
-    return sorted(alms, reverse=True, key=lambda e: (e["score"], e["seqs"]))
+    return sorted(alms, reverse=True, key=lambda e: (e.score, tuple(e.seqs)))
 
 
 # TODO: gap extension as a function?
@@ -106,7 +108,7 @@ def score_alignment(seqs: Sequence[Sequence[Hashable]], scorer, **kwargs) -> flo
 
     # Compute the penalty per sequence based on `gap_seqs`, and correct `site_score`
     seq_penalty = sum([sum(gap_seq) * gap_ext for gap_seq in gap_seqs]) + (
-        len(gap_seqs) * gap_open
+            len(gap_seqs) * gap_open
     )
 
     # Correct by length, as we may be comparing alignments of different length
@@ -125,14 +127,14 @@ def tabulate_alms(alms):
             for chars in itertools.product(ascii_uppercase, repeat=length):
                 yield "".join(chars)
 
-    alm_len = max([len(alm["seqs"][0]) for alm in alms])
+    alm_len = max([len(alm.seqs[0]) for alm in alms])
     headers = ["Idx", "Seq", "Score"] + [f"#{i}" for i in range(alm_len)]
     colalign = tuple(["left", "left", "decimal"] + ["center"] * alm_len)
     table = []
     for alm_idx, alm in enumerate(alms):
         # Add a row for each sequence in the alignment
-        for label, seq in zip(_label_iter(), alm["seqs"]):
-            table.append([alm_idx, label, "%.2f" % alm["score"]] + list(seq))
+        for label, seq in zip(_label_iter(), alm.seqs):
+            table.append([alm_idx, label, "%.2f" % alm.score] + list(seq))
 
         # Add blank row
         table.append(["" for _ in range(3 + alm_len)])

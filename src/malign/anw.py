@@ -9,6 +9,7 @@ from typing import Optional, Hashable, Sequence, List, Tuple, Dict
 # Import from package
 from .utils import score_alignment, sort_alignments
 from .scoring_matrix import ScoringMatrix
+from .alignment import Alignment
 
 # Defines the map for directions; keys are tuples of three booleans,
 # resulting from comparison of direction scores with the best scores,
@@ -257,10 +258,7 @@ def nw_align(
     # this is not necessary for computing the score, as it is performed per site and
     # thus the mirrored sequences have no effect
     alms = [
-        {
-            "seqs": [alm["a"][::-1], alm["b"][::-1]],
-            "score": score_alignment([alm["a"], alm["b"]], matrix),
-        }
+        Alignment([alm["a"][::-1], alm["b"][::-1]], score_alignment([alm["a"], alm["b"]], matrix))
         for alm in nw_backtrace(seq_a, seq_b, d_grid, matrix.gap)
     ]
 
