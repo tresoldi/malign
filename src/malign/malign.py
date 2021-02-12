@@ -17,7 +17,7 @@ from .alignment import Alignment
 
 
 def _build_candidates(
-        potential_alms: Dict[int, Set[Tuple[Hashable, ...]]], matrix: ScoringMatrix
+    potential_alms: Dict[int, Set[Tuple[Hashable, ...]]], matrix: ScoringMatrix
 ) -> Set[Tuple[Tuple[Hashable, ...]]]:
     """
     Internal function used by `_malign()`.
@@ -60,10 +60,10 @@ def _build_candidates(
 # TODO: return type of alignment
 # pylint: disable=too-many-locals
 def _collect_alignments(
-        seqs: List[List[Hashable]],
-        matrix: ScoringMatrix,
-        pw_func,
-        k: Optional[int] = None,
+    seqs: List[List[Hashable]],
+    matrix: ScoringMatrix,
+    pw_func,
+    k: Optional[int] = None,
 ):
     """
     Internal function for multiwise alignment.
@@ -156,7 +156,7 @@ def _collect_alignments(
             alms = alms.union(_build_candidates(potential[length], matrix))
 
     # Compute scores, sort and return
-    alms = [ Alignment(seqs, score_alignment(seqs, matrix))  for seqs in alms]
+    alms = [Alignment(seqs, score_alignment(seqs, matrix)) for seqs in alms]
 
     return sort_alignments(alms)
 
@@ -165,10 +165,10 @@ def _collect_alignments(
 # TODO: alm object in return
 # TODO: accept List[Sequence]?
 def multi_align(
-        seqs: List[List[Hashable]],
-        method: str,
-        matrix: Optional[ScoringMatrix] = None,
-        k: int = 1,
+    seqs: List[List[Hashable]],
+    method: str,
+    matrix: Optional[ScoringMatrix] = None,
+    k: int = 1,
 ) -> List[Alignment]:
     """
     Compute multiple alignments for a list of sequences.
@@ -226,7 +226,7 @@ def multi_align(
 
         alms = _collect_alignments(seqs, matrix, pw_func=pairwise_func, k=pw_k)
 
-        #my_alms = [Alignment(alm["seqs"], alm["score"]) for alm in alms]
+        # my_alms = [Alignment(alm["seqs"], alm["score"]) for alm in alms]
         alms = alms[:k]
 
     return alms

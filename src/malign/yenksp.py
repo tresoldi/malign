@@ -123,7 +123,7 @@ def build_align(
     seq_a: Sequence[Hashable],
     seq_b: Sequence[Hashable],
     gap: Hashable = "-",
-)->Tuple[Sequence[Hashable], Sequence[Hashable]]:
+) -> Tuple[Sequence[Hashable], Sequence[Hashable]]:
     """
     Builds a pairwise alignment from a path of sequence indexes.
 
@@ -189,7 +189,7 @@ def align(
     seq_b: Sequence[Hashable],
     matrix: ScoringMatrix,
     n_paths: Optional[int] = None,
-)->List[Alignment]:
+) -> List[Alignment]:
     """
     Return the `k` best alignments in terms of costs.
 

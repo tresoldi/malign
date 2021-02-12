@@ -13,6 +13,7 @@ from typing import Sequence, Hashable
 # TODO: write methods for comparison, based on score
 # TODO: add various checks post-initialization
 
+
 @dataclass
 class Alignment:
     seqs: Sequence[Hashable]
