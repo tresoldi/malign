@@ -108,7 +108,7 @@ def score_alignment(seqs: Sequence[Sequence[Hashable]], scorer, **kwargs) -> flo
 
     # Compute the penalty per sequence based on `gap_seqs`, and correct `site_score`
     seq_penalty = sum([sum(gap_seq) * gap_ext for gap_seq in gap_seqs]) + (
-            len(gap_seqs) * gap_open
+        len(gap_seqs) * gap_open
     )
 
     # Correct by length, as we may be comparing alignments of different length

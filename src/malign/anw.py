@@ -258,7 +258,10 @@ def nw_align(
     # this is not necessary for computing the score, as it is performed per site and
     # thus the mirrored sequences have no effect
     alms = [
-        Alignment([alm["a"][::-1], alm["b"][::-1]], score_alignment([alm["a"], alm["b"]], matrix))
+        Alignment(
+            [alm["a"][::-1], alm["b"][::-1]],
+            score_alignment([alm["a"], alm["b"]], matrix),
+        )
         for alm in nw_backtrace(seq_a, seq_b, d_grid, matrix.gap)
     ]
 

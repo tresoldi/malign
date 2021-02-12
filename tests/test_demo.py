@@ -253,11 +253,12 @@ class TestMalignResults(unittest.TestCase):
         yenksp_alms = malign.multi_align(seqs, method="yenksp", k=2, matrix=full_matrix)
 
         # TODO: why are we getting the same score?
-#        assert tuple(nw_alms[0]["seqs"][1]) == ("Я", "к", "о", "в", "-", "-", "-")
-#        assert isclose(nw_alms[0]["score"], 2.12027, rel_tol=1e-05)
 
-#        assert tuple(yenksp_alms[0]["seqs"][1]) == ("Я", "-", "-", "к", "о", "в", "-")
-#        assert isclose(yenksp_alms[0]["score"], 2.12027, rel_tol=1e-05)
+    #        assert tuple(nw_alms[0]["seqs"][1]) == ("Я", "к", "о", "в", "-", "-", "-")
+    #        assert isclose(nw_alms[0]["score"], 2.12027, rel_tol=1e-05)
+
+    #        assert tuple(yenksp_alms[0]["seqs"][1]) == ("Я", "-", "-", "к", "о", "в", "-")
+    #        assert isclose(yenksp_alms[0]["score"], 2.12027, rel_tol=1e-05)
 
     # TODO: reimplement these tests
     def test_alignment_identity(self):
