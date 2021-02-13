@@ -55,11 +55,11 @@ class ScoringMatrix:
     """
 
     def __init__(
-            self,
-            scores: Dict[Tuple[Hashable, ...], float] = None,
-            domains: Optional[List[List[Hashable]]] = None,
-            gap: Hashable = "-",
-            impute_method: Optional[str] = "mean",
+        self,
+        scores: Dict[Tuple[Hashable, ...], float] = None,
+        domains: Optional[List[List[Hashable]]] = None,
+        gap: Hashable = "-",
+        impute_method: Optional[str] = "mean",
     ):
         """
         Initialize a scoring matrix.
@@ -103,9 +103,9 @@ class ScoringMatrix:
             self._init_from_scores(scores)
 
     def _init_domains(
-            self,
-            domains: Optional[List[List[Hashable]]],
-            scores: Dict[Tuple[Hashable, ...], float],
+        self,
+        domains: Optional[List[List[Hashable]]],
+        scores: Dict[Tuple[Hashable, ...], float],
     ):
         """
         Internal method for initializing domains from user-provided arguments.

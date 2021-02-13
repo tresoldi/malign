@@ -2,17 +2,19 @@
 Module for computing dumb (pure gap padding) alignments.
 """
 
+# Import Python standard libraries
+from typing import Hashable, Optional, Sequence
+
 # Import other modules
-import malign.utils as utils
-from .scoring_matrix import ScoringMatrix
 from .alignment import Alignment
+from .scoring_matrix import ScoringMatrix
+from .utils import identity_matrix, score_alignment
 
-from typing import Sequence, Hashable, Optional
 
-
+# TODO: have a single signature accepting more than one sequence, and one for the alignment
+# being the pairwise
 def dumb_malign(
     seqs: Sequence[Sequence[Hashable]],
-    gap: Hashable = "-",
     matrix: Optional[ScoringMatrix] = None,
 ) -> Alignment:
     """
@@ -21,15 +23,14 @@ def dumb_malign(
     This method is implemented for testing purposes, as it just pads gaps as necessary
     in order to return a single alignment.
 
-    @param seqs:
-    @param gap:
-    @param matrix:
-    @return:
+    @param seqs: List of sequences to be aligned.
+    @param matrix: Scoring matrix.
+    @return: The alignment for the two sequences.
     """
 
     # Get matrix, defaulting to an identity one
     if not matrix:
-        matrix = utils.identity_matrix(seqs)
+        matrix = identity_matrix(seqs)
 
     # Obtain the longest sequence length
     max_length = max([len(seq) for seq in seqs])
@@ -37,12 +38,11 @@ def dumb_malign(
     # Pad all sequences in `alm`
     ret_seqs = []
     for seq in seqs:
-        # Computer lengths and bads
         num_pad = max_length - len(seq)
         left_pad_len = int(num_pad / 2)
         right_pad_len = num_pad - left_pad_len
-        left_pad = [gap] * left_pad_len
-        right_pad = [gap] * right_pad_len
+        left_pad = [matrix.gap] * left_pad_len
+        right_pad = [matrix.gap] * right_pad_len
 
         # Append the padded sequence and the score, here computed from the
         # number of gaps
@@ -50,4 +50,4 @@ def dumb_malign(
 
     # The `dumb` method will always return a single alignment, but we
     # still return a list for compatibility with other methods
-    return Alignment(ret_seqs, utils.score_alignment(ret_seqs, matrix))
+    return Alignment(ret_seqs, score_alignment(ret_seqs, matrix))

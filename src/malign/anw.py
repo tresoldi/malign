@@ -3,13 +3,13 @@ Module for computing asymmetric Needleman–Wunsch alignments.
 """
 
 # Import Python standard libraries
+from typing import Dict, Hashable, List, Optional, Sequence, Tuple
 import itertools
-from typing import Optional, Hashable, Sequence, List, Tuple, Dict
 
 # Import from package
-from .utils import score_alignment, sort_alignments
-from .scoring_matrix import ScoringMatrix
 from .alignment import Alignment
+from .scoring_matrix import ScoringMatrix
+from .utils import score_alignment, sort_alignments
 
 # Defines the map for directions; keys are tuples of three booleans,
 # resulting from comparison of direction scores with the best scores,
@@ -31,7 +31,7 @@ def nw_grids(
     seq_a: List[Hashable], seq_b: List[Hashable], scorer: ScoringMatrix
 ) -> Tuple[List[List[float]], List[List[Tuple[bool, bool, bool]]]]:
     """
-    Build the Needleman-Wunsch grids
+    Build the Needleman-Wunsch grids.
 
     Note that the sequences must already have the initial gap added to them at this
     point.
@@ -39,7 +39,7 @@ def nw_grids(
     @param seq_a: First sequence for the pairwise alignment.
     @param seq_b: Second sequence for the pairwise alignment.
     @param scorer: The scoring matrix for the pairwise alignement.
-    @return:
+    @return: The score and direction grids from the Needleman-Wunsch algorithm.
     """
 
     # cache lengths
@@ -83,6 +83,7 @@ def nw_grids(
     return s_grid, d_grid
 
 
+# TODO: Drop the "a" and "b", use pure tuple
 def _nw_product(
     prev_alms: List[Dict[str, List[Hashable]]],
     char_a: Hashable,
@@ -93,7 +94,14 @@ def _nw_product(
     Internal function for building a product of paths.
 
     The function is used for NW alignments with two or more directions.
+
+    @param prev_alms:
+    @param char_a:
+    @param char_b:
+    @param paths:
+    @return:
     """
+
     ret_alms = []
     for alm in prev_alms:
         ret_alms += [
@@ -104,7 +112,6 @@ def _nw_product(
     return ret_alms
 
 
-# pylint: disable=too-many-branches
 def nw_backtrace(
     seq_a: List[Hashable],
     seq_b: List[Hashable],
@@ -209,6 +216,7 @@ def nw_backtrace(
             raise ValueError(f"Missing direction {d_grid[j][i]} at (i={i}, j={j})")
 
         # Break when reaching the top left corner
+        # TODO: check at the beginning, in the `while` call
         if i == 0 and j == 0:
             break
 
@@ -250,7 +258,6 @@ def nw_align(
     # Build Needleman-Wunsch grids; note that the scoring grid (the first value returned
     # by `nw_grids()`) is not used in this routine, as the scoring is performed with the
     # more complete `score_alignment()` function.
-    # TODO: do we really need to pass matrix.gap instead of reading it from there? the method is more general here...
     _, d_grid = nw_grids(seq_a, seq_b, matrix)
 
     # Obtain the alignments from backtrace, and them along with a score;
