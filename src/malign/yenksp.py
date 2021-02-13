@@ -4,15 +4,15 @@ Module with functions for the k-best pairwise alignment.
 
 # Import Python standard libraries
 from itertools import islice
-from typing import Sequence, Hashable, Optional, Tuple, List
+from typing import Hashable, List, Optional, Sequence, Tuple
 
 # Import 3rd party libraries
 import networkx as nx
 
 # Import other modules
-import malign.utils as utils
-from .scoring_matrix import ScoringMatrix
 from .alignment import Alignment
+from .scoring_matrix import ScoringMatrix
+from .utils import identity_matrix, pairwise_iter, score_alignment, sort_alignments
 
 
 def compute_graph(
@@ -58,7 +58,7 @@ def compute_graph(
     # adding edges.
     # Please note that, while it would make more sense or at least be more
     # natural, given our graph approach, to store *cost* values instead of
-    # *score* vaues (also favoring smaller/negative ones), the "tradition" in
+    # *score* values (also favoring smaller/negative ones), the "tradition" in
     # sequence alignment is to report scorer.
     max_score = max(matrix.scores.values())
 
@@ -133,23 +133,13 @@ def build_align(
     Paths do not need to start at the top left corner nor end at the bottom
     right one. Sequences are allowed to already have gaps in them.
 
-    Parameters
-    ==========
-    path : list
-        A list of string labels in the format `"seq_a_idx:seq_b_idx"`.
-    seq_a : list
-        A list of elements used as the first sequence (on the vertical
+    @param path: A list of string labels in the format `"seq_a_idx:seq_b_idx"`.
+    @param seq_a: A list of elements used as the first sequence (on the vertical
         border).
-    seq_b : list
-        A list of elements used as the second sequences (on the horizontal
+    @param seq_b: A list of elements used as the second sequences (on the horizontal
         border).
-    gap : str
-        A string used as gap symbol. Defaults to `"-"`.
-
-    Returns
-    =======
-    alm_a, alm_b : lists
-        The alignments for sequence A and B.
+    @param gap: A string used as gap symbol. Defaults to `"-"`.
+    @return: The alignments for sequence A and B.
     """
 
     # We make a copy of the sequences so that we can pop from them without
@@ -162,7 +152,7 @@ def build_align(
     # Build the alignment sequences, adding (more) gaps if necessary
     alm_a = []
     alm_b = []
-    for source, target in utils.pairwise_iter(path):
+    for source, target in pairwise_iter(path):
         if target[1] == source[1]:
             # vertical movement
             alm_a.append(seq_a.pop(0))
@@ -176,11 +166,9 @@ def build_align(
             alm_a.append(seq_a.pop(0))
             alm_b.append(seq_b.pop(0))
 
-    # TODO: Remove "seqs" once the alignment object is written
     return alm_a, alm_b
 
 
-# TODO: return type
 def align(
     graph: nx.DiGraph,
     ne_loc: Tuple[int, int],
@@ -237,11 +225,11 @@ def align(
     for path in list(islice(paths, n_paths)):
         # Build sequential representation of the alignment alignment
         alm_seq_a, alm_seq_b = build_align(path, seq_a, seq_b, gap=matrix.gap)
-        score = utils.score_alignment([alm_seq_a, alm_seq_b], matrix)
+        score = score_alignment([alm_seq_a, alm_seq_b], matrix)
         alignments.append(Alignment([alm_seq_a, alm_seq_b], score))
 
     # Sort and return
-    return utils.sort_alignments(alignments)
+    return sort_alignments(alignments)
 
 
 def yenksp_align(
@@ -274,7 +262,7 @@ def yenksp_align(
 
     # Obtain parameters
     if not matrix:
-        matrix = utils.identity_matrix([seq_a, seq_b])
+        matrix = identity_matrix([seq_a, seq_b])
 
     # Get the paths extremes, if not provided
     sw_loc = sw_loc or (len(seq_a), len(seq_b))
