@@ -22,7 +22,7 @@ from .yenksp import yenksp_align
 
 
 def _build_candidates(
-    potential_alms: Dict[int, Set[Tuple[Hashable, ...]]], matrix: ScoringMatrix
+        potential_alms: Dict[int, Set[Tuple[Hashable, ...]]], matrix: ScoringMatrix
 ) -> Set[Tuple[Tuple[Hashable, ...]]]:
     """
     Internal function used by `_malign()`.
@@ -73,10 +73,10 @@ def _build_candidates(
 # NOTE: type of `pw_func` is defined only as a callable that returns a list of alignments, as the full
 #       set of arguments might vary across methods
 def _collect_alignments(
-    seqs: List[List[Hashable]],
-    matrix: ScoringMatrix,
-    pw_func: Callable[..., List[Alignment]],
-    k: Optional[int] = None,
+        seqs: List[List[Hashable]],
+        matrix: ScoringMatrix,
+        pw_func: Callable[..., List[Alignment]],
+        k: Optional[int] = None,
 ) -> List[Alignment]:
     """
     Internal function for multiwise alignment.
@@ -175,10 +175,10 @@ def _collect_alignments(
 
 # TODO: gap opening/gap extension for scoring
 def multi_align(
-    sequences: List[Hashable],
-    method: str,
-    matrix: Optional[ScoringMatrix] = None,
-    k: int = 1,
+        sequences: List[Hashable],
+        method: str = "anw",
+        matrix: Optional[ScoringMatrix] = None,
+        k: int = 1,
 ) -> List[Alignment]:
     """
     Compute multiple alignments for a list of sequences.
@@ -190,7 +190,8 @@ def multi_align(
         sequences to be aligned.
     @param method: The method to be used for alignment computation. Currently supported methods are
         `"dumb"`, `"anw"` (for "asymmetric Needleman–Wunsch"), and `"yenksp"` (for
-        the graph-alignment based on Yen's k-shortest paths algorithm).
+        the graph-alignment based on Yen's k-shortest paths algorithm). Defaults
+        to `"anw"`.
     @param matrix: The matrix used for scoring the alignment. If provided, must match in length the
         number of sequences in `seqs`. If not provided, an identity matrix will be created
         and used.

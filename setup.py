@@ -1,12 +1,16 @@
+"""
+Setup script.
+"""
+
 from pathlib import Path
+from setuptools import find_packages, setup
 import glob
-from setuptools import setup, find_packages
 
 # The directory containing this file
 LOCAL_PATH = Path(__file__).parent
 
 # The text of the README file
-README_FILE = (LOCAL_PATH / "README.rst").read_text()
+README_FILE = (LOCAL_PATH / "README.md").read_text()
 
 # Build (recursive) list of resource files
 resource_files = []
@@ -20,7 +24,7 @@ with open("requirements.txt") as fp:
 
 # This call to setup() does all the work
 setup(
-    author_email="tresoldi@shh.mpg.de",
+    author_email="tiago.tresoldi@lingfil.uu.se",
     author="Tiago Tresoldi",
     classifiers=[
         "License :: OSI Approved :: MIT License",
@@ -35,7 +39,7 @@ setup(
     install_requires=install_requires,
     keywords=["alignment", "sequence alignment", "multiple alphabet"],
     license="MIT",
-    long_description_content_type="text/x-rst",
+    long_description_content_type="text/markdown",
     long_description=README_FILE,
     name="malign",
     packages=find_packages(where="src"),  # ["malign", "resources", "docs"],
@@ -44,6 +48,6 @@ setup(
     test_suite="tests",
     tests_require=[],
     url="https://github.com/tresoldi/malign",
-    version="0.2",  # remember to sync with __init__.py
+    version="0.3",  # remember to sync with __init__.py
     zip_safe=False,
 )
