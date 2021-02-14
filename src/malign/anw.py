@@ -140,14 +140,14 @@ def nw_backtrace(
     @return:
     """
 
+    # Define empty, initial alignment collection with a single alignment
+    # TODO: as it is pairwise, we don´t really need "a" and "b" and can index a normal list
+    alms = [{"a": [], "b": []}]
+
     # Get parameters, and default for the full alignment, if (i, j) is not provided
     if not i and not j:
         i = len(seq_a) - 1
         j = len(seq_b) - 1
-
-    # Define empty, initial alignment collection with a single alignment
-    # TODO: as it is pairwise, we don´t really need "a" and "b" and can index a normal list
-    alms = [{"a": [], "b": []}]
 
     # Does the backtrace, using recursion when necessary and changing in
     # place as much as possible for speed

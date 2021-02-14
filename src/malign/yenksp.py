@@ -16,7 +16,7 @@ from .utils import identity_matrix, pairwise_iter, score_alignment, sort_alignme
 
 
 def compute_graph(
-    seq_a: Sequence[Hashable], seq_b: Sequence[Hashable], matrix: ScoringMatrix
+        seq_a: Sequence[Hashable], seq_b: Sequence[Hashable], matrix: ScoringMatrix
 ) -> nx.DiGraph:
     """
     Computes a weighted directed graph for alignment.
@@ -119,10 +119,10 @@ def compute_graph(
 
 
 def build_align(
-    path: List[Tuple[int, int]],
-    seq_a: Sequence[Hashable],
-    seq_b: Sequence[Hashable],
-    gap: Hashable = "-",
+        path: List[Tuple[int, int]],
+        seq_a: Sequence[Hashable],
+        seq_b: Sequence[Hashable],
+        gap: Hashable = "-",
 ) -> Tuple[Sequence[Hashable], Sequence[Hashable]]:
     """
     Builds a pairwise alignment from a path of sequence indexes.
@@ -146,8 +146,8 @@ def build_align(
     # consuming the original value. This also simplifies the code, as
     # we can slice from the original point in the path (allowing a starting
     # path different from (0,0).
-    seq_a = list(seq_a[path[0][0] :])
-    seq_b = list(seq_b[path[0][1] :])
+    seq_a = list(seq_a[path[0][0]:])
+    seq_b = list(seq_b[path[0][1]:])
 
     # Build the alignment sequences, adding (more) gaps if necessary
     alm_a = []
@@ -170,13 +170,13 @@ def build_align(
 
 
 def align(
-    graph: nx.DiGraph,
-    ne_loc: Tuple[int, int],
-    sw_loc: Tuple[int, int],
-    seq_a: Sequence[Hashable],
-    seq_b: Sequence[Hashable],
-    matrix: ScoringMatrix,
-    n_paths: Optional[int] = None,
+        graph: nx.DiGraph,
+        ne_loc: Tuple[int, int],
+        sw_loc: Tuple[int, int],
+        seq_a: Sequence[Hashable],
+        seq_b: Sequence[Hashable],
+        matrix: ScoringMatrix,
+        n_paths: Optional[int] = None,
 ) -> List[Alignment]:
     """
     Return the `k` best alignments in terms of costs.
@@ -233,12 +233,12 @@ def align(
 
 
 def yenksp_align(
-    seq_a: Sequence[Hashable],
-    seq_b: Sequence[Hashable],
-    k: Optional[int] = 4,
-    matrix: Optional[ScoringMatrix] = None,
-    ne_loc: Tuple[int, int] = (0, 0),
-    sw_loc: Optional[Tuple[int, int]] = None,
+        seq_a: Sequence[Hashable],
+        seq_b: Sequence[Hashable],
+        k: Optional[int] = 4,
+        matrix: Optional[ScoringMatrix] = None,
+        ne_loc: Tuple[int, int] = (0, 0),
+        sw_loc: Optional[Tuple[int, int]] = None,
 ) -> List[Alignment]:
     """
     Perform pairwise alignment with the Yen K Shortest Paths method.
