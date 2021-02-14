@@ -20,7 +20,18 @@ class Alignment:
     score: float
 
     def __len__(self) -> int:
+        """
+        Return the number of sequences in the alignment.
+
+        @return: The number of sequences in the alignment.
+        """
         return len(self.seqs)
 
-    def __getitem__(self, item) -> Hashable:
-        return self.seqs[item]
+    def __getitem__(self, idx: int) -> Hashable:
+        """
+        Return a sequence by its index.
+
+        @param idx: The index of the sequence in the alignment.
+        @return: The sequence at the requested index.
+        """
+        return self.seqs[idx]

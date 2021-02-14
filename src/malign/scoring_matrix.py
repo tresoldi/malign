@@ -1,6 +1,4 @@
-"""
-Module for scoring matrices.
-"""
+"""Module for scoring matrices."""
 
 # Import Python standard libraries
 from typing import Dict, Hashable, List, Optional, Tuple
@@ -11,7 +9,7 @@ import json
 # Import 3rd-party libraries; `enable_iterative_imputer` is necessary for the one in `sklearn.impute`
 from sklearn.experimental import (
     enable_iterative_imputer,
-)  # pylint: disable=unused-import
+)  # noqa: F401
 from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.impute import IterativeImputer, SimpleImputer
 from sklearn.linear_model import BayesianRidge

@@ -1,6 +1,4 @@
-"""
-Main module with code for alignment methods.
-"""
+"""Main module with code for alignment methods."""
 
 # Import Python standard libraries
 from collections import defaultdict

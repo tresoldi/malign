@@ -1,6 +1,4 @@
-"""
-Module with functions for the k-best pairwise alignment.
-"""
+"""Module with functions for the k-best pairwise alignment."""
 
 # Import Python standard libraries
 from itertools import islice
