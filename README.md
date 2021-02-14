@@ -118,6 +118,10 @@ the `CONTRIBUTING.md` file.
 
 The library is developed by Tiago Tresoldi (tiago.tresoldi@lingfil.uu.se).
 
+The author has received funding from the Riksbankens Jubileumsfond
+(grant agreement ID: [MXM19-1087:1](https://www.rj.se/en/anslag/2019/cultural-evolution-of-texts/),
+[Cultural Evolution of Texts](https://github.com/evotext/)).
+
 During the first stages of development, the author received funding from the
 European Research Council (ERC) under the European Union’s Horizon 2020
 research and innovation programme (grant agreement
