@@ -1,6 +1,4 @@
-"""
-Utility data and functions for the library.
-"""
+"""Utility data and functions for the library."""
 
 # TODO: rename to `common`
 

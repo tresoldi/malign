@@ -1,8 +1,6 @@
 # __init__.py
 
-"""
-__init__.py file for the `malign` library.
-"""
+"""__init__.py file for the `malign` library."""
 
 # Package information for the library
 __version__ = "0.3"

@@ -1,6 +1,4 @@
-"""
-Module for computing asymmetric Needleman–Wunsch alignments.
-"""
+"""Module for computing asymmetric Needleman–Wunsch alignments."""
 
 # Import Python standard libraries
 from typing import Dict, Hashable, List, Optional, Sequence, Tuple

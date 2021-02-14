@@ -1,6 +1,4 @@
-"""
-Module for computing dumb (pure gap padding) alignments.
-"""
+"""Module for computing dumb (pure gap padding) alignments."""
 
 # Import Python standard libraries
 from typing import Hashable, Optional, Sequence
