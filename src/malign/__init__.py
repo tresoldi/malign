@@ -13,3 +13,6 @@ __email__ = "tiago.tresoldi@lingfil.uu.se"
 from malign.malign import multi_align
 from malign.utils import tabulate_alms
 from malign.scoring_matrix import ScoringMatrix
+
+# List symbols to export
+__all__ = ["multi_align", "tabulate_alms", "ScoringMatrix"]
