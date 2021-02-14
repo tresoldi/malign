@@ -102,6 +102,7 @@ Version 0.3:
   - Allow `anw` to work within a threshold percentage of the best score
   - Implement a method combining the results of the different algorithms
   - Add methods and demonstration for matrix optimization
+  - Move to GitHub Actions
 
 ## Community guidelines
 
