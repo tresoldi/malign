@@ -8,7 +8,8 @@ import glob
 LOCAL_PATH = Path(__file__).parent
 
 # The text of the README file
-README_FILE = (LOCAL_PATH / "README.md").read_text()
+with open("README.md", encoding="utf-8") as fp:
+    readme_contents = fp.read()
 
 # Build (recursive) list of resource files
 resource_files = []
@@ -17,7 +18,7 @@ for directory in glob.glob("resources/*/"):
     resource_files.append((directory, files))
 
 # Load requirements, so they are listed in a single place
-with open("requirements.txt") as fp:
+with open("requirements.txt", encoding="utf-8") as fp:
     install_requires = [dep.strip() for dep in fp.readlines()]
 
 # This call to setup() does all the work
@@ -38,7 +39,7 @@ setup(
     keywords=["alignment", "sequence alignment", "multiple alphabet"],
     license="MIT",
     long_description_content_type="text/markdown",
-    long_description=README_FILE,
+    long_description=readme_contents,
     name="malign",
     packages=find_packages(where="src"),  # ["malign", "resources", "docs"],
     package_dir={"": "src"},  # , "resources":"..", "docs":".."},
@@ -47,6 +48,6 @@ setup(
     test_suite="tests",
     tests_require=[],
     url="https://github.com/tresoldi/malign",
-    version="0.3.1",  # remember to sync with __init__.py
+    version="0.3.2",  # remember to sync with __init__.py
     zip_safe=False,
 )
