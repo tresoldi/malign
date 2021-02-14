@@ -91,7 +91,6 @@ Version 0.3
 
 ## TODO
 
-Version 0.3:
   - Complete documentation and setup `readthedocs`
   - Consider implementation of UPGMA and NJ multiple alignment
   - Add function/method to visualize the graphs used for the `yenksp` methods
