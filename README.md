@@ -116,7 +116,7 @@ the `CONTRIBUTING.md` file.
 
 The library is developed by Tiago Tresoldi (tiago.tresoldi@lingfil.uu.se).
 
-During the first steps of development, the author received funding from the
+During the first stages of development, the author received funding from the
 European Research Council (ERC) under the European Union’s Horizon 2020
 research and innovation programme (grant agreement
 No. [ERC Grant #715618](https://cordis.europa.eu/project/rcn/206320/factsheet/en),
