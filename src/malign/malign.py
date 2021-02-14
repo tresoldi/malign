@@ -223,7 +223,7 @@ def multi_align(
         # We create a list to keep the same signature; there is no need to
         # consider `k` here, as the the dumb alignment will return a single
         # potential alignment
-        alms = [dumb_malign(seqs, gap=matrix.gap)]
+        alms = [dumb_malign(seqs, matrix=matrix)]
     else:
         if method == "yenksp":
             # For `yenksp`, we will compute the twice the number of paths
