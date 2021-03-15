@@ -1,7 +1,7 @@
 # MAlign
 
 [![PyPI](https://img.shields.io/pypi/v/malign.svg)](https://pypi.org/project/malign)
-![Python package](https://github.com/tresoldi/malign/workflows/Python%20package/badge.svg)
+![CI](https://github.com/tresoldi/malign/workflows/CI/badge.svg)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/f6428290a03742e69a6a5cb512a99650)](https://www.codacy.com/manual/tresoldi/malign?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tresoldi/malign&amp;utm_campaign=Badge_Grade)
 
 MALIGN is a library for performing multiple alignments on sequences of different
