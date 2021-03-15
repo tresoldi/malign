@@ -88,7 +88,7 @@ class ScoringMatrix:
         # TODO: replace `._dr` with a method reading domains
         self.num_domains: int = -1
         self.domains: Optional[List[List[Hashable]]] = domains
-        self.score = scores
+        self.scores = scores
         self._dr: Optional[Tuple[int, ...]] = None
 
         # If `scores` is not provided, we initialize an empty scorer (which will likely load from disk).
