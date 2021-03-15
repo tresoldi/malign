@@ -44,7 +44,7 @@ setup(
     packages=find_packages(where="src"),  # ["malign", "resources", "docs"],
     package_dir={"": "src"},  # , "resources":"..", "docs":".."},
     project_urls={"Documentation": "https://malign.readthedocs.io"},
-    python_requires='>=3.7',
+    python_requires='>=3.6',
     test_suite="tests",
     tests_require=[],
     url="https://github.com/tresoldi/malign",
