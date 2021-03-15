@@ -7,9 +7,7 @@ import itertools
 import json
 
 # Import 3rd-party libraries; `enable_iterative_imputer` is necessary for the one in `sklearn.impute`
-from sklearn.experimental import (
-    enable_iterative_imputer,
-)  # noqa: F401
+from sklearn.experimental import enable_iterative_imputer  # noqa: F401
 from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.impute import IterativeImputer, SimpleImputer
 from sklearn.linear_model import BayesianRidge
@@ -26,13 +24,12 @@ class ScoringMatrix:
     """
     Class for sequence alignment scoring matrices.
 
-    A scoring matrix is implemented to work as a Python dictionary and, in
-    fact, the alignment methods should be written as expecting any
-    data structure that works like a dictionary, via the `__get__()`
-    method.
+    A scoring matrix is implemented to work similarly to a Python dictionary and,
+    in fact, the alignment methods should be written as expecting such
+    data structures, queried via the `__get__()`  method.
 
     The class, however, provides a number of facilities for dealing with the
-    multidimensionality of the matrices for multiple alignment on
+    multi-dimensionality of the matrices for multiple alignment on
     multiple domains, as intended by the library. Those are mainly:
 
       - allowing and mandating a unique domain for each sequence, even in
@@ -41,7 +38,7 @@ class ScoringMatrix:
       - treat gaps as full, normal "symbols"
 
     The class especially facilitates dealing with sparse matrices/vectors and
-    with submatrices, both for querying and for building.
+    with sub-matrices, both for querying and for building.
 
     The `gap` symbol is a mandatory property and must be shared by all
     domains. By design, exclusive gap alignment vectors (that is, keys
@@ -85,11 +82,11 @@ class ScoringMatrix:
         self.gap = gap
 
         # Instantiate properties that will be initialized later
-        # TODO: replace `._dr` with a method reading domains
+        # TODO: replace `._domain_range` with a method reading domains
         self.num_domains: int = -1
         self.domains: Optional[List[List[Hashable]]] = domains
         self.scores = scores
-        self._dr: Optional[Tuple[int, ...]] = None
+        self._domain_range: Optional[Tuple[int, ...]] = None
 
         # If `scores` is not provided, we initialize an empty scorer (which will likely load from disk).
         if scores:
@@ -144,9 +141,9 @@ class ScoringMatrix:
         # Make sure all `scores` report the same number of domains, store
         # the number of domains and an internal variable with the range (which
         # is used multiple times; the one facing the user is `self.num_domains`)
-        # TODO: remove "domain range" (._dr) or, at least, expand the name
+        # TODO: remove "domain range" if possible
         self.num_domains = len(self.domains)
-        self._dr = tuple(range(self.num_domains))
+        self._domain_range = tuple(range(self.num_domains))
 
         key_lens = {len(key) for key in scores}
         if len(key_lens) > 1:
@@ -156,7 +153,7 @@ class ScoringMatrix:
         # this would not be strictly necessary when the domains are collected
         # automatically, it is still good to keep a simpler loop for that
         # in all circumstances
-        scores_domains = list(zip(*scores.keys()))
+        scores_domains = zip(*scores.keys())
         found = [
             all([symbol in ref_domain for symbol in scores_domain if symbol])
             for scores_domain, ref_domain in zip(scores_domains, self.domains)
@@ -189,13 +186,15 @@ class ScoringMatrix:
         """
 
         # We perform matrix imputation on multi-hot vectors, with one true
-        # position for each domain. `None`, as used for submatrices, is always
+        # position for each domain. `None`, as used for sub-matrices, is always
         # mapped to the first site of its domain; the gap symbol will be part
-        # of the sorted list of symbols, if found. In order to do that, we
+        # of the sorted list of symbols, if provided. In order to do that, we
         # build an initial list of all domain/values, so we can fill the
         # vectors. We call it `encoder` due to analogy with data analysis
         # pipelines, even though it is not strictly an encoder but an auxiliary
         # data structure.
+        # `encoder` will be something like: `[(0, None), (0, '-'), (0, 'A'), (0, 'C'),
+        # (0, 'G'), (0, 'T'), (1, None), (1, '-'), (1, 'A'), (1, 'C'), (1, 'G'), (1, 'T')]
         encoder = list(
             itertools.chain.from_iterable(
                 [
@@ -210,9 +209,9 @@ class ScoringMatrix:
         train_matrix = []
         imp_matrix = []
         for cat_vector in itertools.product(*domains_with_none):
-            # We need to add `None`s in order to account for submatrices,
+            # We need to add `None`s in order to account for sub-matrices,
             # but also need to make sure that at least two non-`None`s are
-            # found (we need at least to sequences to have an alignment)
+            # found (we need at least two sequences to have an alignment)
             if len([val for val in cat_vector if val]) < 2:
                 continue
 
@@ -232,16 +231,24 @@ class ScoringMatrix:
         # TODO: allow setting more options when initializing, such num estimators and random state
         if self.impute_method == "decision_tree":
             estimator = DecisionTreeRegressor(max_features="sqrt", random_state=0)
-            imputer = IterativeImputer(random_state=0, estimator=estimator)
+            imputer = IterativeImputer(
+                missing_values=np.nan, random_state=0, estimator=estimator
+            )
         elif self.impute_method == "extra_trees":
             estimator = ExtraTreesRegressor(n_estimators=10, random_state=0)
-            imputer = IterativeImputer(random_state=0, estimator=estimator)
+            imputer = IterativeImputer(
+                missing_values=np.nan, random_state=0, estimator=estimator
+            )
         elif self.impute_method == "k_neighbors":
             estimator = KNeighborsRegressor(n_neighbors=15)
-            imputer = IterativeImputer(random_state=0, estimator=estimator)
+            imputer = IterativeImputer(
+                missing_values=np.nan, random_state=0, estimator=estimator
+            )
         elif self.impute_method == "bayesian_ridge":
             estimator = BayesianRidge()
-            imputer = IterativeImputer(random_state=0, estimator=estimator)
+            imputer = IterativeImputer(
+                missing_values=np.nan, random_state=0, estimator=estimator
+            )
         elif self.impute_method in ["mean", "median"]:
             imputer = SimpleImputer(missing_values=np.nan, strategy=self.impute_method)
         else:
@@ -278,7 +285,7 @@ class ScoringMatrix:
             serial_data = json.load(json_handler)
 
             self.gap = serial_data["gap"]
-            self._dr = tuple(serial_data["domain_range"])
+            self._domain_range = tuple(serial_data["domain_range"])
             self.domains = serial_data["domains"].copy()
 
             # Make sure values are floats
@@ -328,7 +335,7 @@ class ScoringMatrix:
             serial_data = {
                 "domains": self.domains,
                 "gap": self.gap,
-                "domain_range": list(self._dr),
+                "domain_range": list(self._domain_range),
                 "scores": _scores,
             }
 
@@ -361,14 +368,18 @@ class ScoringMatrix:
                 # Make sure that all entries of domain exist...
                 check = [key[idx] is not None for idx in sub_domain]
                 # ...and all others don't
-                check += [key[idx] is None for idx in self._dr if idx not in sub_domain]
+                check += [
+                    key[idx] is None
+                    for idx in self._domain_range
+                    if idx not in sub_domain
+                ]
 
                 if all(check):
                     sub_key = tuple([k for k in key if k is not None])
                     sub_scores[sub_key] = value
 
             # Create the new ScoringMatrix
-            sub_matrix_scores[sub_domain] = ScoringMatrix(sub_scores)
+            sub_matrix_scores[sub_domain] = ScoringMatrix(sub_scores, gap=self.gap)
 
         return sub_matrix_scores
 
@@ -380,7 +391,8 @@ class ScoringMatrix:
         """
 
         # TODO: can we perform the copy manually?
-        return copy.deepcopy(self)
+        #    return copy.deepcopy(self)
+        return ScoringMatrix(self.scores, self.domains, self.gap, self.impute_method)
 
     # TODO: currently only working for 2 or 3 domains
     # TODO: use more options from tabulate
