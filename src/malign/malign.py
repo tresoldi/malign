@@ -20,7 +20,7 @@ from .yenksp import yenksp_align
 
 
 def _build_candidates(
-        potential_alms: Dict[int, Set[Tuple[Hashable, ...]]], matrix: ScoringMatrix
+    potential_alms: Dict[int, Set[Tuple[Hashable, ...]]], matrix: ScoringMatrix
 ) -> Set[Tuple[Tuple[Hashable, ...]]]:
     """
     Internal function used by `_malign()`.
@@ -71,10 +71,10 @@ def _build_candidates(
 # NOTE: type of `pw_func` is defined only as a callable that returns a list of alignments, as the full
 #       set of arguments might vary across methods
 def _collect_alignments(
-        seqs: List[List[Hashable]],
-        matrix: ScoringMatrix,
-        pw_func: Callable[..., List[Alignment]],
-        k: Optional[int] = None,
+    seqs: List[List[Hashable]],
+    matrix: ScoringMatrix,
+    pw_func: Callable[..., List[Alignment]],
+    k: Optional[int] = None,
 ) -> List[Alignment]:
     """
     Internal function for multiwise alignment.
@@ -173,10 +173,10 @@ def _collect_alignments(
 
 # TODO: gap opening/gap extension for scoring
 def multi_align(
-        sequences: List[Hashable],
-        method: str = "anw",
-        matrix: Optional[ScoringMatrix] = None,
-        k: int = 1,
+    sequences: List[Hashable],
+    method: str = "anw",
+    matrix: Optional[ScoringMatrix] = None,
+    k: int = 1,
 ) -> List[Alignment]:
     """
     Compute multiple alignments for a list of sequences.

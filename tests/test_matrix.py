@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# pylint: disable=no-self-use
-
 """
 test_malign
 ===========
@@ -16,8 +13,7 @@ Tests for the scoring matrices of the `malign` package.
 
 # Import Python libraries
 import math
-import tempfile
-import unittest
+import pytest
 
 # Impor the library itself
 import malign
@@ -98,216 +94,216 @@ PAIRWISE_TEST_SPARSE_VECTOR_02 = {
 }
 
 
-class TestMalign(unittest.TestCase):
+def test_pairwise_from_full_vectors():
     """
-    Suite of tests for scoring matrices.
+    Test pairwise matrices built from complete vectors.
     """
 
-    def test_pairwise_from_full_vectors(self):
-        """
-        Test pairwise matrices built from complete vectors.
-        """
+    # Build matrix
+    matrix = malign.ScoringMatrix(PAIRWISE_TEST_VECTORS)
 
-        # Build matrix
-        matrix = malign.ScoringMatrix(PAIRWISE_TEST_VECTORS)
+    # Assertions
+    assert matrix.num_domains == 2
+    assert matrix.gap == "-"
+    assert len(matrix.scores) == 12
+    assert matrix["-", "-"] == 0.0
+    assert matrix["a", "Y"] == 8.0
+    assert len(matrix.domains) == 2
+    assert tuple(matrix.domains[1]) == ("-", "X", "Y")
 
-        # Assertions
-        assert matrix.num_domains == 2
-        assert matrix.gap == "-"
-        assert len(matrix.scores) == 12
-        assert matrix["-", "-"] == 0.0
-        assert matrix["a", "Y"] == 8.0
-        assert len(matrix.domains) == 2
-        assert tuple(matrix.domains[1]) == ("-", "X", "Y")
 
-    def test_pairwise_from_full_vectors_with_domains(self):
-        """
-        Test pairwise matrices built from complete vectors with domains.
-        """
+def test_pairwise_from_full_vectors_with_domains():
+    """
+    Test pairwise matrices built from complete vectors with domains.
+    """
 
-        # Build matrix with "correct" domains
-        matrix_a = malign.ScoringMatrix(
-            PAIRWISE_TEST_VECTORS, domains=[["-", "a", "b", "c"], ["-", "X", "Y"]]
+    # Build matrix with "correct" domains
+    matrix_a = malign.ScoringMatrix(
+        PAIRWISE_TEST_VECTORS, domains=[["-", "a", "b", "c"], ["-", "X", "Y"]]
+    )
+
+    # Build matrix with "expanded" domains
+    matrix_b = malign.ScoringMatrix(
+        PAIRWISE_TEST_VECTORS,
+        domains=[["-", "a", "b", "c", "d"], ["-", "X", "Y", "Z"]],
+    )
+
+    # Build matrix with "insufficient" domains
+    with pytest.raises(ValueError):
+        malign.ScoringMatrix(
+            PAIRWISE_TEST_VECTORS, domains=[["-", "a", "b"], ["-", "Y", "Z"]]
         )
 
-        # Build matrix with "expanded" domains
-        matrix_b = malign.ScoringMatrix(
-            PAIRWISE_TEST_VECTORS,
-            domains=[["-", "a", "b", "c", "d"], ["-", "X", "Y", "Z"]],
-        )
+    # Assertions
+    assert tuple(matrix_a.domains[1]) == ("-", "X", "Y")
+    assert tuple(matrix_b.domains[1]) == ("-", "X", "Y", "Z")
 
-        # Build matrix with "insufficient" domains
-        with self.assertRaises(ValueError):
-            malign.ScoringMatrix(
-                PAIRWISE_TEST_VECTORS, domains=[["-", "a", "b"], ["-", "Y", "Z"]]
-            )
 
-        # Assertions
-        assert tuple(matrix_a.domains[1]) == ("-", "X", "Y")
-        assert tuple(matrix_b.domains[1]) == ("-", "X", "Y", "Z")
+def test_multiwise_from_full_vectors():
+    """
+    Test multiwise matrices built from complete vectors.
+    """
 
-    def test_multiwise_from_full_vectors(self):
-        """
-        Test multiwise matrices built from complete vectors.
-        """
+    # Build matrix
+    matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
 
-        # Build matrix
-        matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
+    # Assertions
+    assert matrix.num_domains == 3
+    assert matrix.gap == "-"
+    assert len(matrix.scores) == 69
+    assert len(matrix.domains) == 3
+    assert tuple(matrix.domains[2]) == ("-", "i", "j")
+    assert matrix["-", "-", "-"] == 0.0
+    assert matrix["a", "Y", "j"] == pytest.approx(8.0)
 
-        # Assertions
-        assert matrix.num_domains == 3
-        assert matrix.gap == "-"
-        assert len(matrix.scores) == 69
-        assert len(matrix.domains) == 3
-        assert tuple(matrix.domains[2]) == ("-", "i", "j")
-        assert matrix["-", "-", "-"] == 0.0
-        assert math.isclose(matrix["a", "Y", "j"], 8.0)
 
-    def test_multiwise_from_sparse_vectors(self):
-        """
-        Test multiwise matrices built from sparse vectors.
-        """
+def test_multiwise_from_sparse_vectors():
+    """
+    Test multiwise matrices built from sparse vectors.
+    """
 
-        # Build matrices with the various filling methods
-        vectors = MULTIWISE_TEST_VECTORS.copy()
-        vectors.pop(("a", "X", "j"))
-        vectors.pop(("c", "X", "-"))
-        vectors.pop(("b", "-", "i"))
-        vectors.pop(("b", "-", "j"))
-        vectors.pop(("c", "Y", "j"))
-        vectors.pop(("-", "X", "-"))
-        matrix_default = malign.ScoringMatrix(vectors)  # currently, mean
-        matrix_dt = malign.ScoringMatrix(vectors, impute_method="decision_tree")
-        matrix_et = malign.ScoringMatrix(vectors, impute_method="extra_trees")
-        matrix_kn = malign.ScoringMatrix(vectors, impute_method="k_neighbors")
-        matrix_br = malign.ScoringMatrix(vectors, impute_method="bayesian_ridge")
-        matrix_mn = malign.ScoringMatrix(vectors, impute_method="mean")
-        matrix_md = malign.ScoringMatrix(vectors, impute_method="median")
+    # Build matrices with the various filling methods
+    vectors = MULTIWISE_TEST_VECTORS.copy()
+    vectors.pop(("a", "X", "j"))
+    vectors.pop(("c", "X", "-"))
+    vectors.pop(("b", "-", "i"))
+    vectors.pop(("b", "-", "j"))
+    vectors.pop(("c", "Y", "j"))
+    vectors.pop(("-", "X", "-"))
+    matrix_default = malign.ScoringMatrix(vectors)  # currently, mean
+    matrix_dt = malign.ScoringMatrix(vectors, impute_method="decision_tree")
+    matrix_et = malign.ScoringMatrix(vectors, impute_method="extra_trees")
+    matrix_kn = malign.ScoringMatrix(vectors, impute_method="k_neighbors")
+    matrix_br = malign.ScoringMatrix(vectors, impute_method="bayesian_ridge")
+    matrix_mn = malign.ScoringMatrix(vectors, impute_method="mean")
+    matrix_md = malign.ScoringMatrix(vectors, impute_method="median")
 
-        # Assertions
-        assert matrix_default.num_domains == 3
-        assert matrix_default.gap == "-"
-        assert len(matrix_default.scores) == 69
-        assert len(matrix_default.domains) == 3
-        assert tuple(matrix_default.domains[2]) == ("-", "i", "j")
+    # Assertions
+    assert matrix_default.num_domains == 3
+    assert matrix_default.gap == "-"
+    assert len(matrix_default.scores) == 69
+    assert len(matrix_default.domains) == 3
+    assert tuple(matrix_default.domains[2]) == ("-", "i", "j")
 
-        assert matrix_default["-", "-", "-"] == 0.0
-        assert math.isclose(matrix_default["a", "Y", "j"], 8.0, rel_tol=1e-03)
-        assert math.isclose(matrix_default["a", "X", "j"], 0.366666, rel_tol=1e-03)
-        assert math.isclose(matrix_default["c", "X", "-"], 0.366666, rel_tol=1e-03)
-        assert math.isclose(matrix_default["b", "-", "i"], 0.366666, rel_tol=1e-03)
-        assert math.isclose(matrix_default["b", "-", "j"], 0.366666, rel_tol=1e-03)
-        assert math.isclose(matrix_default["c", "Y", "j"], 0.366666, rel_tol=1e-03)
-        assert math.isclose(matrix_default["-", "X", "-"], 0.366666, rel_tol=1e-03)
+    assert matrix_default["-", "-", "-"] == 0.0
+    assert matrix_default["a", "Y", "j"] == pytest.approx(8.0, rel=1e-03)
+    assert matrix_default["a", "X", "j"] == pytest.approx(0.366666, rel=1e-03)
+    assert matrix_default["c", "X", "-"] == pytest.approx(0.366666, rel=1e-03)
+    assert matrix_default["b", "-", "i"] == pytest.approx(0.366666, rel=1e-03)
+    assert matrix_default["b", "-", "j"] == pytest.approx(0.366666, rel=1e-03)
+    assert matrix_default["c", "Y", "j"] == pytest.approx(0.366666, rel=1e-03)
+    assert matrix_default["-", "X", "-"] == pytest.approx(0.366666, rel=1e-03)
 
-        assert matrix_dt["-", "-", "-"] == 0.0
-        assert math.isclose(matrix_dt["a", "Y", "j"], 8.0, rel_tol=1e-03)
-        assert math.isclose(matrix_dt["a", "X", "j"], 0.0, rel_tol=1e-03)
-        assert math.isclose(matrix_dt["c", "X", "-"], 0.0, rel_tol=1e-03)
-        assert math.isclose(matrix_dt["b", "-", "i"], -4.0, rel_tol=1e-03)
-        assert math.isclose(matrix_dt["b", "-", "j"], -8.0, rel_tol=1e-03)
-        assert math.isclose(matrix_dt["c", "Y", "j"], -6.0, rel_tol=1e-03)
-        assert math.isclose(matrix_dt["-", "X", "-"], 0.0, rel_tol=1e-03)
+    assert matrix_dt["-", "-", "-"] == 0.0
+    assert matrix_dt["a", "Y", "j"] == pytest.approx(8.0, rel=1e-03)
+    assert matrix_dt["a", "X", "j"] == pytest.approx(0.0, rel=1e-03)
+    assert matrix_dt["c", "X", "-"] == pytest.approx(0.0, rel=1e-03)
+    assert matrix_dt["b", "-", "i"] == pytest.approx(-4.0, rel=1e-03)
+    assert matrix_dt["b", "-", "j"] == pytest.approx(-8.0, rel=1e-03)
+    assert matrix_dt["c", "Y", "j"] == pytest.approx(-6.0, rel=1e-03)
+    assert matrix_dt["-", "X", "-"] == pytest.approx(0.0, rel=1e-03)
 
-        assert matrix_et["-", "-", "-"] == 0.0
-        assert math.isclose(matrix_et["a", "Y", "j"], 8.0, rel_tol=1e-03)
-        assert math.isclose(matrix_et["a", "X", "j"], 0.0, rel_tol=1e-03)
-        assert math.isclose(matrix_et["c", "X", "-"], -7.0, rel_tol=1e-03)
-        assert math.isclose(matrix_et["b", "-", "i"], -3.0, rel_tol=1e-03)
-        assert math.isclose(matrix_et["b", "-", "j"], 3.0, rel_tol=1e-03)
-        assert math.isclose(matrix_et["c", "Y", "j"], 7.0, rel_tol=1e-03)
-        assert math.isclose(matrix_et["-", "X", "-"], -4.5, rel_tol=1e-03)
+    assert matrix_et["-", "-", "-"] == 0.0
+    assert matrix_et["a", "Y", "j"] == pytest.approx(8.0, rel=1e-03)
+    assert matrix_et["a", "X", "j"] == pytest.approx(0.0, rel=1e-03)
+    assert matrix_et["c", "X", "-"] == pytest.approx(-7.0, rel=1e-03)
+    assert matrix_et["b", "-", "i"] == pytest.approx(-3.0, rel=1e-03)
+    assert matrix_et["b", "-", "j"] == pytest.approx(3.0, rel=1e-03)
+    assert matrix_et["c", "Y", "j"] == pytest.approx(7.0, rel=1e-03)
+    assert matrix_et["-", "X", "-"] == pytest.approx(-4.5, rel=1e-03)
 
-        assert matrix_kn["-", "-", "-"] == 0.0
-        assert math.isclose(matrix_kn["a", "Y", "j"], 8.0, rel_tol=1e-03)
-        assert math.isclose(matrix_kn["a", "X", "j"], 1.86666, rel_tol=1e-03)
-        assert math.isclose(matrix_kn["c", "X", "-"], 0.93333, rel_tol=1e-03)
-        assert math.isclose(matrix_kn["b", "-", "i"], 1.46666, rel_tol=1e-03)
-        assert math.isclose(matrix_kn["b", "-", "j"], 1.2, rel_tol=1e-03)
-        assert math.isclose(matrix_kn["c", "Y", "j"], 1.6, rel_tol=1e-03)
-        assert math.isclose(matrix_kn["-", "X", "-"], 0.06666, rel_tol=1e-03)
+    assert matrix_kn["-", "-", "-"] == 0.0
+    assert matrix_kn["a", "Y", "j"] == pytest.approx(8.0, rel=1e-03)
+    assert matrix_kn["a", "X", "j"] == pytest.approx(1.86666, rel=1e-03)
+    assert matrix_kn["c", "X", "-"] == pytest.approx(0.93333, rel=1e-03)
+    assert matrix_kn["b", "-", "i"] == pytest.approx(1.46666, rel=1e-03)
+    assert matrix_kn["b", "-", "j"] == pytest.approx(1.2, rel=1e-03)
+    assert matrix_kn["c", "Y", "j"] == pytest.approx(1.6, rel=1e-03)
+    assert matrix_kn["-", "X", "-"] == pytest.approx(0.06666, rel=1e-03)
 
-        assert matrix_br["-", "-", "-"] == 0.0
-        assert math.isclose(matrix_br["a", "Y", "j"], 8.0, rel_tol=1e-03)
-        assert math.isclose(matrix_br["a", "X", "j"], 2.83974, rel_tol=1e-03)
-        assert math.isclose(matrix_br["c", "X", "-"], 0.48655, rel_tol=1e-03)
-        assert math.isclose(matrix_br["b", "-", "i"], 1.36074, rel_tol=1e-03)
-        assert math.isclose(matrix_br["b", "-", "j"], 1.45179, rel_tol=1e-03)
-        assert math.isclose(matrix_br["c", "Y", "j"], 1.43649, rel_tol=1e-03)
-        assert math.isclose(matrix_br["-", "X", "-"], -3.45639, rel_tol=1e-03)
+    assert matrix_br["-", "-", "-"] == 0.0
+    assert matrix_br["a", "Y", "j"] == pytest.approx(8.0, rel=1e-03)
+    assert matrix_br["a", "X", "j"] == pytest.approx(2.83974, rel=1e-03)
+    assert matrix_br["c", "X", "-"] == pytest.approx(0.48655, rel=1e-03)
+    assert matrix_br["b", "-", "i"] == pytest.approx(1.36074, rel=1e-03)
+    assert matrix_br["b", "-", "j"] == pytest.approx(1.45179, rel=1e-03)
+    assert matrix_br["c", "Y", "j"] == pytest.approx(1.43649, rel=1e-03)
+    assert matrix_br["-", "X", "-"] == pytest.approx(-3.45639, rel=1e-03)
 
-        assert matrix_mn["-", "-", "-"] == 0.0
-        assert math.isclose(matrix_mn["a", "Y", "j"], 8.0, rel_tol=1e-03)
-        assert math.isclose(matrix_mn["a", "X", "j"], 0.366666, rel_tol=1e-03)
-        assert math.isclose(matrix_mn["c", "X", "-"], 0.366666, rel_tol=1e-03)
-        assert math.isclose(matrix_mn["b", "-", "i"], 0.366666, rel_tol=1e-03)
-        assert math.isclose(matrix_mn["b", "-", "j"], 0.366666, rel_tol=1e-03)
-        assert math.isclose(matrix_mn["c", "Y", "j"], 0.366666, rel_tol=1e-03)
-        assert math.isclose(matrix_mn["-", "X", "-"], 0.366666, rel_tol=1e-03)
+    assert matrix_mn["-", "-", "-"] == 0.0
+    assert matrix_mn["a", "Y", "j"] == pytest.approx(8.0, rel=1e-03)
+    assert matrix_mn["a", "X", "j"] == pytest.approx(0.366666, rel=1e-03)
+    assert matrix_mn["c", "X", "-"] == pytest.approx(0.366666, rel=1e-03)
+    assert matrix_mn["b", "-", "i"] == pytest.approx(0.366666, rel=1e-03)
+    assert matrix_mn["b", "-", "j"] == pytest.approx(0.366666, rel=1e-03)
+    assert matrix_mn["c", "Y", "j"] == pytest.approx(0.366666, rel=1e-03)
+    assert matrix_mn["-", "X", "-"] == pytest.approx(0.366666, rel=1e-03)
 
-        assert matrix_md["-", "-", "-"] == 0.0
-        assert math.isclose(matrix_md["a", "Y", "j"], 8.0, rel_tol=1e-03)
-        assert math.isclose(matrix_md["a", "X", "j"], 0.0, rel_tol=1e-03)
-        assert math.isclose(matrix_md["c", "X", "-"], 0.0, rel_tol=1e-03)
-        assert math.isclose(matrix_md["b", "-", "i"], 0.0, rel_tol=1e-03)
-        assert math.isclose(matrix_md["b", "-", "j"], 0.0, rel_tol=1e-03)
-        assert math.isclose(matrix_md["c", "Y", "j"], 0.0, rel_tol=1e-03)
-        assert math.isclose(matrix_md["-", "X", "-"], 0.0, rel_tol=1e-03)
+    assert matrix_md["-", "-", "-"] == 0.0
+    assert matrix_md["a", "Y", "j"] == pytest.approx(8.0, rel=1e-03)
+    assert matrix_md["a", "X", "j"] == pytest.approx(0.0, rel=1e-03)
+    assert matrix_md["c", "X", "-"] == pytest.approx(0.0, rel=1e-03)
+    assert matrix_md["b", "-", "i"] == pytest.approx(0.0, rel=1e-03)
+    assert matrix_md["b", "-", "j"] == pytest.approx(0.0, rel=1e-03)
+    assert matrix_md["c", "Y", "j"] == pytest.approx(0.0, rel=1e-03)
+    assert matrix_md["-", "X", "-"] == pytest.approx(0.0, rel=1e-03)
 
-    def test_multiwise_from_subvectors(self):
-        """
-        Test multiwise matrices built from sub vectors.
-        """
 
-        # Build sub matrices, and then the main matrix
-        scores_01 = {
-            (key[0], key[1], None): value
-            for key, value in PAIRWISE_TEST_SPARSE_VECTOR_01.items()
-        }
-        scores_02 = {
-            (key[0], None, key[1]): value
-            for key, value in PAIRWISE_TEST_SPARSE_VECTOR_02.items()
-        }
-        scores = {**scores_01, **scores_02}
-        matrix = malign.ScoringMatrix(scores)
+def test_multiwise_from_subvectors():
+    """
+    Test multiwise matrices built from sub vectors.
+    """
 
-        # Assertions
-        assert matrix.num_domains == 3
-        assert matrix.gap == "-"
-        assert len(matrix.scores) == 69
-        assert len(matrix.domains) == 3
+    # Build sub matrices, and then the main matrix
+    scores_01 = {
+        (key[0], key[1], None): value
+        for key, value in PAIRWISE_TEST_SPARSE_VECTOR_01.items()
+    }
+    scores_02 = {
+        (key[0], None, key[1]): value
+        for key, value in PAIRWISE_TEST_SPARSE_VECTOR_02.items()
+    }
+    scores = {**scores_01, **scores_02}
+    matrix = malign.ScoringMatrix(scores)
 
-        assert matrix["-", "-", "-"] == 0.0
-        assert math.isclose(matrix["a", "Y", "j"], 0.5, rel_tol=1e-05)
-        assert math.isclose(matrix["a", "X", "j"], 0.5, rel_tol=1e-05)
-        assert math.isclose(matrix["c", "X", "-"], 0.5, rel_tol=1e-05)
-        assert math.isclose(matrix["b", "-", "i"], 0.5, rel_tol=1e-05)
-        assert math.isclose(matrix["b", "-", "j"], 0.5, rel_tol=1e-05)
-        assert math.isclose(matrix["c", "Y", "j"], 0.5, rel_tol=1e-05)
-        assert math.isclose(matrix["-", "X", "-"], 0.5, rel_tol=1e-05)
+    # Assertions
+    assert matrix.num_domains == 3
+    assert matrix.gap == "-"
+    assert len(matrix.scores) == 69
+    assert len(matrix.domains) == 3
 
-    def test_subdomain_query(self):
-        """
-        Test querying of subdomains.
-        """
+    assert matrix["-", "-", "-"] == 0.0
+    assert math.isclose(matrix["a", "Y", "j"], 0.5, rel_tol=1e-05)
+    assert math.isclose(matrix["a", "X", "j"], 0.5, rel_tol=1e-05)
+    assert math.isclose(matrix["c", "X", "-"], 0.5, rel_tol=1e-05)
+    assert math.isclose(matrix["b", "-", "i"], 0.5, rel_tol=1e-05)
+    assert math.isclose(matrix["b", "-", "j"], 0.5, rel_tol=1e-05)
+    assert math.isclose(matrix["c", "Y", "j"], 0.5, rel_tol=1e-05)
+    assert math.isclose(matrix["-", "X", "-"], 0.5, rel_tol=1e-05)
 
-        # Build matrices with the various filling methods
-        matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
 
-        assert math.isclose(matrix[None, "X", "i"], 0.25, rel_tol=1e-05)
-        assert math.isclose(matrix["c", None, "i"], 0.25, rel_tol=1e-05)
-        assert math.isclose(matrix["c", "X", None], 0.25, rel_tol=1e-05)
+def test_subdomain_query():
+    """
+    Test querying of subdomains.
+    """
 
-    def test_load_save(self):
-        """
-        Test load and saving matrices
-        """
+    # Build matrices with the various filling methods
+    matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
+    assert math.isclose(matrix[None, "X", "i"], 0.25, rel_tol=1e-05)
+    assert math.isclose(matrix["c", None, "i"], 0.25, rel_tol=1e-05)
+    assert math.isclose(matrix["c", "X", None], 0.25, rel_tol=1e-05)
 
-        # Build matrices with the various filling methods
-        matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
 
-        # Build a temporary file name and save
-        # TODO: does not work on windows...
+def test_load_save():
+    """
+    Test load and saving matrices
+    """
+
+    # Build matrices with the various filling methods
+    matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
+
+    # Build a temporary file name and save
+    # TODO: does not work on windows...
 
     #        handler = tempfile.NamedTemporaryFile()
     #        matrix.save(handler.name)
@@ -319,53 +315,50 @@ class TestMalign(unittest.TestCase):
     #        assert matrix.scores == matrix2.scores
     #        assert tuple(matrix.domains) == tuple(matrix2.domains)
 
-    def test_copy(self):
-        """
-        Test method for matrix copy.
-        """
 
-        # Build reference matrix
-        ref_matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
+def test_copy():
+    """
+    Test method for matrix copy.
+    """
 
-        # Get copy
-        cpy_matrix = ref_matrix.copy()
+    # Build reference matrix
+    ref_matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
 
-        # Perform manual comparison
-        assert ref_matrix.scores == cpy_matrix.scores
-        assert ref_matrix.domains == cpy_matrix.domains
+    # Get copy
+    cpy_matrix = ref_matrix.copy()
 
-    def test_set_item(self):
-        """
-        Test matrix __setitem__.
-        """
-
-        # Build reference matrix
-        matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
-
-        # Various sets and tests
-        matrix["a", "X", "i"] = -111
-        matrix[None, "X", "i"] = -222
-        with self.assertRaises(ValueError):
-            matrix["<", "X", "i"] = -333
-
-        assert matrix["a", "X", "i"] == -111
-        assert matrix[None, "X", "i"] == -222
-
-    def test_tabulate(self):
-        """
-        Test matrix tabulation.
-        """
-
-        # Build reference matrix
-        matrix_a = malign.ScoringMatrix(PAIRWISE_TEST_VECTORS)
-        matrix_b = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
-
-        # NOTE: currently only building it, to get coverage
-        assert len(matrix_a.tabulate()) > 0
-        assert len(matrix_b.tabulate()) > 0
+    # Perform manual comparison
+    assert ref_matrix.scores == cpy_matrix.scores
+    assert ref_matrix.domains == cpy_matrix.domains
 
 
-if __name__ == "__main__":
-    # Explicitly creating and running a test suite allows to profile it
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestMalign)
-    unittest.TextTestRunner(verbosity=2).run(suite)
+def test_set_item():
+    """
+    Test matrix __setitem__.
+    """
+
+    # Build reference matrix
+    matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
+
+    # Various sets and tests
+    matrix["a", "X", "i"] = -111
+    matrix[None, "X", "i"] = -222
+    with pytest.raises(ValueError):
+        matrix["<", "X", "i"] = -333
+
+    assert matrix["a", "X", "i"] == -111
+    assert matrix[None, "X", "i"] == -222
+
+
+def test_tabulate():
+    """
+    Test matrix tabulation.
+    """
+
+    # Build reference matrix
+    matrix_a = malign.ScoringMatrix(PAIRWISE_TEST_VECTORS)
+    matrix_b = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
+
+    # NOTE: currently only building it, to get coverage
+    assert len(matrix_a.tabulate()) > 0
+    assert len(matrix_b.tabulate()) > 0
