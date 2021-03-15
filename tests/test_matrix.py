@@ -1,5 +1,5 @@
 """
-test_malign
+test_matrix
 ===========
 
 Tests for the scoring matrices of the `malign` package.
@@ -93,6 +93,39 @@ PAIRWISE_TEST_SPARSE_VECTOR_02 = {
     ("c", "j"): 4.0,
 }
 
+MULTIWISE_TEST_VECTORS_SPARSE = {
+    ("-", "-", "-"): 0.0,
+    ("-", "-", "i"): -4.0,
+    ("-", "-", "j"): -8.0,
+    ("-", "X", "i"): -3.0,
+    ("-", "X", "j"): -5.0,
+    ("-", "Y", "-"): -5.0,
+    ("-", "Y", "i"): -9.0,
+    ("-", "Y", "j"): -6.0,
+    ("a", "-", "-"): 0.0,
+    ("a", "-", "i"): -3.0,
+    ("a", "-", "j"): 3.0,
+    ("a", "X", "-"): 0.0,
+    ("a", "X", "i"): 0.0,
+    ("a", "Y", "-"): 8.0,
+    ("a", "Y", "i"): 8.0,
+    ("a", "Y", "j"): 8.0,
+    ("b", "-", "-"): 0.0,
+    ("b", "X", "-"): 4.0,
+    ("b", "X", "i"): 4.0,
+    ("b", "X", "j"): 5.0,
+    ("b", "Y", "-"): 4.0,
+    ("b", "Y", "i"): 4.0,
+    ("b", "Y", "j"): 4.0,
+    ("c", "-", "-"): 0.0,
+    ("c", "-", "i"): 2.0,
+    ("c", "-", "j"): -5.0,
+    ("c", "X", "i"): -1.0,
+    ("c", "X", "j"): 6.0,
+    ("c", "Y", "-"): -7.0,
+    ("c", "Y", "i"): 7.0,
+}
+
 
 def test_pairwise_from_full_vectors():
     """
@@ -157,96 +190,117 @@ def test_multiwise_from_full_vectors():
     assert matrix["a", "Y", "j"] == pytest.approx(8.0)
 
 
-def test_multiwise_from_sparse_vectors():
+# TODO: add test with "default" (currently "mean")
+@pytest.mark.parametrize(
+    "method,num_domains,gap,size,tests",
+    [
+        [
+            "mean",
+            3,
+            "-",
+            69,
+            [
+                [("a", "Y", "j"), 8.0, 1e-03],
+                [("a", "X", "j"), 0.366666, 1e-03],
+                [("c", "X", "-"), 0.366666, 1e-03],
+                [("b", "-", "i"), 0.366666, 1e-03],
+                [("b", "-", "j"), 0.366666, 1e-03],
+                [("c", "Y", "j"), 0.366666, 1e-03],
+                [("-", "X", "-"), 0.366666, 1e-03],
+            ],
+        ],
+        [
+            "median",
+            3,
+            "-",
+            69,
+            [
+                [("a", "Y", "j"), 8.0, 1e-03],
+                [("a", "X", "j"), 0.0, 1e-03],
+                [("c", "X", "-"), 0.0, 1e-03],
+                [("b", "-", "i"), 0.0, 1e-03],
+                [("b", "-", "j"), 0.0, 1e-03],
+                [("c", "Y", "j"), 0.0, 1e-03],
+                [("-", "X", "-"), 0.0, 1e-03],
+            ],
+        ],
+        [
+            "decision_tree",
+            3,
+            "-",
+            69,
+            [
+                [("a", "Y", "j"), 8.0, 1e-03],
+                [("a", "X", "j"), 0.0, 1e-03],
+                [("c", "X", "-"), 0.0, 1e-03],
+                [("b", "-", "i"), -4.0, 1e-03],
+                [("b", "-", "j"), -8.0, 1e-03],
+                [("c", "Y", "j"), -6.0, 1e-03],
+                [("-", "X", "-"), 0.0, 1e-03],
+            ],
+        ],
+        [
+            "extra_trees",
+            3,
+            "-",
+            69,
+            [
+                [("a", "Y", "j"), 8.0, 1e-03],
+                [("a", "X", "j"), 0.0, 1e-03],
+                [("c", "X", "-"), -7.0, 1e-03],
+                [("b", "-", "i"), -3.0, 1e-03],
+                [("b", "-", "j"), 3.0, 1e-03],
+                [("c", "Y", "j"), 7.0, 1e-03],
+                [("-", "X", "-"), -4.5, 1e-03],
+            ],
+        ],
+        [
+            "k_neighbors",
+            3,
+            "-",
+            69,
+            [
+                [("a", "Y", "j"), 8.0, 1e-03],
+                [("a", "X", "j"), 1.86666, 1e-03],
+                [("c", "X", "-"), 0.93333, 1e-03],
+                [("b", "-", "i"), 1.46666, 1e-03],
+                [("b", "-", "j"), 1.2, 1e-03],
+                [("c", "Y", "j"), 1.6, 1e-03],
+                [("-", "X", "-"), 0.06666, 1e-03],
+            ],
+        ],
+        [
+            "bayesian_ridge",
+            3,
+            "-",
+            69,
+            [
+                [("a", "Y", "j"), 8.0, 1e-03],
+                [("a", "X", "j"), 2.83974, 1e-03],
+                [("c", "X", "-"), 0.48655, 1e-03],
+                [("b", "-", "i"), 1.36074, 1e-03],
+                [("b", "-", "j"), 1.45179, 1e-03],
+                [("c", "Y", "j"), 1.43649, 1e-03],
+                [("-", "X", "-"), -3.45639, 1e-03],
+            ],
+        ],
+    ],
+)
+def test_multiwise_from_sparse_vectors(method, num_domains, gap, size, tests):
     """
     Test multiwise matrices built from sparse vectors.
     """
 
-    # Build matrices with the various filling methods
-    vectors = MULTIWISE_TEST_VECTORS.copy()
-    vectors.pop(("a", "X", "j"))
-    vectors.pop(("c", "X", "-"))
-    vectors.pop(("b", "-", "i"))
-    vectors.pop(("b", "-", "j"))
-    vectors.pop(("c", "Y", "j"))
-    vectors.pop(("-", "X", "-"))
-    matrix_default = malign.ScoringMatrix(vectors)  # currently, mean
-    matrix_dt = malign.ScoringMatrix(vectors, impute_method="decision_tree")
-    matrix_et = malign.ScoringMatrix(vectors, impute_method="extra_trees")
-    matrix_kn = malign.ScoringMatrix(vectors, impute_method="k_neighbors")
-    matrix_br = malign.ScoringMatrix(vectors, impute_method="bayesian_ridge")
-    matrix_mn = malign.ScoringMatrix(vectors, impute_method="mean")
-    matrix_md = malign.ScoringMatrix(vectors, impute_method="median")
+    matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS_SPARSE, impute_method=method)
 
-    # Assertions
-    assert matrix_default.num_domains == 3
-    assert matrix_default.gap == "-"
-    assert len(matrix_default.scores) == 69
-    assert len(matrix_default.domains) == 3
-    assert tuple(matrix_default.domains[2]) == ("-", "i", "j")
+    assert matrix.num_domains == num_domains
+    assert matrix.gap == gap
+    assert len(matrix.scores) == size
+    assert ["-", "i", "j"] in matrix.domains
 
-    assert matrix_default["-", "-", "-"] == 0.0
-    assert matrix_default["a", "Y", "j"] == pytest.approx(8.0, rel=1e-03)
-    assert matrix_default["a", "X", "j"] == pytest.approx(0.366666, rel=1e-03)
-    assert matrix_default["c", "X", "-"] == pytest.approx(0.366666, rel=1e-03)
-    assert matrix_default["b", "-", "i"] == pytest.approx(0.366666, rel=1e-03)
-    assert matrix_default["b", "-", "j"] == pytest.approx(0.366666, rel=1e-03)
-    assert matrix_default["c", "Y", "j"] == pytest.approx(0.366666, rel=1e-03)
-    assert matrix_default["-", "X", "-"] == pytest.approx(0.366666, rel=1e-03)
-
-    assert matrix_dt["-", "-", "-"] == 0.0
-    assert matrix_dt["a", "Y", "j"] == pytest.approx(8.0, rel=1e-03)
-    assert matrix_dt["a", "X", "j"] == pytest.approx(0.0, rel=1e-03)
-    assert matrix_dt["c", "X", "-"] == pytest.approx(0.0, rel=1e-03)
-    assert matrix_dt["b", "-", "i"] == pytest.approx(-4.0, rel=1e-03)
-    assert matrix_dt["b", "-", "j"] == pytest.approx(-8.0, rel=1e-03)
-    assert matrix_dt["c", "Y", "j"] == pytest.approx(-6.0, rel=1e-03)
-    assert matrix_dt["-", "X", "-"] == pytest.approx(0.0, rel=1e-03)
-
-    assert matrix_et["-", "-", "-"] == 0.0
-    assert matrix_et["a", "Y", "j"] == pytest.approx(8.0, rel=1e-03)
-    assert matrix_et["a", "X", "j"] == pytest.approx(0.0, rel=1e-03)
-    assert matrix_et["c", "X", "-"] == pytest.approx(-7.0, rel=1e-03)
-    assert matrix_et["b", "-", "i"] == pytest.approx(-3.0, rel=1e-03)
-    assert matrix_et["b", "-", "j"] == pytest.approx(3.0, rel=1e-03)
-    assert matrix_et["c", "Y", "j"] == pytest.approx(7.0, rel=1e-03)
-    assert matrix_et["-", "X", "-"] == pytest.approx(-4.5, rel=1e-03)
-
-    assert matrix_kn["-", "-", "-"] == 0.0
-    assert matrix_kn["a", "Y", "j"] == pytest.approx(8.0, rel=1e-03)
-    assert matrix_kn["a", "X", "j"] == pytest.approx(1.86666, rel=1e-03)
-    assert matrix_kn["c", "X", "-"] == pytest.approx(0.93333, rel=1e-03)
-    assert matrix_kn["b", "-", "i"] == pytest.approx(1.46666, rel=1e-03)
-    assert matrix_kn["b", "-", "j"] == pytest.approx(1.2, rel=1e-03)
-    assert matrix_kn["c", "Y", "j"] == pytest.approx(1.6, rel=1e-03)
-    assert matrix_kn["-", "X", "-"] == pytest.approx(0.06666, rel=1e-03)
-
-    assert matrix_br["-", "-", "-"] == 0.0
-    assert matrix_br["a", "Y", "j"] == pytest.approx(8.0, rel=1e-03)
-    assert matrix_br["a", "X", "j"] == pytest.approx(2.83974, rel=1e-03)
-    assert matrix_br["c", "X", "-"] == pytest.approx(0.48655, rel=1e-03)
-    assert matrix_br["b", "-", "i"] == pytest.approx(1.36074, rel=1e-03)
-    assert matrix_br["b", "-", "j"] == pytest.approx(1.45179, rel=1e-03)
-    assert matrix_br["c", "Y", "j"] == pytest.approx(1.43649, rel=1e-03)
-    assert matrix_br["-", "X", "-"] == pytest.approx(-3.45639, rel=1e-03)
-
-    assert matrix_mn["-", "-", "-"] == 0.0
-    assert matrix_mn["a", "Y", "j"] == pytest.approx(8.0, rel=1e-03)
-    assert matrix_mn["a", "X", "j"] == pytest.approx(0.366666, rel=1e-03)
-    assert matrix_mn["c", "X", "-"] == pytest.approx(0.366666, rel=1e-03)
-    assert matrix_mn["b", "-", "i"] == pytest.approx(0.366666, rel=1e-03)
-    assert matrix_mn["b", "-", "j"] == pytest.approx(0.366666, rel=1e-03)
-    assert matrix_mn["c", "Y", "j"] == pytest.approx(0.366666, rel=1e-03)
-    assert matrix_mn["-", "X", "-"] == pytest.approx(0.366666, rel=1e-03)
-
-    assert matrix_md["-", "-", "-"] == 0.0
-    assert matrix_md["a", "Y", "j"] == pytest.approx(8.0, rel=1e-03)
-    assert matrix_md["a", "X", "j"] == pytest.approx(0.0, rel=1e-03)
-    assert matrix_md["c", "X", "-"] == pytest.approx(0.0, rel=1e-03)
-    assert matrix_md["b", "-", "i"] == pytest.approx(0.0, rel=1e-03)
-    assert matrix_md["b", "-", "j"] == pytest.approx(0.0, rel=1e-03)
-    assert matrix_md["c", "Y", "j"] == pytest.approx(0.0, rel=1e-03)
-    assert matrix_md["-", "X", "-"] == pytest.approx(0.0, rel=1e-03)
+    assert matrix["-", "-", "-"] == 0.0
+    for key, expected, rel in tests:
+        assert matrix[key] == pytest.approx(expected, rel=rel)
 
 
 def test_multiwise_from_subvectors():
@@ -330,6 +384,9 @@ def test_copy():
     # Perform manual comparison
     assert ref_matrix.scores == cpy_matrix.scores
     assert ref_matrix.domains == cpy_matrix.domains
+
+    # Assert they are different
+    assert id(ref_matrix) != id(cpy_matrix)
 
 
 def test_set_item():
