@@ -443,9 +443,21 @@ class ScoringMatrix:
         Sub-domains can be specified by passing a `None` to the positions the key
         does not apply, e.g. `("a", "b", None)`.
 
+        If the `key` is not found, for example when aligning sequences with
+        unobserved values, the lowest overall value in terms of the
+        components of the key will be returned.
+
         @param key: The element in the multidimensional matrix to be queried.
         @return: The value associated with the requested element.
         """
+
+        if key not in self.scores:
+            potential = []
+            for domain, value in enumerate(key):
+                for k, v in self.scores.items():
+                    if k[domain] == value:
+                        potential.append(value)
+            return min(potential)
 
         return self.scores[key]
 
