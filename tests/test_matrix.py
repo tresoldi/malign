@@ -419,3 +419,14 @@ def test_tabulate():
     # NOTE: currently only building it, to get coverage
     assert len(matrix_a.tabulate()) > 0
     assert len(matrix_b.tabulate()) > 0
+
+def test_missing_key():
+    """
+    Test pairwise matrices built from complete vectors.
+    """
+
+    # Build matrix
+    matrix = malign.ScoringMatrix(PAIRWISE_TEST_VECTORS)
+    assert matrix["a", "1"] == -3.0
+    assert matrix["A", "X"] == -3.0
+    assert matrix["A", "1"] == -9.0

@@ -453,10 +453,14 @@ class ScoringMatrix:
 
         if key not in self.scores:
             potential = []
-            for domain, value in enumerate(key):
-                for k, v in self.scores.items():
-                    if k[domain] == value:
-                        potential.append(value)
+            for domain, state in enumerate(key):
+                for entry, score in self.scores.items():
+                    if entry[domain] == state:
+                        potential.append(score)
+
+            # If there is no potential, return the minimum global score
+            if not potential:
+                return min(self.scores.values())
             return min(potential)
 
         return self.scores[key]
