@@ -3,7 +3,7 @@
 """__init__.py file for the `malign` library."""
 
 # Package information for the library
-__version__ = "0.3.2"
+__version__ = "0.4"
 __author__ = "Tiago Tresoldi"
 __email__ = "tiago.tresoldi@lingfil.uu.se"
 

@@ -14,23 +14,22 @@ from .utils import identity_matrix, score_alignment, sort_alignments
 from .yenksp import yenksp_align
 
 
-# TODO: remove underscore from _build_candidates and others, use __all__
 # TODO: decide on matrix/scorer name globally
 # TODO: globally decide on types Sized, Collection, Sequence
 
 
-def _build_candidates(
+def build_candidates(
     potential_alms: Dict[int, Set[Tuple[Hashable, ...]]], matrix: ScoringMatrix
 ) -> Set[Tuple[Tuple[Hashable, ...]]]:
     """
-    Internal function used by `_malign()`.
+    Internal function used by the alignment method.
 
     This function takes a collection of individual sequence alignments, grouped by
     lengths in `potential_alms`, and a scoring `matrix`, and returns all potential
     alignments that can be constructed from it. It can be consider an informed "product" of
     all potential alignments.
 
-    Note that the function does not score the alignments.
+    Note that the function does *not* score the alignments.
 
     @param potential_alms: A dictionary with sequence indexes as key, and sets of all collected potential
         alignments as values.
@@ -66,11 +65,10 @@ def _build_candidates(
     return alms
 
 
-# TODO: remove underscore here as well
 # TODO: have an issue allowing UPGMA/NJ
 # NOTE: type of `pw_func` is defined only as a callable that returns a list of alignments, as the full
 #       set of arguments might vary across methods
-def _collect_alignments(
+def collect_alignments(
     seqs: List[List[Hashable]],
     matrix: ScoringMatrix,
     pw_func: Callable[..., List[Alignment]],
@@ -163,7 +161,7 @@ def _collect_alignments(
     alms = set()
     for length in potential:
         if len(potential[length]) == len(seqs):
-            alms = alms.union(_build_candidates(potential[length], matrix))
+            alms = alms.union(build_candidates(potential[length], matrix))
 
     # Compute scores, sort and return
     ret_alms = [Alignment(seqs, score_alignment(seqs, matrix)) for seqs in alms]
@@ -225,7 +223,7 @@ def multi_align(
         alms = [dumb_malign(seqs, matrix=matrix)]
     else:
         if method == "yenksp":
-            # For `yenksp`, we will compute the twice the number of paths
+            # For `yenksp`, we will compute the square of the number of paths
             # requested, in order to get out of local minima
             pairwise_func = yenksp_align
             pw_k = k ** 2
@@ -236,6 +234,6 @@ def multi_align(
         # Collect alignments in a list, making sure we extend at most to the requested `k` (the one passed as
         # an argument is more indicative, and its realization depends on the function, the methods, and
         # the sequences being aligned)
-        alms = _collect_alignments(seqs, matrix, pw_func=pairwise_func, k=pw_k)[:k]
+        alms = collect_alignments(seqs, matrix, pw_func=pairwise_func, k=pw_k)[:k]
 
     return alms
