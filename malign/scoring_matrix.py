@@ -278,6 +278,83 @@ class ScoringMatrix:
                 for key, value in serial_data["scores"].items()
             }
 
+    @classmethod
+    def from_yaml(cls, filename: str, impute_method: str | None = "mean"):
+        """Load a scoring matrix from a YAML file.
+
+        This is a class method that provides a convenient way to create a
+        ScoringMatrix instance directly from a YAML file.
+
+        Args:
+            filename: Path to the YAML file containing the serialized matrix.
+            impute_method: Imputation method to use if the matrix needs filling.
+                Defaults to "mean".
+
+        Returns:
+            A new ScoringMatrix instance loaded from the YAML file.
+
+        Example:
+            >>> matrix = ScoringMatrix.from_yaml("italian_russian.yml")
+        """
+        matrix = cls(impute_method=impute_method)
+        matrix.load(filename)
+        return matrix
+
+    @classmethod
+    def from_sequences(
+        cls,
+        sequences: list[list[Hashable]],
+        match: float = 1.0,
+        mismatch: float = -1.0,
+        gap: Hashable = "-",
+        gap_score: float = -1.0,
+        impute_method: str | None = "mean",
+    ):
+        """Create a scoring matrix from sequences with simple match/mismatch scoring.
+
+        This builder creates a pairwise identity-style scoring matrix suitable
+        for aligning sequences from different alphabets with basic scoring.
+
+        Args:
+            sequences: List of sequence alphabets (e.g., [["A","C","G","T"], ["А","В","Г","Т"]]).
+            match: Score for matching symbols (default: 1.0).
+            mismatch: Score for mismatching symbols (default: -1.0).
+            gap: Gap symbol (default: "-").
+            gap_score: Score for gaps (default: -1.0).
+            impute_method: Method for filling missing scores (default: "mean").
+
+        Returns:
+            A new ScoringMatrix with basic match/mismatch scoring.
+
+        Example:
+            >>> matrix = ScoringMatrix.from_sequences(
+            ...     sequences=[["A", "C", "G", "T"], ["А", "В", "Г", "Т"]],
+            ...     match=1.0,
+            ...     mismatch=-0.5,
+            ...     gap_score=-1.0
+            ... )
+        """
+        # Build domains from sequences, ensuring gap is included
+        domains = [sorted(set([gap, *seq])) for seq in sequences]
+
+        # Create scores dictionary with basic identity scoring
+        scores = {}
+        for combo in itertools.product(*domains):
+            # All-gap vector is always 0.0
+            if all(s == gap for s in combo):
+                scores[combo] = 0.0
+            # Any gap gets gap_score
+            elif gap in combo:
+                scores[combo] = gap_score
+            # All matching non-gap symbols (for identity matrices)
+            elif len(set(combo)) == 1:
+                scores[combo] = match
+            # Mismatching symbols
+            else:
+                scores[combo] = mismatch
+
+        return cls(scores=scores, domains=domains, gap=gap, impute_method=impute_method)
+
     def save(self, filename: str) -> None:
         """Serialize a matrix to YAML format.
 
