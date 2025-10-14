@@ -20,7 +20,7 @@ class Alignment:
     @param score: The alignment score.
     """
 
-    seqs: Sequence[Hashable]
+    seqs: Sequence[Sequence[Hashable]]
     score: float
 
     def __len__(self) -> int:
@@ -30,7 +30,7 @@ class Alignment:
         """
         return len(self.seqs)
 
-    def __getitem__(self, idx: int) -> Hashable:
+    def __getitem__(self, idx: int) -> Sequence[Hashable]:
         """Return a sequence by its index.
 
         @param idx: The index of the sequence in the alignment.
