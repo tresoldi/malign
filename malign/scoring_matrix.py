@@ -2,10 +2,10 @@
 
 # Import Python standard libraries
 import itertools
-import json
 from collections.abc import Hashable
 
 import numpy as np
+import yaml
 from sklearn.ensemble import ExtraTreesRegressor
 
 # Import 3rd-party libraries; `enable_iterative_imputer` is necessary for the one in `sklearn.impute`
@@ -256,15 +256,14 @@ class ScoringMatrix:
 
     # TODO: allow to return a ScoringMatrix, so we have `ScoringMatrix().load(filename)`
     # TODO: make sure it works with types other than strings, at least integers
-    # TODO: better solution than JSON for serializing? perhaps just pickle?
     def load(self, filename: str) -> None:
-        """Internal function for loading a serialized matrix from file.
+        """Load a serialized matrix from a YAML file.
 
-        @param filename: Path to the file holding the matrix to be loaded.
+        @param filename: Path to the YAML file holding the matrix to be loaded.
         """
 
-        with open(filename, encoding="utf-8") as json_handler:
-            serial_data = json.load(json_handler)
+        with open(filename, encoding="utf-8") as yaml_handler:
+            serial_data = yaml.safe_load(yaml_handler)
 
             self.gap = serial_data["gap"]
             self._domain_range = tuple(serial_data["domain_range"])
@@ -280,44 +279,40 @@ class ScoringMatrix:
             }
 
     def save(self, filename: str) -> None:
-        """Serialize a matrix to disk.
+        """Serialize a matrix to YAML format.
 
-        Note that, due limits in serializing with JSON, which do not allow
-        lists as keys, the `" / "` symbol used for serialization (note the
-        spaces) is not allowed.
+        The `" / "` symbol (note the spaces) is used as a separator for tuple keys
+        and is therefore not allowed in domain symbols.
 
-        @param filename: Path to the file where to write the serialized matrix.
+        @param filename: Path to the YAML file where to write the serialized matrix.
         """
 
         # Make sure the reserved symbol is not used
         if any(" / " in domain for domain in self.domains):
             raise ValueError("At least one domain uses reserved symbols.")
 
-        # Make a copy of `self.scores` replacing `None`s, which cannot be part
-        # of the key as per the JSON standard, with a custom element, which
-        # must be mapped back when loading.
-        # As we only operate on strings, to facilitate human edition/inspection
-        # we map the `None`s to numeric zero value. Note that we need our
-        # custom sorting function as we cannot otherwise sort keys with Nones
-        # and strings.
+        # Make a copy of `self.scores` replacing `None`s with "NULL" string,
+        # as YAML keys should be strings for better human readability.
+        # Note that we need a custom sorting function as we cannot otherwise
+        # sort keys with Nones and strings.
         def _allow_none_key(obj):
             return tuple(["0000000000" if k is None else k for k in obj])
 
         _scores = {
-            " / ".join(["NULL" if k is None else k for k in key]): self.scores[key]
+            " / ".join(["NULL" if k is None else k for k in key]): float(self.scores[key])
             for key in sorted(self.scores, key=_allow_none_key)
         }
 
         # Open handler, build serialized data, and write to disk
-        with open(filename, "w", encoding="utf-8") as json_handler:
+        with open(filename, "w", encoding="utf-8") as yaml_handler:
             serial_data = {
-                "domains": self.domains,
                 "gap": self.gap,
+                "domains": self.domains,
                 "domain_range": list(self._domain_range),
                 "scores": _scores,
             }
 
-            json.dump(serial_data, json_handler, indent=4, ensure_ascii=False)
+            yaml.dump(serial_data, yaml_handler, default_flow_style=False, allow_unicode=True)
 
     # TODO: should cache? should be internal?
     # TODO: cannot annotate that it returns a dict with ScoringMatrix as values
