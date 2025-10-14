@@ -129,3 +129,13 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Ruff
+.ruff_cache/
+
+# Generated docs (nhandu)
+docs/*.html
+docs/*.out.*
+
+# Benchmark results
+benchmark_results*/
