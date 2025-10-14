@@ -333,23 +333,34 @@ def test_subdomain_query():
 
 
 def test_load_save():
-    """Test load and saving matrices"""
+    """Test loading and saving matrices in YAML format."""
+    import tempfile
+    import os
 
-    # Build matrices with the various filling methods
+    # Build matrix with various filling methods
     matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
 
-    # Build a temporary file name and save
-    # TODO: does not work on windows...
+    # Use tempfile with proper cleanup
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", delete=False) as f:
+        temp_path = f.name
 
-    #        handler = tempfile.NamedTemporaryFile()
-    #        matrix.save(handler.name)
-    #
-    #        # Load and check
-    #        matrix2 = malign.ScoringMatrix(handler.name)
-    #
-    #        # Assertions
-    #        assert matrix.scores == matrix2.scores
-    #        assert tuple(matrix.domains) == tuple(matrix2.domains)
+    try:
+        # Save matrix to YAML
+        matrix.save(temp_path)
+
+        # Load matrix from YAML
+        matrix2 = malign.ScoringMatrix()
+        matrix2.load(temp_path)
+
+        # Assertions
+        assert matrix.scores == matrix2.scores
+        assert matrix.domains == matrix2.domains
+        assert matrix.gap == matrix2.gap
+        assert matrix._domain_range == matrix2._domain_range
+    finally:
+        # Clean up temp file
+        if os.path.exists(temp_path):
+            os.unlink(temp_path)
 
 
 def test_copy():
