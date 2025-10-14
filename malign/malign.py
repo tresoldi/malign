@@ -1,9 +1,9 @@
 """Main module with code for alignment methods."""
 
 # Import Python standard libraries
-from collections import defaultdict
-from typing import Callable, Dict, Hashable, List, Optional, Set, Tuple
 import itertools
+from collections import defaultdict
+from collections.abc import Callable, Hashable
 
 # Import other modules
 from .alignment import Alignment
@@ -13,17 +13,15 @@ from .scoring_matrix import ScoringMatrix
 from .utils import identity_matrix, score_alignment, sort_alignments
 from .yenksp import yenksp_align
 
-
 # TODO: remove underscore from _build_candidates and others, use __all__
 # TODO: decide on matrix/scorer name globally
 # TODO: globally decide on types Sized, Collection, Sequence
 
 
 def _build_candidates(
-    potential_alms: Dict[int, Set[Tuple[Hashable, ...]]], matrix: ScoringMatrix
-) -> Set[Tuple[Tuple[Hashable, ...]]]:
-    """
-    Internal function used by `_malign()`.
+    potential_alms: dict[int, set[tuple[Hashable, ...]]], matrix: ScoringMatrix
+) -> set[tuple[tuple[Hashable, ...]]]:
+    """Internal function used by `_malign()`.
 
     This function takes a collection of individual sequence alignments, grouped by
     lengths in `potential_alms`, and a scoring `matrix`, and returns all potential
@@ -55,10 +53,10 @@ def _build_candidates(
         # The combination of alignments might results in full-gap vectors; here we
         # remove them and make sure to only add unique alignments
         full_gap = tuple([matrix.gap] * num_seqs)
-        vectors = list(zip(*seqs))
+        vectors = list(zip(*seqs, strict=False))
         if full_gap in vectors:
             vectors = [vector for vector in vectors if vector != full_gap]
-            seqs = tuple(zip(*vectors))
+            seqs = tuple(zip(*vectors, strict=False))
 
         # Store the sequences, either in the original form or cleaned of full gaps
         alms.add(seqs)
@@ -71,13 +69,12 @@ def _build_candidates(
 # NOTE: type of `pw_func` is defined only as a callable that returns a list of alignments, as the full
 #       set of arguments might vary across methods
 def _collect_alignments(
-    seqs: List[List[Hashable]],
+    seqs: list[list[Hashable]],
     matrix: ScoringMatrix,
-    pw_func: Callable[..., List[Alignment]],
-    k: Optional[int] = None,
-) -> List[Alignment]:
-    """
-    Internal function for multiwise alignment.
+    pw_func: Callable[..., list[Alignment]],
+    k: int | None = None,
+) -> list[Alignment]:
+    """Internal function for multiwise alignment.
 
     This function is used to perform the multiwise alignment with different
     pairwise methods. It follows a procedure different from the more common
@@ -173,13 +170,12 @@ def _collect_alignments(
 
 # TODO: gap opening/gap extension for scoring
 def multi_align(
-    sequences: List[Hashable],
+    sequences: list[Hashable],
     method: str = "anw",
-    matrix: Optional[ScoringMatrix] = None,
+    matrix: ScoringMatrix | None = None,
     k: int = 1,
-) -> List[Alignment]:
-    """
-    Compute multiple alignments for a list of sequences.
+) -> list[Alignment]:
+    """Compute multiple alignments for a list of sequences.
 
     The function will return a sorted list of the `k` best alignments, as long as they
     can be computed.
@@ -187,7 +183,7 @@ def multi_align(
     @param sequences: A list of lists of hashable elements (usually stings) representing the
         sequences to be aligned.
     @param method: The method to be used for alignment computation. Currently supported methods are
-        `"dumb"`, `"anw"` (for "asymmetric Needleman–Wunsch"), and `"yenksp"` (for
+        `"dumb"`, `"anw"` (for "asymmetric Needleman-Wunsch"), and `"yenksp"` (for
         the graph-alignment based on Yen's k-shortest paths algorithm). Defaults
         to `"anw"`.
     @param matrix: The matrix used for scoring the alignment. If provided, must match in length the
@@ -204,7 +200,7 @@ def multi_align(
     # Note that, while not recommended, this even allows to mix different iterable
     # types in `seqs`. The conversion also guarantees that a copy is made, for
     # immutability.
-    seqs: List[List[Hashable]] = [list(seq) for seq in sequences]
+    seqs: list[list[Hashable]] = [list(seq) for seq in sequences]
 
     # Get the user-provided matrix, or compute an identity one
     if not matrix:
@@ -228,7 +224,7 @@ def multi_align(
             # For `yenksp`, we will compute the twice the number of paths
             # requested, in order to get out of local minima
             pairwise_func = yenksp_align
-            pw_k = k ** 2
+            pw_k = k**2
         else:  # anw
             pairwise_func = nw_align
             pw_k = k

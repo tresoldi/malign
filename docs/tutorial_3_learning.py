@@ -13,7 +13,6 @@
 #'
 #' ## Basic Matrix Learning (Phase 2 - EM Method)
 
-import malign
 
 # Example cognate sets (Italian-Russian name pairs)
 cognate_sets = [

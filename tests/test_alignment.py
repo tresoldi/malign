@@ -1,8 +1,5 @@
 """Tests for the Alignment class and validation metrics."""
 
-import pytest
-import malign
-
 
 def test_alignment_creation():
     """Test basic Alignment object creation."""

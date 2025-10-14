@@ -1,7 +1,7 @@
 """Module for computing dumb (pure gap padding) alignments."""
 
 # Import Python standard libraries
-from typing import Hashable, Optional, Sequence
+from collections.abc import Hashable, Sequence
 
 # Import other modules
 from .alignment import Alignment
@@ -13,10 +13,9 @@ from .utils import identity_matrix, score_alignment
 # being the pairwise
 def dumb_malign(
     seqs: Sequence[Sequence[Hashable]],
-    matrix: Optional[ScoringMatrix] = None,
+    matrix: ScoringMatrix | None = None,
 ) -> Alignment:
-    """
-    Perform a *dumb* multiple alignment.
+    """Perform a *dumb* multiple alignment.
 
     This method is implemented for testing purposes, as it just pads gaps as necessary
     in order to return a single alignment.

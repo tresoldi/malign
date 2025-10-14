@@ -1,5 +1,4 @@
-"""
-test_matrix
+"""test_matrix
 ===========
 
 Tests for the scoring matrices of the `malign` package.
@@ -13,6 +12,7 @@ Tests for the scoring matrices of the `malign` package.
 
 # Import Python libraries
 import math
+
 import pytest
 
 # Impor the library itself
@@ -128,9 +128,7 @@ MULTIWISE_TEST_VECTORS_SPARSE = {
 
 
 def test_pairwise_from_full_vectors():
-    """
-    Test pairwise matrices built from complete vectors.
-    """
+    """Test pairwise matrices built from complete vectors."""
 
     # Build matrix
     matrix = malign.ScoringMatrix(PAIRWISE_TEST_VECTORS)
@@ -146,9 +144,7 @@ def test_pairwise_from_full_vectors():
 
 
 def test_pairwise_from_full_vectors_with_domains():
-    """
-    Test pairwise matrices built from complete vectors with domains.
-    """
+    """Test pairwise matrices built from complete vectors with domains."""
 
     # Build matrix with "correct" domains
     matrix_a = malign.ScoringMatrix(
@@ -163,9 +159,7 @@ def test_pairwise_from_full_vectors_with_domains():
 
     # Build matrix with "insufficient" domains
     with pytest.raises(ValueError):
-        malign.ScoringMatrix(
-            PAIRWISE_TEST_VECTORS, domains=[["-", "a", "b"], ["-", "Y", "Z"]]
-        )
+        malign.ScoringMatrix(PAIRWISE_TEST_VECTORS, domains=[["-", "a", "b"], ["-", "Y", "Z"]])
 
     # Assertions
     assert tuple(matrix_a.domains[1]) == ("-", "X", "Y")
@@ -173,9 +167,7 @@ def test_pairwise_from_full_vectors_with_domains():
 
 
 def test_multiwise_from_full_vectors():
-    """
-    Test multiwise matrices built from complete vectors.
-    """
+    """Test multiwise matrices built from complete vectors."""
 
     # Build matrix
     matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
@@ -287,9 +279,7 @@ def test_multiwise_from_full_vectors():
     ],
 )
 def test_multiwise_from_sparse_vectors(method, num_domains, gap, size, tests):
-    """
-    Test multiwise matrices built from sparse vectors.
-    """
+    """Test multiwise matrices built from sparse vectors."""
 
     matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS_SPARSE, impute_method=method)
 
@@ -304,18 +294,14 @@ def test_multiwise_from_sparse_vectors(method, num_domains, gap, size, tests):
 
 
 def test_multiwise_from_subvectors():
-    """
-    Test multiwise matrices built from sub vectors.
-    """
+    """Test multiwise matrices built from sub vectors."""
 
     # Build sub matrices, and then the main matrix
     scores_01 = {
-        (key[0], key[1], None): value
-        for key, value in PAIRWISE_TEST_SPARSE_VECTOR_01.items()
+        (key[0], key[1], None): value for key, value in PAIRWISE_TEST_SPARSE_VECTOR_01.items()
     }
     scores_02 = {
-        (key[0], None, key[1]): value
-        for key, value in PAIRWISE_TEST_SPARSE_VECTOR_02.items()
+        (key[0], None, key[1]): value for key, value in PAIRWISE_TEST_SPARSE_VECTOR_02.items()
     }
     scores = {**scores_01, **scores_02}
     matrix = malign.ScoringMatrix(scores)
@@ -337,9 +323,7 @@ def test_multiwise_from_subvectors():
 
 
 def test_subdomain_query():
-    """
-    Test querying of subdomains.
-    """
+    """Test querying of subdomains."""
 
     # Build matrices with the various filling methods
     matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
@@ -349,9 +333,7 @@ def test_subdomain_query():
 
 
 def test_load_save():
-    """
-    Test load and saving matrices
-    """
+    """Test load and saving matrices"""
 
     # Build matrices with the various filling methods
     matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
@@ -371,9 +353,7 @@ def test_load_save():
 
 
 def test_copy():
-    """
-    Test method for matrix copy.
-    """
+    """Test method for matrix copy."""
 
     # Build reference matrix
     ref_matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
@@ -390,9 +370,7 @@ def test_copy():
 
 
 def test_set_item():
-    """
-    Test matrix __setitem__.
-    """
+    """Test matrix __setitem__."""
 
     # Build reference matrix
     matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
@@ -408,9 +386,7 @@ def test_set_item():
 
 
 def test_tabulate():
-    """
-    Test matrix tabulation.
-    """
+    """Test matrix tabulation."""
 
     # Build reference matrix
     matrix_a = malign.ScoringMatrix(PAIRWISE_TEST_VECTORS)
@@ -420,10 +396,9 @@ def test_tabulate():
     assert len(matrix_a.tabulate()) > 0
     assert len(matrix_b.tabulate()) > 0
 
+
 def test_missing_key():
-    """
-    Test pairwise matrices built from complete vectors.
-    """
+    """Test pairwise matrices built from complete vectors."""
 
     # Build matrix
     matrix = malign.ScoringMatrix(PAIRWISE_TEST_VECTORS)

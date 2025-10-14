@@ -1,8 +1,8 @@
 """Module with functions for the k-best pairwise alignment."""
 
 # Import Python standard libraries
+from collections.abc import Hashable, Sequence
 from itertools import islice
-from typing import Hashable, List, Optional, Sequence, Tuple
 
 # Import 3rd party libraries
 import networkx as nx
@@ -16,8 +16,7 @@ from .utils import identity_matrix, pairwise_iter, score_alignment, sort_alignme
 def compute_graph(
     seq_a: Sequence[Hashable], seq_b: Sequence[Hashable], matrix: ScoringMatrix
 ) -> nx.DiGraph:
-    """
-    Computes a weighted directed graph for alignment.
+    """Computes a weighted directed graph for alignment.
 
     The function builds a weighted directed graph for a pairwise alignment
     between two sequences, in a manner analogous to a Needleman-Wunsch
@@ -65,8 +64,8 @@ def compute_graph(
     # NOTE: the "+" operation on lists here allows us to, in a single step,
     # add the necessary alignment gap and make an in-memory copy of both
     # sequences, preserving the original ones.
-    seq_a = [matrix.gap] + list(seq_a)
-    seq_b = [matrix.gap] + list(seq_b)
+    seq_a = [matrix.gap, *list(seq_a)]
+    seq_b = [matrix.gap, *list(seq_b)]
 
     # Build the directional graph and add edges iterating from the bottom
     # right to the top left corner (as in NW).
@@ -117,13 +116,12 @@ def compute_graph(
 
 
 def build_align(
-    path: List[Tuple[int, int]],
+    path: list[tuple[int, int]],
     seq_a: Sequence[Hashable],
     seq_b: Sequence[Hashable],
     gap: Hashable = "-",
-) -> Tuple[Sequence[Hashable], Sequence[Hashable]]:
-    """
-    Builds a pairwise alignment from a path of sequence indexes.
+) -> tuple[Sequence[Hashable], Sequence[Hashable]]:
+    """Builds a pairwise alignment from a path of sequence indexes.
 
     The function receives a `path` as provided from a k shortest path
     searching method and applies it to a pair of sequences, building the
@@ -169,15 +167,14 @@ def build_align(
 
 def align(
     graph: nx.DiGraph,
-    ne_loc: Tuple[int, int],
-    sw_loc: Tuple[int, int],
+    ne_loc: tuple[int, int],
+    sw_loc: tuple[int, int],
     seq_a: Sequence[Hashable],
     seq_b: Sequence[Hashable],
     matrix: ScoringMatrix,
-    n_paths: Optional[int] = None,
-) -> List[Alignment]:
-    """
-    Return the `k` best alignments in terms of costs.
+    n_paths: int | None = None,
+) -> list[Alignment]:
+    """Return the `k` best alignments in terms of costs.
 
     The function with take a path as source and target nodes in a graph,
     score the best alignments in terms of transition weights and gap
@@ -233,13 +230,12 @@ def align(
 def yenksp_align(
     seq_a: Sequence[Hashable],
     seq_b: Sequence[Hashable],
-    k: Optional[int] = 4,
-    matrix: Optional[ScoringMatrix] = None,
-    ne_loc: Tuple[int, int] = (0, 0),
-    sw_loc: Optional[Tuple[int, int]] = None,
-) -> List[Alignment]:
-    """
-    Perform pairwise alignment with the Yen K Shortest Paths method.
+    k: int | None = 4,
+    matrix: ScoringMatrix | None = None,
+    ne_loc: tuple[int, int] = (0, 0),
+    sw_loc: tuple[int, int] | None = None,
+) -> list[Alignment]:
+    """Perform pairwise alignment with the Yen K Shortest Paths method.
 
     @param seq_a: The first sequence to be aligned.
     @param seq_b: The second sequence to be aligned.

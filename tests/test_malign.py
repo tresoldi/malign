@@ -1,19 +1,17 @@
-"""
-test_malign
+"""test_malign
 ===========
 
 Tests for the `malign` package.
 """
 
 # Import the library itself
-import malign
 import pytest
+
+import malign
 
 
 def test_dumb_pw_align():
-    """
-    Test `dumb` pairwise alignment.
-    """
+    """Test `dumb` pairwise alignment."""
 
     alms = malign.multi_align(["tra", "fatata"], method="dumb")
     assert len(alms) == 1
@@ -23,9 +21,7 @@ def test_dumb_pw_align():
 
 
 def test_nw_pw_align():
-    """
-    Test `nw` pairwise alignment.
-    """
+    """Test `nw` pairwise alignment."""
 
     alms = malign.multi_align(["tra", "fata"], k=2, method="anw")
     assert len(alms) == 1
@@ -36,9 +32,7 @@ def test_nw_pw_align():
 
 # TODO: fix code so it computes the graph by itself, even in pairwise
 def test_yenksp_pw_align():
-    """
-    Test `kbest` pairwise alignment.
-    """
+    """Test `kbest` pairwise alignment."""
 
     # Test with basic alignment, no scorer
     alms = malign.multi_align(["tra", "fata"], k=4, method="yenksp")
@@ -53,18 +47,14 @@ def test_yenksp_pw_align():
     graph = malign.yenksp.compute_graph(dna_seq1, dna_seq2, malign.utils.DNA_MATRIX)
 
     dest = (len(dna_seq1), len(dna_seq2))
-    aligns = malign.yenksp.align(
-        graph, (0, 0), dest, dna_seq1, dna_seq2, malign.utils.DNA_MATRIX
-    )
+    aligns = malign.yenksp.align(graph, (0, 0), dest, dna_seq1, dna_seq2, malign.utils.DNA_MATRIX)
     assert "".join(aligns[0].seqs[0]) == "TGGAC-CCGG-G-AAGGTGACCCAC"
     assert "".join(aligns[0].seqs[1]) == "TTACCACCGGCGCGAACCCCCCCCC"
     assert aligns[0].score == pytest.approx(2.32)
 
 
 def test_compute_graph():
-    """
-    Test graph computation for Yen's algorithm.
-    """
+    """Test graph computation for Yen's algorithm."""
 
     dna_seq1 = "TGGAACC"
     dna_seq2 = "TAGACC"
@@ -77,9 +67,7 @@ def test_compute_graph():
 
 
 def test_score_alignment():
-    """
-    Test different scoring properties.
-    """
+    """Test different scoring properties."""
 
     mtx = malign.utils.DNA_MATRIX
 
@@ -94,9 +82,7 @@ def test_score_alignment():
     # Test #3 - gap
     alm = [("A", "T", "T"), ("A", "T", "-")]
     assert malign.utils.score_alignment(alm, mtx) == pytest.approx(3.666666, rel=1e-05)
-    assert malign.utils.score_alignment(alm, mtx, gap_ext=-10) == pytest.approx(
-        0.666666, rel=1e-05
-    )
+    assert malign.utils.score_alignment(alm, mtx, gap_ext=-10) == pytest.approx(0.666666, rel=1e-05)
     assert malign.utils.score_alignment(alm, mtx, gap_open=-10) == pytest.approx(
         0.666666,
         rel=1e-05,
@@ -137,9 +123,7 @@ def test_score_alignment():
 
 
 def test_tabulation():
-    """
-    Test alignment tabulation output
-    """
+    """Test alignment tabulation output"""
 
     # TODO: assertMultiLineEqual() is failing, only keeping here for coverage
 
