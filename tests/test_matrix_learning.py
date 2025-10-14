@@ -1,7 +1,5 @@
 """Tests for matrix learning and optimization (Phase 2)."""
 
-import pytest
-import malign
 
 # All tests marked as TODO for Phase 2 when learn_matrix() is implemented
 

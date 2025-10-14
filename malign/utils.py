@@ -3,10 +3,10 @@
 # TODO: rename to `common`
 
 # Import Python standard libraries
-from collections import Counter
-from string import ascii_uppercase
 import itertools
-from typing import Iterable, Sequence, Hashable, List
+from collections import Counter
+from collections.abc import Hashable, Iterable, Sequence
+from string import ascii_uppercase
 
 # Import 3rd party tools
 from tabulate import tabulate
@@ -48,8 +48,7 @@ DNA_MATRIX = ScoringMatrix(
 
 
 def pairwise_iter(iterable: Iterable):
-    """
-    Auxiliary function for sequential pairwise iteration.
+    """Auxiliary function for sequential pairwise iteration.
 
     The function follows the recipe in Python's `itertools` documentation.
     [https://docs.python.org/3/library/itertools.html]
@@ -60,13 +59,12 @@ def pairwise_iter(iterable: Iterable):
     item_a, item_b = itertools.tee(iterable)
     next(item_a, None)
 
-    return zip(item_a, item_b)
+    return zip(item_a, item_b, strict=False)
 
 
 # TODO: move to the alignment return object
-def sort_alignments(alms: List[Alignment]) -> List[Alignment]:
-    """
-    Sorts a list of alignments in-place.
+def sort_alignments(alms: list[Alignment]) -> list[Alignment]:
+    """Sorts a list of alignments in-place.
 
     While the logic is simple, the usage of a single function guarantees that no
     competing implementations are design for each alignment method.
@@ -84,9 +82,7 @@ def sort_alignments(alms: List[Alignment]) -> List[Alignment]:
 # TODO: different gap penalties at the borders? -- strip border gaps
 # TODO: (related) benefit for longer non-gaps?
 def score_alignment(seqs: Sequence[Sequence[Hashable]], scorer, **kwargs) -> float:
-    """
-    Computes the score of an alignment according to a scoring matrix.
-    """
+    """Computes the score of an alignment according to a scoring matrix."""
 
     # Get parameters
     gap = kwargs.get("gap", "-")
@@ -94,7 +90,7 @@ def score_alignment(seqs: Sequence[Sequence[Hashable]], scorer, **kwargs) -> flo
     gap_open = kwargs.get("gap_open", -1)
 
     # Collect the scores for each alignment site
-    site_score = sum([scorer[corr] for corr in zip(*seqs)])
+    site_score = sum([scorer[corr] for corr in zip(*seqs, strict=False)])
 
     # Collect the gap sub-sequences for each sequence
     # 1st pass ->  [[['A'], ['T', 'T'], ['-'], ['C'], ['G', 'G'], ['A'], ['-', '-'] ...
@@ -105,9 +101,7 @@ def score_alignment(seqs: Sequence[Sequence[Hashable]], scorer, **kwargs) -> flo
     gap_seqs = [gap_seq for gap_seq in gap_seqs if gap_seq]
 
     # Compute the penalty per sequence based on `gap_seqs`
-    seq_penalty = sum([sum(gap_seq) * gap_ext for gap_seq in gap_seqs]) + (
-        len(gap_seqs) * gap_open
-    )
+    seq_penalty = sum([sum(gap_seq) * gap_ext for gap_seq in gap_seqs]) + (len(gap_seqs) * gap_open)
 
     # Correct by length, as we may be comparing alignments of different length
     return (site_score + seq_penalty) / len(seqs[0])
@@ -115,9 +109,7 @@ def score_alignment(seqs: Sequence[Sequence[Hashable]], scorer, **kwargs) -> flo
 
 # TODO: allow customizations
 def tabulate_alms(alms) -> str:
-    """
-    Return a tabulated textual representation of alignments.
-    """
+    """Return a tabulated textual representation of alignments."""
 
     # Internal function for generating representation labels
     def _label_iter():
@@ -131,8 +123,8 @@ def tabulate_alms(alms) -> str:
     table = []
     for alm_idx, alm in enumerate(alms):
         # Add a row for each sequence in the alignment
-        for label, seq in zip(_label_iter(), alm.seqs):
-            table.append([alm_idx, label, "%.2f" % alm.score] + list(seq))
+        for label, seq in zip(_label_iter(), alm.seqs, strict=False):
+            table.append([alm_idx, label, f"{alm.score:.2f}", *list(seq)])
 
         # Add blank row
         table.append(["" for _ in range(3 + alm_len)])
@@ -146,8 +138,7 @@ def tabulate_alms(alms) -> str:
 # TODO: do sub-matrices and matrices at the same pass?
 # TODO: move to scoring matrix?
 def identity_matrix(seqs: Sequence[Sequence[Hashable]], **kwargs) -> ScoringMatrix:
-    """
-    Build an identity matrix from a list of sequences.
+    """Build an identity matrix from a list of sequences.
 
     The function assumes, as expected, that the domains of all sequences are
     equal, even if symbols don't appear in all sequences.
@@ -161,7 +152,7 @@ def identity_matrix(seqs: Sequence[Sequence[Hashable]], **kwargs) -> ScoringMatr
     mismatch_score = kwargs.get("mismatch", gap_score * 0.9)  # TODO: just a bit below
 
     # Collect alphabet and build key space
-    alphabet = list(set(list(itertools.chain.from_iterable(seqs)) + [gap]))
+    alphabet = list({*list(itertools.chain.from_iterable(seqs)), gap})
 
     # Build full scoring matrix
     scores = {}
@@ -182,12 +173,7 @@ def identity_matrix(seqs: Sequence[Sequence[Hashable]], **kwargs) -> ScoringMatr
     for domain in domains:
         for symbols in itertools.product(alphabet, alphabet):
             symbol_iter = iter(symbols)
-            key = tuple(
-                [
-                    next(symbol_iter) if idx in domain else None
-                    for idx in range(len(seqs))
-                ]
-            )
+            key = tuple([next(symbol_iter) if idx in domain else None for idx in range(len(seqs))])
 
             if gap in symbols:
                 scores[key] = gap_score

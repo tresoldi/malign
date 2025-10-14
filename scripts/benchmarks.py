@@ -5,7 +5,6 @@ TODO: Complete implementation in Phase 3.
 """
 
 import argparse
-import time
 from pathlib import Path
 
 

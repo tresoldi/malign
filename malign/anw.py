@@ -1,8 +1,8 @@
-"""Module for computing asymmetric Needleman–Wunsch alignments."""
+"""Module for computing asymmetric Needleman-Wunsch alignments."""
 
 # Import Python standard libraries
-from typing import Dict, Hashable, List, Optional, Sequence, Tuple
 import itertools
+from collections.abc import Hashable, Sequence
 
 # Import from package
 from .alignment import Alignment
@@ -26,10 +26,9 @@ DIRECTION_MAP = {
 
 
 def nw_grids(
-    seq_a: List[Hashable], seq_b: List[Hashable], scorer: ScoringMatrix
-) -> Tuple[List[List[float]], List[List[Tuple[bool, bool, bool]]]]:
-    """
-    Build the Needleman-Wunsch grids.
+    seq_a: list[Hashable], seq_b: list[Hashable], scorer: ScoringMatrix
+) -> tuple[list[list[float]], list[list[tuple[bool, bool, bool]]]]:
+    """Build the Needleman-Wunsch grids.
 
     Note that the sequences must already have the initial gap added to them at this
     point.
@@ -46,10 +45,8 @@ def nw_grids(
     # Initialize (seq_a x seq_b) grids, one for the scores (`s_grid`) and one
     # for the directions (`d_grid`). Note that `seq_a` is modelled at the top
     # (i.e., columns), so the indexing is performed with `grid[b][a]`
-    s_grid: List[List[float]] = [[0.0] * len_a for _ in seq_b]
-    d_grid: List[List[Tuple[bool, bool, bool]]] = [
-        [(False, False, False)] * len_a for _ in seq_b
-    ]
+    s_grid: list[list[float]] = [[0.0] * len_a for _ in seq_b]
+    d_grid: list[list[tuple[bool, bool, bool]]] = [[(False, False, False)] * len_a for _ in seq_b]
 
     # Fill first row and column of both grids
     s_grid[0][0] = scorer[scorer.gap, scorer.gap]
@@ -83,13 +80,12 @@ def nw_grids(
 
 # TODO: Drop the "a" and "b", use pure tuple
 def _nw_product(
-    prev_alms: List[Dict[str, List[Hashable]]],
+    prev_alms: list[dict[str, list[Hashable]]],
     char_a: Hashable,
     char_b: Hashable,
-    paths: List[Dict[Hashable, List[Hashable]]],
-) -> List[Dict[str, List[Hashable]]]:
-    """
-    Internal function for building a product of paths.
+    paths: list[dict[Hashable, list[Hashable]]],
+) -> list[dict[str, list[Hashable]]]:
+    """Internal function for building a product of paths.
 
     The function is used for NW alignments with two or more directions.
 
@@ -111,15 +107,14 @@ def _nw_product(
 
 
 def nw_backtrace(
-    seq_a: List[Hashable],
-    seq_b: List[Hashable],
-    d_grid: List[List[Tuple[bool, bool, bool]]],
+    seq_a: list[Hashable],
+    seq_b: list[Hashable],
+    d_grid: list[list[tuple[bool, bool, bool]]],
     gap: Hashable,
-    i: Optional[int] = None,
-    j: Optional[int] = None,
-) -> List[Dict[Hashable, List[Hashable]]]:
-    """
-    Run the Needleman-Wunsch backtrace operation.
+    i: int | None = None,
+    j: int | None = None,
+) -> list[dict[Hashable, list[Hashable]]]:
+    """Run the Needleman-Wunsch backtrace operation.
 
     Note that the alignments are returned in reverse order, from the bottom right to the
     top left; as the function is called recursively, it is up to the function
@@ -139,7 +134,7 @@ def nw_backtrace(
     """
 
     # Define empty, initial alignment collection with a single alignment
-    # TODO: as it is pairwise, we don´t really need "a" and "b" and can index a normal list
+    # TODO: as it is pairwise, we don't really need "a" and "b" and can index a normal list
     alms = [{"a": [], "b": []}]
 
     # Get parameters, and default for the full alignment, if (i, j) is not provided
@@ -225,10 +220,9 @@ def nw_align(
     seq_a: Sequence[Hashable],
     seq_b: Sequence[Hashable],
     matrix: ScoringMatrix,
-    k: Optional[int] = None,
-) -> List[Alignment]:
-    """
-    Perform pairwise alignment with the Asymmetric Needleman-Wunsch method.
+    k: int | None = None,
+) -> list[Alignment]:
+    """Perform pairwise alignment with the Asymmetric Needleman-Wunsch method.
 
     @param seq_a: The first sequence to be aligned.
     @param seq_b: The second sequence to be aligned.
@@ -250,8 +244,8 @@ def nw_align(
     # Add initial gaps; note that this also makes a
     # copy of the contents of each sequence, so we preserve the original
     # memory in-place
-    seq_a = [matrix.gap] + list(seq_a)
-    seq_b = [matrix.gap] + list(seq_b)
+    seq_a = [matrix.gap, *list(seq_a)]
+    seq_b = [matrix.gap, *list(seq_b)]
 
     # Build Needleman-Wunsch grids; note that the scoring grid (the first value returned
     # by `nw_grids()`) is not used in this routine, as the scoring is performed with the

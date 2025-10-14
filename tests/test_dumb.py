@@ -1,6 +1,5 @@
 """Tests for the dumb baseline alignment method."""
 
-import pytest
 import malign
 
 

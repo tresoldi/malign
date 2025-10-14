@@ -1,6 +1,5 @@
 """Tests for utility functions."""
 
-import pytest
 import malign
 
 

@@ -1,28 +1,26 @@
 """Module for scoring matrices."""
 
 # Import Python standard libraries
-from typing import Dict, Hashable, List, Optional, Tuple
-import copy
 import itertools
 import json
+from collections.abc import Hashable
+
+import numpy as np
+from sklearn.ensemble import ExtraTreesRegressor
 
 # Import 3rd-party libraries; `enable_iterative_imputer` is necessary for the one in `sklearn.impute`
 from sklearn.experimental import enable_iterative_imputer  # noqa: F401
-from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.impute import IterativeImputer, SimpleImputer
 from sklearn.linear_model import BayesianRidge
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.tree import DecisionTreeRegressor
 from tabulate import tabulate
-import numpy as np
-
 
 # TODO: study different method for loading
 
 
 class ScoringMatrix:
-    """
-    Class for sequence alignment scoring matrices.
+    """Class for sequence alignment scoring matrices.
 
     A scoring matrix is implemented to work similarly to a Python dictionary and,
     in fact, the alignment methods should be written as expecting such
@@ -51,13 +49,12 @@ class ScoringMatrix:
 
     def __init__(
         self,
-        scores: Dict[Tuple[Hashable, ...], float] = None,
-        domains: Optional[List[List[Hashable]]] = None,
+        scores: dict[tuple[Hashable, ...], float] | None = None,
+        domains: list[list[Hashable]] | None = None,
         gap: Hashable = "-",
-        impute_method: Optional[str] = "mean",
+        impute_method: str | None = "mean",
     ):
-        """
-        Initialize a scoring matrix.
+        """Initialize a scoring matrix.
 
         @param scores: An optional scoring dictionary, with tuples of hashable elements, usually
             strings, as keys (respecting the order that will be used when using the matrix) and
@@ -84,9 +81,9 @@ class ScoringMatrix:
         # Instantiate properties that will be initialized later
         # TODO: replace `._domain_range` with a method reading domains
         self.num_domains: int = -1
-        self.domains: Optional[List[List[Hashable]]] = domains
+        self.domains: list[list[Hashable]] | None = domains
         self.scores = scores
-        self._domain_range: Optional[Tuple[int, ...]] = None
+        self._domain_range: tuple[int, ...] | None = None
 
         # If `scores` is not provided, we initialize an empty scorer (which will likely load from disk).
         if scores:
@@ -99,11 +96,10 @@ class ScoringMatrix:
 
     def _init_domains(
         self,
-        domains: Optional[List[List[Hashable]]],
-        scores: Dict[Tuple[Hashable, ...], float],
+        domains: list[list[Hashable]] | None,
+        scores: dict[tuple[Hashable, ...], float],
     ):
-        """
-        Internal method for initializing domains from user-provided arguments.
+        """Internal method for initializing domains from user-provided arguments.
 
         @param domains: The `domains` argument passed to `.__init__()`.
         @param scores: The `scores` argument passed to `.__init__()`.
@@ -120,7 +116,7 @@ class ScoringMatrix:
             # sub-matrix identities.
             self.domains = [
                 set([symbol for symbol in domain if symbol] + [self.gap])
-                for domain in zip(*scores.keys())
+                for domain in zip(*scores.keys(), strict=False)
             ]
 
         # Organize the domains; as this is applied to both user-provide
@@ -128,9 +124,8 @@ class ScoringMatrix:
         # cases to simplify the code
         self.domains = [sorted(set(domain)) for domain in self.domains]
 
-    def _init_from_scores(self, scores: Dict[Tuple[Hashable, ...], float]):
-        """
-        Internal method for initializing from user-provided scores.
+    def _init_from_scores(self, scores: dict[tuple[Hashable, ...], float]):
+        """Internal method for initializing from user-provided scores.
 
         The method assumes that domains have already been initialized by an internal
         call to `._init_domains()`.
@@ -153,10 +148,10 @@ class ScoringMatrix:
         # this would not be strictly necessary when the domains are collected
         # automatically, it is still good to keep a simpler loop for that
         # in all circumstances
-        scores_domains = zip(*scores.keys())
+        scores_domains = zip(*scores.keys(), strict=False)
         found = [
-            all([symbol in ref_domain for symbol in scores_domain if symbol])
-            for scores_domain, ref_domain in zip(scores_domains, self.domains)
+            all(symbol in ref_domain for symbol in scores_domain if symbol)
+            for scores_domain, ref_domain in zip(scores_domains, self.domains, strict=False)
         ]
         if not all(found):
             raise ValueError("`scores` has symbols not in domains.")
@@ -181,9 +176,7 @@ class ScoringMatrix:
             self._fill_matrix()
 
     def _fill_matrix(self):
-        """
-        Internal function for filling a matrix with an imputation method.
-        """
+        """Internal function for filling a matrix with an imputation method."""
 
         # We perform matrix imputation on multi-hot vectors, with one true
         # position for each domain. `None`, as used for sub-matrices, is always
@@ -198,14 +191,14 @@ class ScoringMatrix:
         encoder = list(
             itertools.chain.from_iterable(
                 [
-                    [(domain_idx, value) for value in [None] + domain_values]
+                    [(domain_idx, value) for value in [None, *domain_values]]
                     for domain_idx, domain_values in enumerate(self.domains)
                 ]
             )
         )
 
         # Fill the matrix for imputation for each possible combination
-        domains_with_none = [[None] + domain for domain in self.domains]
+        domains_with_none = [[None, *domain] for domain in self.domains]
         train_matrix = []
         imp_matrix = []
         for cat_vector in itertools.product(*domains_with_none):
@@ -219,9 +212,9 @@ class ScoringMatrix:
             mh_vector = [cat_vector[element[0]] == element[1] for element in encoder]
             score = self.scores.get(cat_vector)
             if score is not None:
-                train_matrix.append(mh_vector + [score])
+                train_matrix.append([*mh_vector, score])
             else:
-                imp_matrix.append(mh_vector + [np.nan])
+                imp_matrix.append([*mh_vector, np.nan])
 
         # If the imputation matrix is empty, there is nothing to do
         if not imp_matrix:
@@ -231,24 +224,16 @@ class ScoringMatrix:
         # TODO: allow setting more options when initializing, such num estimators and random state
         if self.impute_method == "decision_tree":
             estimator = DecisionTreeRegressor(max_features="sqrt", random_state=0)
-            imputer = IterativeImputer(
-                missing_values=np.nan, random_state=0, estimator=estimator
-            )
+            imputer = IterativeImputer(missing_values=np.nan, random_state=0, estimator=estimator)
         elif self.impute_method == "extra_trees":
             estimator = ExtraTreesRegressor(n_estimators=10, random_state=0)
-            imputer = IterativeImputer(
-                missing_values=np.nan, random_state=0, estimator=estimator
-            )
+            imputer = IterativeImputer(missing_values=np.nan, random_state=0, estimator=estimator)
         elif self.impute_method == "k_neighbors":
             estimator = KNeighborsRegressor(n_neighbors=15)
-            imputer = IterativeImputer(
-                missing_values=np.nan, random_state=0, estimator=estimator
-            )
+            imputer = IterativeImputer(missing_values=np.nan, random_state=0, estimator=estimator)
         elif self.impute_method == "bayesian_ridge":
             estimator = BayesianRidge()
-            imputer = IterativeImputer(
-                missing_values=np.nan, random_state=0, estimator=estimator
-            )
+            imputer = IterativeImputer(missing_values=np.nan, random_state=0, estimator=estimator)
         elif self.impute_method in ["mean", "median"]:
             imputer = SimpleImputer(missing_values=np.nan, strategy=self.impute_method)
         else:
@@ -265,9 +250,7 @@ class ScoringMatrix:
             # `encoder[idx]` is a tuple (position, character), but we only need
             # the character as we can trust the code not to give us more than
             # one character per position
-            cat_vector = [
-                encoder[idx][1] for idx, value in enumerate(mh_vector) if value
-            ]
+            cat_vector = [encoder[idx][1] for idx, value in enumerate(mh_vector) if value]
 
             self.scores[tuple(cat_vector)] = value
 
@@ -275,8 +258,7 @@ class ScoringMatrix:
     # TODO: make sure it works with types other than strings, at least integers
     # TODO: better solution than JSON for serializing? perhaps just pickle?
     def load(self, filename: str) -> None:
-        """
-        Internal function for loading a serialized matrix from file.
+        """Internal function for loading a serialized matrix from file.
 
         @param filename: Path to the file holding the matrix to be loaded.
         """
@@ -292,17 +274,13 @@ class ScoringMatrix:
             # TODO: should "NULL" be "0000000000"? "NULL" could be a symbol...
             self.scores = {
                 tuple(
-                    [
-                        None if sub_key == "NULL" else sub_key
-                        for sub_key in key.split(" / ")
-                    ]
+                    [None if sub_key == "NULL" else sub_key for sub_key in key.split(" / ")]
                 ): float(value)
                 for key, value in serial_data["scores"].items()
             }
 
     def save(self, filename: str) -> None:
-        """
-        Serialize a matrix to disk.
+        """Serialize a matrix to disk.
 
         Note that, due limits in serializing with JSON, which do not allow
         lists as keys, the `" / "` symbol used for serialization (note the
@@ -312,7 +290,7 @@ class ScoringMatrix:
         """
 
         # Make sure the reserved symbol is not used
-        if any([" / " in domain for domain in self.domains]):
+        if any(" / " in domain for domain in self.domains):
             raise ValueError("At least one domain uses reserved symbols.")
 
         # Make a copy of `self.scores` replacing `None`s, which cannot be part
@@ -343,9 +321,8 @@ class ScoringMatrix:
 
     # TODO: should cache? should be internal?
     # TODO: cannot annotate that it returns a dict with ScoringMatrix as values
-    def compute_submatrices(self, domains: List[Tuple[int, ...]]) -> Dict:
-        """
-        Compute submatrices from a collection of domains.
+    def compute_submatrices(self, domains: list[tuple[int, ...]]) -> dict:
+        """Compute submatrices from a collection of domains.
 
         Sub-matrices are useful, when compared to the possibility of addressing
         a normal matrix with `None` values in keys, in simplifying computation
@@ -355,7 +332,7 @@ class ScoringMatrix:
         @return: A dictionary with domain-tuples as keys and ScoringMatrices as values.
         """
 
-        sub_matrix_scores: Dict[Tuple[Hashable, ...], ScoringMatrix] = {}
+        sub_matrix_scores: dict[tuple[Hashable, ...], ScoringMatrix] = {}
 
         for sub_domain in domains:
             # Trigger the computation/completion of the domain
@@ -363,16 +340,12 @@ class ScoringMatrix:
             # TODO: maybe some flag? check if filled indeed?
 
             # Collect all scores for the given domain
-            sub_scores: Dict[Tuple[Hashable, ...], float] = {}
+            sub_scores: dict[tuple[Hashable, ...], float] = {}
             for key, value in self.scores.items():
                 # Make sure that all entries of domain exist...
                 check = [key[idx] is not None for idx in sub_domain]
                 # ...and all others don't
-                check += [
-                    key[idx] is None
-                    for idx in self._domain_range
-                    if idx not in sub_domain
-                ]
+                check += [key[idx] is None for idx in self._domain_range if idx not in sub_domain]
 
                 if all(check):
                     sub_key = tuple([k for k in key if k is not None])
@@ -386,9 +359,7 @@ class ScoringMatrix:
     # TODO: use __copy__ and __deepcopy__ properly
     # TODO: cannot annotate it returns a scoring matrix
     def copy(self):
-        """
-        Return a copy of the current matrix object.
-        """
+        """Return a copy of the current matrix object."""
 
         # TODO: can we perform the copy manually?
         #    return copy.deepcopy(self)
@@ -397,8 +368,7 @@ class ScoringMatrix:
     # TODO: currently only working for 2 or 3 domains
     # TODO: use more options from tabulate
     def tabulate(self) -> str:
-        """
-        Build a string with a tabulated representation of the matrix.
+        """Build a string with a tabulated representation of the matrix.
 
         @return: A string with a tabular representation of the matrix, intended for human
             inspection.
@@ -407,21 +377,17 @@ class ScoringMatrix:
         rows = []
         if self.num_domains == 2:
             for symbol_a in self.domains[0]:
-                row = [symbol_a] + [
-                    self.scores[symbol_a, symbol_b] for symbol_b in self.domains[1]
-                ]
+                row = [symbol_a] + [self.scores[symbol_a, symbol_b] for symbol_b in self.domains[1]]
                 rows.append(row)
 
-            headers = [""] + list(self.domains[1])
+            headers = ["", *list(self.domains[1])]
 
         elif self.num_domains == 3:
             rows = []
             for symbol_a in self.domains[0]:
                 row = [symbol_a] + [
                     self.scores.get((symbol_a, symbol_b, symbol_c), "-")
-                    for symbol_b, symbol_c in itertools.product(
-                        self.domains[1], self.domains[2]
-                    )
+                    for symbol_b, symbol_c in itertools.product(self.domains[1], self.domains[2])
                 ]
                 rows.append(row)
 
@@ -436,9 +402,8 @@ class ScoringMatrix:
 
     # TODO: decide/inform on what to do when a sub-domain is requested and it has
     #       not been computed.
-    def __getitem__(self, key: Tuple[Optional[Hashable], ...]) -> float:
-        """
-        Return the score associated with a tuple of alignments per domain.
+    def __getitem__(self, key: tuple[Hashable | None, ...]) -> float:
+        """Return the score associated with a tuple of alignments per domain.
 
         Sub-domains can be specified by passing a `None` to the positions the key
         does not apply, e.g. `("a", "b", None)`.
@@ -465,15 +430,16 @@ class ScoringMatrix:
 
         return self.scores[key]
 
-    def __setitem__(self, key: Tuple[Hashable, ...], value: float) -> None:
-        """
-        Set the value of a key in the multidimensional matrix.
+    def __setitem__(self, key: tuple[Hashable, ...], value: float) -> None:
+        """Set the value of a key in the multidimensional matrix.
 
         @param key: The element in the multidimensional matrix whose value will be set or changed.
         @param value: The value to which set the element.
         """
 
-        matches = [k in domain for k, domain in zip(key, self.domains) if k is not None]
+        matches = [
+            k in domain for k, domain in zip(key, self.domains, strict=False) if k is not None
+        ]
         if not all(matches):
             raise ValueError("`key` uses symbol(s) not in domain.")
 

@@ -1,6 +1,5 @@
 """Property-based tests using Hypothesis (Phase 3)."""
 
-import pytest
 
 # from hypothesis import given, strategies as st
 # import malign

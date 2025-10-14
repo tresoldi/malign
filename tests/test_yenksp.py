@@ -1,6 +1,5 @@
 """Tests for Yen's K-Shortest Paths alignment algorithm."""
 
-import pytest
 import malign
 
 
@@ -13,8 +12,8 @@ def test_yenksp_basic():
 
 def test_yenksp_graph():
     """Test graph construction for YenKSP."""
-    from malign.yenksp import compute_graph
     from malign.utils import DNA_MATRIX
+    from malign.yenksp import compute_graph
 
     graph = compute_graph("ACGT", "AGCT", DNA_MATRIX)
     assert graph is not None

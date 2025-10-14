@@ -1,6 +1,5 @@
 """Tests for the Asymmetric Needleman-Wunsch algorithm."""
 
-import pytest
 import malign
 
 

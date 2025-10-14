@@ -24,10 +24,7 @@ alms = malign.align(sequences, k=1)  # Uses default identity matrix
 #' ### From Sequences
 
 matrix = malign.ScoringMatrix.from_sequences(
-    sequences=[["A", "C", "G", "T"], ["А", "В", "Г", "Т"]],
-    match=1.0,
-    mismatch=-0.5,
-    gap=-1.0
+    sequences=[["A", "C", "G", "T"], ["А", "В", "Г", "Т"]], match=1.0, mismatch=-0.5, gap=-1.0
 )
 
 #' ### From YAML File (Phase 2)

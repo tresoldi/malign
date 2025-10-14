@@ -1,7 +1,5 @@
 """Regression tests against gold-standard linguistic data (Phase 3)."""
 
-import pytest
-import malign
 
 # TODO: Phase 3 - Implement regression tests once gold data is available
 

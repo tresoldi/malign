@@ -1,6 +1,7 @@
 """Integration tests for full alignment pipelines."""
 
 import pytest
+
 import malign
 
 

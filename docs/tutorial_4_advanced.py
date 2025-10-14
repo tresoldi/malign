@@ -5,7 +5,6 @@
 #'
 #' ## Batch Processing
 
-import malign
 
 # Align multiple cognate sets in batch
 # cognate_sets = [
