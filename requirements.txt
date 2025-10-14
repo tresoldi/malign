@@ -1,4 +1,0 @@
-networkx
-numpy
-sklearn
-tabulate
