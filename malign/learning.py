@@ -25,6 +25,11 @@ def learn_matrix(
     max_iter: int = 10,
     initial_matrix: ScoringMatrix | None = None,
     gap: Hashable = "-",
+    convergence_threshold: float = 0.001,
+    matrix_threshold: float = 0.01,
+    patience: int = 5,
+    bounds: tuple[float, float] = (-10.0, 10.0),
+    verbose: bool = False,
     **kwargs,
 ) -> ScoringMatrix:
     """Learn a scoring matrix from cognate sets.
@@ -39,6 +44,13 @@ def learn_matrix(
         max_iter: Maximum iterations for learning (default: 10).
         initial_matrix: Starting matrix (if None, creates identity matrix).
         gap: Gap symbol (default: "-").
+        convergence_threshold: Relative score change threshold for convergence (default: 0.001).
+            Stops if |new_score - old_score| / |old_score| < threshold.
+        matrix_threshold: Frobenius norm threshold for matrix convergence (default: 0.01).
+            Stops if sqrt(sum((new[k] - old[k])**2)) < threshold.
+        patience: Early stopping patience - stop after N iterations without improvement (default: 5).
+        bounds: Parameter bounds for gradient descent as (min, max) (default: (-10.0, 10.0)).
+        verbose: Print convergence information during learning (default: False).
         **kwargs: Additional method-specific parameters.
 
     Returns:
@@ -52,13 +64,31 @@ def learn_matrix(
         >>> matrix = learn_matrix(cognate_sets, method="em", max_iter=5)
 
     Note:
-        Phase 2 implements basic iteration without convergence criteria.
-        Convergence checking will be added in Phase 3.
+        Phase 3.7 adds convergence detection and early stopping for both EM and gradient descent.
     """
     if method == "em":
-        return _em_learning(cognate_sets, max_iter, initial_matrix, gap, **kwargs)
+        return _em_learning(
+            cognate_sets,
+            max_iter,
+            initial_matrix,
+            gap,
+            convergence_threshold=convergence_threshold,
+            matrix_threshold=matrix_threshold,
+            patience=patience,
+            verbose=verbose,
+            **kwargs,
+        )
     elif method == "gradient_descent":
-        return _gradient_descent_learning(cognate_sets, max_iter, initial_matrix, gap, **kwargs)
+        return _gradient_descent_learning(
+            cognate_sets,
+            max_iter,
+            initial_matrix,
+            gap,
+            bounds=bounds,
+            patience=patience,
+            verbose=verbose,
+            **kwargs,
+        )
     else:
         raise ValueError(f"Unknown learning method: {method}. Use 'em' or 'gradient_descent'.")
 
@@ -102,6 +132,10 @@ def _em_learning(
     max_iter: int,
     initial_matrix: ScoringMatrix | None,
     gap: Hashable,
+    convergence_threshold: float = 0.001,
+    matrix_threshold: float = 0.01,
+    patience: int = 5,
+    verbose: bool = False,
     **kwargs,
 ) -> ScoringMatrix:
     """Learn matrix using Expectation-Maximization.
@@ -110,11 +144,19 @@ def _em_learning(
     - E-step: Align all cognate sets with current matrix
     - M-step: Update matrix scores based on observed alignments
 
+    Phase 3.7 enhancements:
+    - Convergence detection (score-based and matrix-based)
+    - Early stopping with patience
+
     Args:
         cognate_sets: Cognate sets for training.
-        max_iter: Number of EM iterations.
+        max_iter: Maximum number of EM iterations.
         initial_matrix: Starting matrix (if None, creates one).
         gap: Gap symbol.
+        convergence_threshold: Relative score change threshold (default: 0.001).
+        matrix_threshold: Frobenius norm threshold (default: 0.01).
+        patience: Early stopping patience (default: 5).
+        verbose: Print convergence information (default: False).
         **kwargs: Additional parameters (reserved for future use).
 
     Returns:
@@ -126,15 +168,37 @@ def _em_learning(
     else:
         matrix = initial_matrix.copy()
 
+    # Track convergence
+    prev_total_score = None
+    best_score = float("-inf")
+    patience_counter = 0
+
+    # Get score keys for matrix comparison
+    # Use custom key to handle None values in tuples
+    def _sort_key(k):
+        """Sort key that handles None values by treating them as empty strings."""
+        if isinstance(k, tuple):
+            return tuple(str(x) if x is not None else "" for x in k)
+        return str(k) if k is not None else ""
+
+    score_keys = sorted(matrix.scores.keys(), key=_sort_key)
+
     # EM iteration
     for iteration in range(max_iter):
+        # Store previous matrix for convergence check
+        prev_matrix_values = np.array([matrix.scores[key] for key in score_keys])
+
         # E-step: Align all cognate sets with current matrix
         alignments = []
+        total_score = 0.0
+
         for cog_set in cognate_sets:
             # Get best alignment for this cognate set
             alms = multi_align(cog_set, k=1, matrix=matrix)
             if alms:
                 alignments.append(alms[0])
+                if alms[0].score is not None:
+                    total_score += alms[0].score
 
         # M-step: Update scores based on alignments
         # Count symbol co-occurrences across all alignments
@@ -157,6 +221,53 @@ def _em_learning(
                 score = np.log(freq + 1e-10)  # Add small constant to avoid log(0)
                 matrix.scores[pair] = float(score)
 
+        # Check convergence criteria
+        converged = False
+
+        # 1. Score-based convergence: relative change in total score
+        if prev_total_score is not None and abs(prev_total_score) > 1e-10:
+            relative_change = abs(total_score - prev_total_score) / abs(prev_total_score)
+            if verbose:
+                print(f"Iteration {iteration + 1}: score={total_score:.4f}, relative_change={relative_change:.6f}")
+            if relative_change < convergence_threshold:
+                if verbose:
+                    print(f"Converged: score change {relative_change:.6f} < {convergence_threshold}")
+                converged = True
+        elif verbose:
+            print(f"Iteration {iteration + 1}: score={total_score:.4f}")
+
+        # 2. Matrix-based convergence: Frobenius norm of parameter change
+        current_matrix_values = np.array([matrix.scores[key] for key in score_keys])
+        frobenius_norm = float(np.linalg.norm(current_matrix_values - prev_matrix_values))
+        if verbose:
+            print(f"  Matrix Frobenius norm: {frobenius_norm:.6f}")
+        if frobenius_norm < matrix_threshold:
+            if verbose:
+                print(f"Converged: Frobenius norm {frobenius_norm:.6f} < {matrix_threshold}")
+            converged = True
+
+        # Stop if converged (OR logic - either criterion met)
+        if converged:
+            if verbose:
+                print(f"Stopping early at iteration {iteration + 1}")
+            break
+
+        # 3. Early stopping with patience
+        if total_score > best_score:
+            best_score = total_score
+            patience_counter = 0
+        else:
+            patience_counter += 1
+            if verbose:
+                print(f"  No improvement: patience {patience_counter}/{patience}")
+            if patience_counter >= patience:
+                if verbose:
+                    print(f"Early stopping: no improvement for {patience} iterations")
+                break
+
+        # Update previous score for next iteration
+        prev_total_score = total_score
+
     return matrix
 
 
@@ -165,6 +276,9 @@ def _gradient_descent_learning(
     max_iter: int,
     initial_matrix: ScoringMatrix | None,
     gap: Hashable,
+    bounds: tuple[float, float] = (-10.0, 10.0),
+    patience: int = 5,
+    verbose: bool = False,
     **kwargs,
 ) -> ScoringMatrix:
     """Learn matrix using gradient descent via scipy.optimize.
@@ -172,11 +286,18 @@ def _gradient_descent_learning(
     Uses L-BFGS-B optimization to find matrix that maximizes total
     alignment scores across all cognate sets.
 
+    Phase 3.7 enhancements:
+    - Parameter bounds to prevent extreme values
+    - Early stopping with patience
+
     Args:
         cognate_sets: Cognate sets for training.
         max_iter: Maximum optimization iterations.
         initial_matrix: Starting matrix (if None, creates one).
         gap: Gap symbol.
+        bounds: Parameter bounds as (min, max) tuple (default: (-10.0, 10.0)).
+        patience: Early stopping patience (default: 5).
+        verbose: Print optimization information (default: False).
         **kwargs: Additional parameters passed to scipy.optimize.minimize.
 
     Returns:
@@ -189,8 +310,20 @@ def _gradient_descent_learning(
         matrix = initial_matrix.copy()
 
     # Get score keys in consistent order for flattening
-    score_keys = sorted(matrix.scores.keys())
+    # Use custom key to handle None values in tuples
+    def _sort_key(k):
+        """Sort key that handles None values by treating them as empty strings."""
+        if isinstance(k, tuple):
+            return tuple(str(x) if x is not None else "" for x in k)
+        return str(k) if k is not None else ""
+
+    score_keys = sorted(matrix.scores.keys(), key=_sort_key)
     num_params = len(score_keys)
+
+    # Early stopping tracking
+    best_objective = float("inf")
+    patience_counter = 0
+    iteration_count = [0]  # Use list to allow modification in nested function
 
     def _flatten_matrix(mat: ScoringMatrix) -> np.ndarray:
         """Flatten matrix scores to array for optimization."""
@@ -211,22 +344,66 @@ def _gradient_descent_learning(
         for cog_set in cognate_sets:
             alms = multi_align(cog_set, k=1, matrix=mat)
             if alms:
-                total_score += alms[0].score
+                if alms[0].score is not None:
+                    total_score += alms[0].score
 
         # Return negative (we minimize, but want to maximize score)
         return -total_score
 
+    def _callback(params: np.ndarray) -> bool:
+        """Callback for early stopping with patience.
+
+        Returns:
+            True to stop optimization, False to continue.
+        """
+        nonlocal best_objective, patience_counter
+
+        iteration_count[0] += 1
+        current_objective = _objective(params)
+
+        if verbose:
+            print(f"Iteration {iteration_count[0]}: objective={current_objective:.4f}")
+
+        # Check if this is the best objective so far
+        if current_objective < best_objective:
+            best_objective = current_objective
+            patience_counter = 0
+            if verbose:
+                print(f"  New best objective: {best_objective:.4f}")
+        else:
+            patience_counter += 1
+            if verbose:
+                print(f"  No improvement: patience {patience_counter}/{patience}")
+
+            # Stop if patience exceeded
+            if patience_counter >= patience:
+                if verbose:
+                    print(f"Early stopping: no improvement for {patience} iterations")
+                return True  # Stop optimization
+
+        return False  # Continue optimization
+
     # Initial parameters
     x0 = _flatten_matrix(matrix)
 
-    # Optimize
+    # Set bounds for all parameters
+    param_bounds = [bounds] * num_params
+
+    # Optimize with bounds and callback
     result = minimize(
         _objective,
         x0,
         method="L-BFGS-B",
-        options={"maxiter": max_iter, "disp": False},
+        bounds=param_bounds,
+        callback=_callback,
+        options={"maxiter": max_iter, "disp": verbose},
         **kwargs,
     )
+
+    if verbose:
+        print(f"Optimization finished: {result.message}")
+        print(f"Final objective: {result.fun:.4f}")
+        print(f"Total iterations: {iteration_count[0]}")
 
     # Return optimized matrix
     return _unflatten_to_matrix(result.x)
