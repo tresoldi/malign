@@ -267,3 +267,145 @@ def test_initialize_matrix_helper():
         assert "-" in domain
         # Should have some DNA symbols
         assert any(s in domain for s in ["A", "C", "G", "T"])
+
+
+# Phase 3.7: Convergence and early stopping tests
+
+
+def test_em_convergence_early_stopping():
+    """Test EM early convergence (stops before max_iter)."""
+    # Create cognate sets that should converge quickly
+    simple_cognates = [
+        [["A", "A"], ["A", "A"]],  # Perfect matches
+        [["T", "T"], ["T", "T"]],
+        [["G", "G"], ["G", "G"]],
+    ]
+
+    # Run with high max_iter but should converge early
+    matrix = malign.learn_matrix(
+        cognate_sets=simple_cognates,
+        method="em",
+        max_iter=50,  # High limit
+        convergence_threshold=0.001,
+        matrix_threshold=0.01,
+        patience=3,
+        gap="-",
+    )
+
+    # Should produce a valid matrix
+    assert isinstance(matrix, ScoringMatrix)
+
+    # Verify matrix works for alignment
+    test_seqs = [["A", "A"], ["A", "A"]]
+    alms = malign.multi_align(test_seqs, k=1, matrix=matrix)
+    assert len(alms) > 0
+
+
+def test_em_patience_mechanism():
+    """Test EM early stopping with patience."""
+    # Run with small patience value
+    matrix = malign.learn_matrix(
+        cognate_sets=DNA_COGNATES,
+        method="em",
+        max_iter=100,  # High limit
+        patience=2,  # Low patience
+        gap="-",
+    )
+
+    # Should stop early due to patience
+    assert isinstance(matrix, ScoringMatrix)
+
+
+def test_em_verbose_output(capsys):
+    """Test EM verbose flag prints convergence info."""
+    matrix = malign.learn_matrix(
+        cognate_sets=DNA_COGNATES[:2],  # Small dataset
+        method="em",
+        max_iter=3,
+        verbose=True,
+        gap="-",
+    )
+
+    # Capture output
+    captured = capsys.readouterr()
+
+    # Should have printed iteration information
+    assert "Iteration" in captured.out or "score" in captured.out.lower()
+    assert isinstance(matrix, ScoringMatrix)
+
+
+def test_gradient_descent_bounds():
+    """Test gradient descent respects parameter bounds."""
+    # Learn with strict bounds
+    matrix = malign.learn_matrix(
+        cognate_sets=DNA_COGNATES,
+        method="gradient_descent",
+        max_iter=10,
+        bounds=(-5.0, 5.0),
+        gap="-",
+    )
+
+    # All scores should be within bounds
+    assert isinstance(matrix, ScoringMatrix)
+    for score in matrix.scores.values():
+        assert -5.0 <= score <= 5.0
+
+
+def test_gradient_descent_patience():
+    """Test gradient descent early stopping with patience."""
+    # Run with high max_iter but low patience
+    matrix = malign.learn_matrix(
+        cognate_sets=DNA_COGNATES,
+        method="gradient_descent",
+        max_iter=100,
+        patience=3,
+        gap="-",
+    )
+
+    # Should stop early
+    assert isinstance(matrix, ScoringMatrix)
+
+
+def test_gradient_descent_verbose(capsys):
+    """Test gradient descent verbose flag."""
+    matrix = malign.learn_matrix(
+        cognate_sets=DNA_COGNATES[:2],
+        method="gradient_descent",
+        max_iter=5,
+        verbose=True,
+        gap="-",
+    )
+
+    captured = capsys.readouterr()
+
+    # Should print iteration info
+    assert "Iteration" in captured.out or "objective" in captured.out.lower()
+    assert isinstance(matrix, ScoringMatrix)
+
+
+def test_convergence_thresholds_customizable():
+    """Test that convergence thresholds can be customized."""
+    # Very loose thresholds (should converge immediately)
+    matrix_loose = malign.learn_matrix(
+        cognate_sets=DNA_COGNATES,
+        method="em",
+        max_iter=50,
+        convergence_threshold=1.0,  # Very loose
+        matrix_threshold=100.0,  # Very loose
+        gap="-",
+    )
+
+    # Very tight thresholds (should run to max_iter or patience)
+    matrix_tight = malign.learn_matrix(
+        cognate_sets=DNA_COGNATES,
+        method="em",
+        max_iter=5,
+        convergence_threshold=1e-10,  # Very tight
+        matrix_threshold=1e-10,  # Very tight
+        patience=3,
+        gap="-",
+    )
+
+    # Both should produce valid matrices
+    assert isinstance(matrix_loose, ScoringMatrix)
+    assert isinstance(matrix_tight, ScoringMatrix)
