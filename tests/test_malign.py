@@ -139,3 +139,93 @@ def test_tabulation():
 | 1     | A     |   -0.33 |  -   |  -   |  t   |  -   |  r   |  a   |
 | 1     | B     |   -0.33 |  f   |  a   |  t   |  a   |  t   |  a   |
         """
+
+
+def test_error_k_less_than_one():
+    """Test that k < 1 raises ValueError."""
+    with pytest.raises(ValueError, match="At least one alignment must be returned"):
+        malign.multi_align(["ACGT", "ACGT"], k=0)
+
+    with pytest.raises(ValueError, match="At least one alignment must be returned"):
+        malign.multi_align(["ACGT", "ACGT"], k=-1)
+
+
+def test_error_invalid_method():
+    """Test that invalid method raises ValueError."""
+    with pytest.raises(ValueError, match="Invalid alignment method"):
+        malign.multi_align(["ACGT", "ACGT"], method="invalid")
+
+    with pytest.raises(ValueError, match="Invalid alignment method"):
+        malign.multi_align(["ACGT", "ACGT"], method="upgma")
+
+
+def test_multiwise_alignment_varying_lengths():
+    """Test multiwise alignment with sequences of very different lengths.
+
+    This exercises the complex length-filling logic in _collect_alignments (lines 133-157).
+    """
+    # Test with 3 sequences of very different lengths
+    seqs = [
+        ["A"],  # Very short
+        ["A", "C", "G"],  # Medium
+        ["A", "C", "G", "T", "T"],  # Long
+    ]
+
+    alms = malign.multi_align(seqs, method="anw", k=2)
+
+    # Should produce valid alignments
+    assert len(alms) >= 1
+
+    # All sequences in alignment should have same length
+    for alm in alms:
+        lengths = [len(seq) for seq in alm.seqs]
+        assert len(set(lengths)) == 1, "All aligned sequences should have same length"
+
+    # Check that sequences are preserved (gaps removed)
+    for alm in alms:
+        for i, original in enumerate(seqs):
+            aligned_no_gaps = [s for s in alm.seqs[i] if s != "-"]
+            assert aligned_no_gaps == original, f"Sequence {i} not preserved"
+
+
+def test_multiwise_alignment_four_sequences():
+    """Test multiwise alignment with 4 sequences to exercise complex pairing logic."""
+    seqs = [
+        ["A", "C"],
+        ["A", "G"],
+        ["T", "C"],
+        ["T", "G"],
+    ]
+
+    alms = malign.multi_align(seqs, method="anw", k=3)
+
+    # Should produce alignments
+    assert len(alms) >= 1
+
+    # Verify all have same length
+    for alm in alms:
+        lengths = [len(seq) for seq in alm.seqs]
+        assert len(set(lengths)) == 1
+        assert len(alm.seqs) == 4, "Should have 4 sequences"
+
+
+def test_multiwise_alignment_five_sequences():
+    """Test with 5 sequences to further exercise pairing combinations."""
+    seqs = [
+        ["A"],
+        ["A", "C"],
+        ["A", "C", "G"],
+        ["A", "C", "G", "T"],
+        ["A", "C", "G", "T", "A"],
+    ]
+
+    alms = malign.multi_align(seqs, method="yenksp", k=2)
+
+    # Should handle 5 sequences
+    assert len(alms) >= 1
+    assert len(alms[0].seqs) == 5
+
+    # Verify length consistency
+    for alm in alms:
+        lengths = [len(seq) for seq in alm.seqs]
+        assert len(set(lengths)) == 1
