@@ -1,0 +1,8587 @@
+description: Cognate sets for training matrix learning algorithms (200 sets)
+source: Arca Verborum (forms_with_alignments.csv)
+count: 200
+cognate_sets:
+- id: gravinachadic_17318
+  dataset: gravinachadic
+  gloss: LIMP
+  parameter_id: gravinachadic_371_limp
+  forms:
+  - language_id: gravinachadic_Lagwan
+    glottolog_name: Lagwan
+    segments:
+    - s
+    - kʷ
+    - a
+    - ɗ
+    - a
+    alignment: []
+  - language_id: gravinachadic_Malgbe
+    glottolog_name: Malgbe
+    segments:
+    - k
+    - a
+    - l
+    - a
+    - w
+    - u
+    - n
+    alignment: []
+  - language_id: gravinachadic_Mpade
+    glottolog_name: Mpade
+    segments:
+    - n
+    - g
+    - a
+    - ɗ
+    - ɨ
+    - +
+    - h
+    - o
+    alignment: []
+  - language_id: gravinachadic_Mser
+    glottolog_name: Mser
+    segments:
+    - s
+    - k
+    - a
+    - ɗ
+    - ɨ
+    alignment: []
+- id: smithborneo_4678
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_358_millipede
+  forms:
+  - language_id: smithborneo_Bekati
+    glottolog_name: Riuk Bekati'
+    segments:
+    - k
+    - a
+    - b
+    - e
+    - b
+    - e
+    alignment: []
+  - language_id: smithborneo_Benyadu
+    glottolog_name: Benyadu'
+    segments:
+    - k
+    - a
+    - r
+    - a
+    - m
+    - i
+    - b
+    - i
+    alignment: []
+- id: syrjaenenuralic_3087
+  dataset: syrjaenenuralic
+  gloss: RUB
+  parameter_id: syrjaenenuralic_131_rub
+  forms:
+  - language_id: syrjaenenuralic_komipermyak
+    glottolog_name: Komi-Permyak
+    segments:
+    - z
+    - ɯ
+    - r
+    - t
+    - n
+    - ɯ
+    alignment: []
+  - language_id: syrjaenenuralic_komizyrian
+    glottolog_name: Komi-Zyrian
+    segments:
+    - z
+    - ɯ
+    - r
+    - ɑ
+    - v
+    - n
+    - ɯ
+    alignment: []
+  - language_id: syrjaenenuralic_udmurt
+    glottolog_name: Udmurt
+    segments:
+    - z
+    - ɯ
+    - r
+    - ɑ
+    - n
+    - ɯ
+    alignment: []
+- id: mixtecansubgrouping_683
+  dataset: mixtecansubgrouping
+  gloss: SMOKE (EXHAUST)
+  parameter_id: mixtecansubgrouping_188_smokeexhaust
+  forms:
+  - language_id: mixtecansubgrouping_SanAndresChicahuaxtla1890Triqui
+    glottolog_name: Chicahuaxtla Triqui
+    segments:
+    - k
+    - a
+    - ts
+    - e
+    - ʔ
+    - a
+    alignment: []
+  - language_id: mixtecansubgrouping_SanAndresChicahuaxtlaTriqui
+    glottolog_name: Chicahuaxtla Triqui
+    segments:
+    - g
+    - a
+    - ³
+    - ts
+    - e
+    - ʔ
+    - ¹
+    alignment: []
+  - language_id: mixtecansubgrouping_SanJuanCopalaTriqui
+    glottolog_name: Copala Triqui
+    segments:
+    - k
+    - a
+    - ts
+    - e
+    - ʔ
+    - ³
+    alignment: []
+  - language_id: mixtecansubgrouping_SanMartinItunyosoTriqui
+    glottolog_name: San Martín Itunyoso Triqui
+    segments:
+    - k
+    - a
+    - ³
+    - s
+    - eˀ
+    - ³
+    alignment: []
+- id: walworthpolynesian_1088
+  dataset: walworthpolynesian
+  gloss: EGG
+  parameter_id: walworthpolynesian_98_egg
+  forms:
+  - language_id: walworthpolynesian_Mangareva
+    glottolog_name: Mangareva
+    segments:
+    - m
+    - aː
+    - m
+    - a
+    - r
+    - i
+    - +
+    - m
+    - o
+    - a
+    alignment: []
+  - language_id: walworthpolynesian_NorthMarquesan
+    glottolog_name: North Marquesan
+    segments:
+    - m
+    - a
+    - m
+    - a
+    - ʔ
+    - i
+    alignment: []
+  - language_id: walworthpolynesian_Rapanui
+    glottolog_name: Rapanui
+    segments:
+    - m
+    - aː
+    - m
+    - a
+    - r
+    - i
+    alignment: []
+- id: smithborneo_6853
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_524_small
+  forms:
+  - language_id: smithborneo_Bulungan
+    glottolog_name: Bolongan
+    segments:
+    - a
+    - l
+    - u
+    - s
+    alignment: []
+  - language_id: smithborneo_Dusun
+    glottolog_name: Dusun Witu
+    segments:
+    - h
+    - a
+    - l
+    - u
+    - s
+    alignment: []
+  - language_id: smithborneo_Maanyan
+    glottolog_name: Ma'anyan
+    segments:
+    - h
+    - a
+    - l
+    - u
+    - s
+    alignment: []
+  - language_id: smithborneo_Paser
+    glottolog_name: Pasir
+    segments:
+    - a
+    - l
+    - u
+    - s
+    alignment: []
+- id: bowernpny_5-nose
+  dataset: bowernpny
+  gloss: NOSE
+  parameter_id: bowernpny_215_nose
+  forms:
+  - language_id: bowernpny_Nhirrpi
+    glottolog_name: Nhirrpi
+    segments:
+    - k
+    - i
+    - n
+    - t̪
+    - a
+    alignment: []
+  - language_id: bowernpny_Yindjibarndi
+    glottolog_name: Yindjibarndi
+    segments:
+    - m
+    - u
+    - t̪
+    - a
+    alignment: []
+- id: bowernpny_8-bad
+  dataset: bowernpny
+  gloss: BAD OR EVIL
+  parameter_id: bowernpny_35_badevil
+  forms:
+  - language_id: bowernpny_Kariyarra
+    glottolog_name: Kariyarra
+    segments:
+    - w
+    - a
+    - ɭ
+    - j
+    - k
+    - a
+    alignment: []
+  - language_id: bowernpny_MartuWangka
+    glottolog_name: Martu Wangka
+    segments:
+    - w
+    - a
+    - l
+    - j
+    - k
+    - u
+    alignment: []
+  - language_id: bowernpny_Ngaanyatjarra
+    glottolog_name: Ngaanyatjarra
+    segments:
+    - w
+    - a
+    - l
+    - j
+    - k
+    - u
+    alignment: []
+  - language_id: bowernpny_Ngadjumaya
+    glottolog_name: Ngadjunmaya
+    segments:
+    - w
+    - a
+    - l
+    - c
+    - i
+    alignment: []
+  - language_id: bowernpny_Ngarluma
+    glottolog_name: Ngarluma
+    segments:
+    - w
+    - a
+    - l
+    - j
+    - g
+    - a
+    alignment: []
+  - language_id: bowernpny_Panyjima
+    glottolog_name: Panytyima
+    segments:
+    - w
+    - a
+    - l
+    - j
+    - i
+    alignment: []
+  - language_id: bowernpny_PintupiLuritja
+    glottolog_name: Pintupi-Luritja
+    segments:
+    - k
+    - u
+    - r
+    - a
+    alignment: []
+  - language_id: bowernpny_Pitjantjatjara
+    glottolog_name: Pitjantjatjara
+    segments:
+    - k
+    - u
+    - ɹ
+    - a
+    alignment: []
+- id: chaconcolumbian_27093
+  dataset: chaconcolumbian
+  gloss: MOON
+  parameter_id: chaconcolumbian_57_moon
+  forms:
+  - language_id: chaconcolumbian_Barasana
+    glottolog_name: Barasana-Eduria
+    segments:
+    - j
+    - ã
+    - b
+    - ĩ
+    - a
+    - g
+    - ɨ
+    alignment: []
+  - language_id: chaconcolumbian_Macuna
+    glottolog_name: Macuna
+    segments:
+    - j
+    - ã
+    - b
+    - ĩ
+    alignment: []
+- id: smithborneo_7690
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_589_thin
+  forms:
+  - language_id: smithborneo_Bekati
+    glottolog_name: Riuk Bekati'
+    segments:
+    - ɣ
+    - a
+    - d
+    - ḛ
+    - ʔ
+    alignment: []
+  - language_id: smithborneo_Golik
+    glottolog_name: Southern Land Dayak
+    segments:
+    - l
+    - i
+    - d
+    - ɛ
+    - ʔ
+    alignment: []
+  - language_id: smithborneo_Ribun
+    glottolog_name: Ribun
+    segments:
+    - h
+    - i
+    - d
+    - i
+    alignment: []
+- id: tuled_16385
+  dataset: tuled
+  gloss: TEACH
+  parameter_id: tuled_378
+  forms:
+  - language_id: tuled_Kokama
+    glottolog_name: Cocama-Cocamilla
+    segments:
+    - j
+    - u
+    - m
+    - i
+    - t
+    - a
+    alignment:
+    - j
+    - u
+    - m
+    - i
+    - '-'
+    - t
+    - a
+  - language_id: tuled_Omagua
+    glottolog_name: Omagua
+    segments:
+    - j
+    - u
+    - m
+    - u
+    - j
+    - t
+    - a
+    alignment:
+    - j
+    - u
+    - m
+    - u
+    - j
+    - t
+    - a
+- id: iecor_5170
+  dataset: iecor
+  gloss: HOUSE
+  parameter_id: iecor_214
+  forms:
+  - language_id: iecor_195
+    glottolog_name: Cypriot Greek
+    segments:
+    - s
+    - p
+    - i
+    - t
+    - i
+    - n
+    alignment: []
+  - language_id: iecor_201
+    glottolog_name: Apulia-Calabrian Greek
+    segments:
+    - s
+    - p
+    - i
+    - t
+    - i
+    alignment: []
+  - language_id: iecor_210
+    glottolog_name: Cappadocian Greek
+    segments:
+    - s
+    - p
+    - i
+    - t
+    alignment: []
+  - language_id: iecor_211
+    glottolog_name: Pontic
+    segments:
+    - o̞
+    - s
+    - p
+    - i
+    - t
+    - i
+    - n
+    alignment: []
+  - language_id: iecor_32
+    glottolog_name: Modern Greek
+    segments:
+    - s
+    - p
+    - i
+    - t
+    - i
+    alignment: []
+- id: lundgrenomagoa_503
+  dataset: lundgrenomagoa
+  gloss: CLOTHES
+  parameter_id: lundgrenomagoa_364_clothes
+  forms:
+  - language_id: lundgrenomagoa_Kokama
+    glottolog_name: Cocama
+    segments:
+    - tʃ
+    - i
+    - ɾ
+    - u
+    alignment:
+    - tʃ
+    - i
+    - ɾ
+    - u
+  - language_id: lundgrenomagoa_Omagua
+    glottolog_name: Omagua
+    segments:
+    - ʃ
+    - i
+    - ɾ
+    - u
+    alignment:
+    - ʃ
+    - i
+    - ɾ
+    - u
+- id: gravinachadic_11791
+  dataset: gravinachadic
+  gloss: EIGHT
+  parameter_id: gravinachadic_191_eight
+  forms:
+  - language_id: gravinachadic_KamweFutu
+    glottolog_name: Kamwe
+    segments:
+    - d
+    - ə
+    - gʱ
+    - o
+    - s
+    - o
+    alignment: []
+  - language_id: gravinachadic_Psikye
+    glottolog_name: Psikye
+    segments:
+    - d
+    - ə
+    - g
+    - ə
+    - s
+    - ə
+    alignment: []
+  - language_id: gravinachadic_Sukur
+    glottolog_name: Sukur
+    segments:
+    - t
+    - ə
+    - k
+    - ə
+    - z
+    alignment: []
+- id: syrjaenenuralic_3041
+  dataset: syrjaenenuralic
+  gloss: RIVER
+  parameter_id: syrjaenenuralic_125_river
+  forms:
+  - language_id: syrjaenenuralic_ingrian
+    glottolog_name: Ingrian
+    segments:
+    - j
+    - o
+    - ɡ̥
+    - i
+    alignment: []
+  - language_id: syrjaenenuralic_komipermyak
+    glottolog_name: Komi-Permyak
+    segments:
+    - j
+    - u
+    alignment: []
+  - language_id: syrjaenenuralic_komizyrian
+    glottolog_name: Komi-Zyrian
+    segments:
+    - j
+    - u
+    alignment: []
+- id: luangthongkumkaren_336
+  dataset: luangthongkumkaren
+  gloss: ''
+  parameter_id: luangthongkumkaren_336_wrongmistakeerror
+  forms:
+  - language_id: luangthongkumkaren_Kayaw
+    glottolog_name: Brek Karen
+    segments:
+    - m
+    - a
+    - ¹¹
+    alignment: []
+  - language_id: luangthongkumkaren_NorthernPao
+    glottolog_name: Northern Pa'o
+    segments:
+    - m
+    - a
+    - ⁵⁵
+    alignment: []
+  - language_id: luangthongkumkaren_NorthernSgaw
+    glottolog_name: Wewaw
+    segments:
+    - k
+    - ə
+    - ¹¹
+    - +
+    - m
+    - a
+    - ³¹
+    alignment: []
+  - language_id: luangthongkumkaren_ProtoKaren
+    glottolog_name: Karenic
+    segments:
+    - g
+    - ə
+    - ⁰
+    - +
+    - m̥
+    - a
+    - ¹¹
+    alignment: []
+  - language_id: luangthongkumkaren_SouthernPao
+    glottolog_name: Southern Pa'o
+    segments:
+    - m
+    - a
+    - ³³
+    alignment: []
+  - language_id: luangthongkumkaren_SouthernPwo
+    glottolog_name: Pwo Eastern Karen
+    segments:
+    - m
+    - a
+    - ⁵⁵
+    alignment: []
+  - language_id: luangthongkumkaren_SouthernSgaw
+    glottolog_name: S'gaw Karen
+    segments:
+    - m
+    - a
+    - ⁴⁵
+    alignment: []
+  - language_id: luangthongkumkaren_WesternBwe
+    glottolog_name: Bwe Karen
+    segments:
+    - g
+    - ə
+    - ³³
+    - +
+    - m
+    - ɛ
+    - ³³
+    alignment: []
+- id: chaconcolumbian_13818
+  dataset: chaconcolumbian
+  gloss: HAND
+  parameter_id: chaconcolumbian_58_hand
+  forms:
+  - language_id: chaconcolumbian_Cuiba
+    glottolog_name: Cuiba
+    segments:
+    - p
+    - e
+    - k
+    - o
+    - b
+    - e
+    alignment: []
+  - language_id: chaconcolumbian_Cuiba
+    glottolog_name: Cuiba
+    segments:
+    - p
+    - e
+    - k
+    - o
+    - b
+    - e
+    alignment: []
+  - language_id: chaconcolumbian_Guahibo
+    glottolog_name: Sikuani
+    segments:
+    - p
+    - e
+    - k
+    - o
+    - b
+    - eː
+    alignment: []
+  - language_id: chaconcolumbian_Jitnu
+    glottolog_name: Hitnu
+    segments:
+    - p
+    - e
+    - k
+    - o
+    alignment: []
+  - language_id: chaconcolumbian_Playero
+    glottolog_name: Playero
+    segments:
+    - p
+    - e
+    - k
+    - o
+    - b
+    - e
+    alignment: []
+- id: mcd_P2-363
+  dataset: mcd
+  gloss: ''
+  parameter_id: mcd_belch
+  forms:
+  - language_id: mcd_kosraean
+    glottolog_name: Kosraean
+    segments:
+    - k
+    - ɨ
+    - r
+    - a
+    - r
+    alignment: []
+  - language_id: mcd_puloannan
+    glottolog_name: Pulo Anna
+    segments:
+    - x
+    - ɨ
+    - ɾ
+    - a
+    - l
+    - ɨ
+    alignment: []
+  - language_id: mcd_puluwatese
+    glottolog_name: Puluwatese
+    segments:
+    - k
+    - ɨ
+    - r
+    - ə
+    - r
+    alignment: []
+  - language_id: mcd_saipancarolinian
+    glottolog_name: Carolinian
+    segments:
+    - x
+    - ə
+    - r
+    - ə
+    - r
+    alignment: []
+  - language_id: mcd_saipancaroliniant
+    glottolog_name: Tanapag
+    segments:
+    - g
+    - ə
+    - r
+    - ə
+    - r
+    alignment: []
+  - language_id: mcd_woleaian
+    glottolog_name: Woleaian
+    segments:
+    - x
+    - ü
+    - ʐ
+    - e
+    - ʐ
+    - e
+    alignment: []
+- id: tuled_16387
+  dataset: tuled
+  gloss: TEACH
+  parameter_id: tuled_378
+  forms:
+  - language_id: tuled_Karo
+    glottolog_name: Karo (Brazil)
+    segments:
+    - tʃ
+    - a
+    - h
+    - m
+    - ã
+    - j
+    - +
+    - n
+    - ã
+    - n
+    alignment:
+    - tʃ
+    - a
+    - h
+    - m
+    - ã
+    - j
+  - language_id: tuled_Wayoro
+    glottolog_name: Wayoró
+    segments:
+    - m
+    - ã
+    - j
+    alignment:
+    - '-'
+    - '-'
+    - '-'
+    - m
+    - ã
+    - j
+- id: bowernpny_82-good
+  dataset: bowernpny
+  gloss: GOOD
+  parameter_id: bowernpny_143_good
+  forms:
+  - language_id: bowernpny_BidyaraGungabula
+    glottolog_name: Southern Maric
+    segments:
+    - m
+    - i
+    - g
+    - a
+    - ɲ
+    alignment: []
+  - language_id: bowernpny_Yiningay
+    glottolog_name: Bidyara
+    segments:
+    - m
+    - i
+    - k
+    - a
+    - ɲ
+    alignment: []
+- id: lundgrenomagoa_1996
+  dataset: lundgrenomagoa
+  gloss: SLEEP
+  parameter_id: lundgrenomagoa_1427_sleepintr
+  forms:
+  - language_id: lundgrenomagoa_Kokama
+    glottolog_name: Cocama
+    segments:
+    - u
+    - +
+    - k
+    - ɨ
+    - ɾ
+    - ɨ
+    alignment:
+    - u
+    - +
+    - k
+    - ɨ
+    - ɾ
+    - ɨ
+  - language_id: lundgrenomagoa_Omagua
+    glottolog_name: Omagua
+    segments:
+    - u
+    - +
+    - k
+    - ɨ
+    - ɾ
+    - ɨ
+    alignment:
+    - u
+    - +
+    - k
+    - ɨ
+    - ɾ
+    - ɨ
+  - language_id: lundgrenomagoa_Tupinamba
+    glottolog_name: Tupinambá
+    segments:
+    - k
+    - e
+    - ɾ
+    - a
+    alignment:
+    - k
+    - e
+    - ɾ
+    - a
+- id: constenlachibchan_1013
+  dataset: constenlachibchan
+  gloss: HEAVY
+  parameter_id: constenlachibchan_79_pesado
+  forms:
+  - language_id: constenlachibchan_Cacaopera
+    glottolog_name: Cacaopera
+    segments:
+    - w
+    - i
+    - m
+    alignment: []
+  - language_id: constenlachibchan_Miskito
+    glottolog_name: Mískito
+    segments:
+    - w
+    - i
+    - r
+    - a
+    alignment: []
+- id: savelyevturkic_602
+  dataset: savelyevturkic
+  gloss: ABOVE
+  parameter_id: savelyevturkic_7_above
+  forms:
+  - language_id: savelyevturkic_KarachayBalkar
+    glottolog_name: Karachay-Balkar
+    segments:
+    - b
+    - a
+    - ʃ
+    - ɯ
+    - n
+    - d
+    - a
+    alignment:
+    - b
+    - a
+    - ʃ
+    - ɯ
+    - n
+    - d
+    - a
+  - language_id: savelyevturkic_Salar
+    glottolog_name: Salar
+    segments:
+    - b
+    - a
+    - ʃ
+    alignment: []
+  - language_id: savelyevturkic_Turkmen
+    glottolog_name: Turkmen
+    segments:
+    - b
+    - a
+    - ʃ
+    - ɯ
+    - n
+    - d
+    - a
+    alignment: []
+- id: bowernpny_42-intestines
+  dataset: bowernpny
+  gloss: INTESTINES
+  parameter_id: bowernpny_169_intestines
+  forms:
+  - language_id: bowernpny_Gamilaraay
+    glottolog_name: Gamilaraay
+    segments:
+    - m
+    - oː
+    - b
+    - u
+    - l
+    alignment: []
+  - language_id: bowernpny_Yuwaalaraay
+    glottolog_name: Yuwaalaraay
+    segments:
+    - m
+    - u
+    - b
+    - a
+    - l
+    alignment: []
+- id: bodtkhobwa_753
+  dataset: bodtkhobwa
+  gloss: MIDDAY
+  parameter_id: bodtkhobwa_340_noon
+  forms:
+  - language_id: bodtkhobwa_Duhumbi
+    glottolog_name: Duhumbi
+    segments:
+    - b
+    - i~u/i
+    - s
+    - +
+    - t
+    - a
+    - n
+    alignment:
+    - b
+    - i~u/i
+    - s
+  - language_id: bodtkhobwa_Khispi
+    glottolog_name: Khispi
+    segments:
+    - b
+    - u
+    - ɕ
+    - +
+    - t
+    - a
+    - n
+    alignment:
+    - b
+    - u
+    - ɕ
+- id: kahd_1228
+  dataset: kahd
+  gloss: BELLY
+  parameter_id: kahd_47_belly
+  forms:
+  - language_id: kahd_Deni
+    glottolog_name: Deni
+    segments:
+    - j
+    - e
+    - h
+    - e
+    alignment:
+    - j
+    - e
+    - h
+    - '-'
+    - e
+  - language_id: kahd_Paumari
+    glottolog_name: Paumari
+    segments:
+    - dʒ
+    - a
+    - h
+    - a
+    alignment:
+    - dʒ
+    - a
+    - h
+    - '-'
+    - a
+  - language_id: kahd_Paumari_1833
+    glottolog_name: Paumari
+    segments:
+    - d
+    - a
+    - w
+    - au
+    - a
+    alignment:
+    - d
+    - a
+    - w
+    - au
+    - a
+- id: bowernpny_70-cut
+  dataset: bowernpny
+  gloss: CUT OR HACK
+  parameter_id: bowernpny_88_cuthack
+  forms:
+  - language_id: bowernpny_KuukuYau
+    glottolog_name: Kuuku-Ya'u
+    segments:
+    - m
+    - uː
+    - ŋ
+    - a
+    - n
+    - a
+    alignment: []
+  - language_id: bowernpny_Umpila
+    glottolog_name: Umpila
+    segments:
+    - m
+    - uː
+    - ŋ
+    - a
+    alignment: []
+- id: lieberherrkhobwa_18505
+  dataset: lieberherrkhobwa
+  gloss: WHAT
+  parameter_id: lieberherrkhobwa_93_what
+  forms:
+  - language_id: lieberherrkhobwa_Bichom
+    glottolog_name: Bichom
+    segments:
+    - n
+    - i
+    - w
+    alignment: []
+  - language_id: lieberherrkhobwa_Dikhyang
+    glottolog_name: Dikhyang
+    segments:
+    - ɲ
+    - u
+    - j
+    - aː
+    alignment: []
+  - language_id: lieberherrkhobwa_Kaspi
+    glottolog_name: Kaspi
+    segments:
+    - n
+    - i
+    - j
+    - e
+    alignment: []
+  - language_id: lieberherrkhobwa_Namphri
+    glottolog_name: Namphri
+    segments:
+    - ɲ
+    - i
+    - j
+    - a
+    - g
+    - a
+    alignment: []
+  - language_id: lieberherrkhobwa_Singchung
+    glottolog_name: Singchung
+    segments:
+    - n
+    - i
+    - w
+    - k
+    - a
+    alignment: []
+  - language_id: lieberherrkhobwa_Wangho
+    glottolog_name: Wangho
+    segments:
+    - n
+    - i
+    - w
+    alignment: []
+- id: chaconcolumbian_20111
+  dataset: chaconcolumbian
+  gloss: ''
+  parameter_id: chaconcolumbian_93_stream
+  forms:
+  - language_id: chaconcolumbian_Bora
+    glottolog_name: Bora
+    segments:
+    - tʰ
+    - eː
+    - ʔ
+    - i
+    - kʷ
+    - ɯ
+    alignment: []
+  - language_id: chaconcolumbian_Mirana
+    glottolog_name: Bora
+    segments:
+    - tʰ
+    - eː
+    - ʔ
+    - i
+    alignment: []
+  - language_id: chaconcolumbian_Muinane
+    glottolog_name: Muinane
+    segments:
+    - t
+    - eː
+    - ʔ
+    - i
+    alignment: []
+  - language_id: chaconcolumbian_Resigaro
+    glottolog_name: Resígaro
+    segments:
+    - t
+    - eː
+    - ʔ
+    - i
+    - dʒ
+    - a
+    - ʔ
+    alignment: []
+  - language_id: chaconcolumbian_Secoya
+    glottolog_name: Secoya
+    segments:
+    - a
+    - ʔ
+    - d
+    - i
+    alignment: []
+- id: smithborneo_8858
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_674_yellowbrownmonkey
+  forms:
+  - language_id: smithborneo_Bekati
+    glottolog_name: Riuk Bekati'
+    segments:
+    - a
+    - j
+    - o
+    - h
+    alignment: []
+  - language_id: smithborneo_Molbog
+    glottolog_name: Molbog
+    segments:
+    - u
+    - j
+    - o
+    - w
+    alignment: []
+  - language_id: smithborneo_Punan_Tuvu
+    glottolog_name: Punan Tubu
+    segments:
+    - o
+    - i
+    - h
+    alignment: []
+- id: sagartst_1983
+  dataset: sagartst
+  gloss: STAND
+  parameter_id: sagartst_199_tostand
+  forms:
+  - language_id: sagartst_Chaozhou
+    glottolog_name: Chaozhou
+    segments:
+    - kʰ
+    - i
+    - a
+    - ³⁵
+    alignment: []
+  - language_id: sagartst_Guangzhou
+    glottolog_name: Guangzhou
+    segments:
+    - kʰ
+    - e
+    - i
+    - ²³
+    alignment: []
+  - language_id: sagartst_Jieyang
+    glottolog_name: Chaoshan
+    segments:
+    - kʰ
+    - i
+    - a
+    - ³⁵
+    alignment: []
+  - language_id: sagartst_Longgang
+    glottolog_name: Hakka Chinese
+    segments:
+    - kʰ
+    - i
+    - ³²
+    alignment: []
+  - language_id: sagartst_Xingning
+    glottolog_name: Hakka Chinese
+    segments:
+    - kʰ
+    - i
+    - ⁴⁵
+    alignment: []
+- id: bowernpny_15-house
+  dataset: bowernpny
+  gloss: HOUSE
+  parameter_id: bowernpny_162_house
+  forms:
+  - language_id: bowernpny_Dhuwal
+    glottolog_name: Dhuwal
+    segments:
+    - w
+    - æ
+    - ŋ
+    - a
+    alignment: []
+  - language_id: bowernpny_Djapu
+    glottolog_name: Djapu
+    segments:
+    - w
+    - æ
+    - ŋ
+    - a
+    alignment: []
+  - language_id: bowernpny_Ritharrngu
+    glottolog_name: Ritarungo
+    segments:
+    - w
+    - aː
+    - ŋ
+    - a
+    alignment: []
+  - language_id: bowernpny_Wulguru
+    glottolog_name: Wulguru
+    segments:
+    - w
+    - a
+    - ŋ
+    - a
+    alignment: []
+- id: sidwellvietic_182
+  dataset: sidwellvietic
+  gloss: FALL
+  parameter_id: sidwellvietic_32_falldropv
+  forms:
+  - language_id: sidwellvietic_CuoiTanHop
+    glottolog_name: Cuoi
+    segments:
+    - p
+    - e
+    - ³³
+    - ʔ
+    alignment: []
+  - language_id: sidwellvietic_CuoiThaiHoa
+    glottolog_name: Cuoi
+    segments:
+    - p
+    - e
+    - ²¹²
+    alignment: []
+  - language_id: sidwellvietic_Jahai
+    glottolog_name: Jehai
+    segments:
+    - g
+    - i
+    - b
+    - a
+    - l
+    alignment: []
+- id: bowernpny_20-when
+  dataset: bowernpny
+  gloss: WHEN
+  parameter_id: bowernpny_332_when
+  forms:
+  - language_id: bowernpny_Arabana
+    glottolog_name: Arabana
+    segments:
+    - u
+    - n
+    - k
+    - u
+    - l
+    - u
+    alignment: []
+  - language_id: bowernpny_Wangkangurru
+    glottolog_name: Wangganguru
+    segments:
+    - u
+    - n
+    - k
+    - u
+    - l
+    - u
+    - ?/ʔ
+    alignment: []
+- id: bowernpny_35-sharp
+  dataset: bowernpny
+  gloss: SHARP
+  parameter_id: bowernpny_249_sharp
+  forms:
+  - language_id: bowernpny_Gamilaraay
+    glottolog_name: Gamilaraay
+    segments:
+    - j
+    - u
+    - dː
+    - h
+    - a
+    - l
+    - a
+    alignment: []
+  - language_id: bowernpny_Kamilaroi
+    glottolog_name: Gamilaraay
+    segments:
+    - j
+    - u
+    - dː
+    - h
+    - a
+    - l
+    - a
+    alignment: []
+- id: bowernpny_54-rope
+  dataset: bowernpny
+  gloss: ROPE
+  parameter_id: bowernpny_242_rope
+  forms:
+  - language_id: bowernpny_Djabugay
+    glottolog_name: Dyaabugay
+    segments:
+    - n
+    - a
+    - r
+    - a
+    alignment: []
+  - language_id: bowernpny_Kukatj
+    glottolog_name: Gugadj
+    segments:
+    - n̪
+    - a
+    - ɹ
+    alignment: []
+- id: mcd_P2-433
+  dataset: mcd
+  gloss: ''
+  parameter_id: mcd_centipede
+  forms:
+  - language_id: mcd_chuukese
+    glottolog_name: Chuukese
+    segments:
+    - m
+    - ə
+    - ɾ
+    - ɾ
+    - ɨ
+    - pʷ
+    - i
+    - ɾ
+    alignment:
+    - '-'
+    - '-'
+    - m
+    - ə
+    - ɾ
+    - '-'
+    - ɾ
+    - ɨ
+    - pʷ
+    - i
+    - ɾ
+    - '-'
+  - language_id: mcd_puloannan
+    glottolog_name: Pulo Anna
+    segments:
+    - m
+    - a
+    - ɾ
+    - ɨ
+    - ɾ
+    - i
+    - βʷ
+    - o
+    - ŋ
+    - i
+    alignment:
+    - '-'
+    - '-'
+    - m
+    - a
+    - ɾ
+    - ɨ
+    - ɾ
+    - i
+    - βʷ
+    - o
+    - ŋ
+    - i
+  - language_id: mcd_puluwatese
+    glottolog_name: Puluwatese
+    segments:
+    - m
+    - a
+    - nn
+    - i
+    - pʷ
+    - o
+    - ŋ
+    alignment:
+    - '-'
+    - '-'
+    - m
+    - a
+    - nn
+    - '-'
+    - '-'
+    - i
+    - pʷ
+    - o
+    - ŋ
+    - '-'
+  - language_id: mcd_saipancarolinian
+    glottolog_name: Carolinian
+    segments:
+    - l
+    - i
+    - m
+    - æ
+    - l
+    - l
+    - i
+    - bʷ
+    - o
+    - ŋ
+    alignment:
+    - l
+    - i
+    - m
+    - æ
+    - l
+    - '-'
+    - l
+    - i
+    - bʷ
+    - o
+    - ŋ
+    - '-'
+  - language_id: mcd_saipancaroliniant
+    glottolog_name: Tanapag
+    segments:
+    - m
+    - a
+    - n
+    - i
+    - i
+    - bʷ
+    - o
+    - ŋ
+    alignment:
+    - '-'
+    - '-'
+    - m
+    - a
+    - n
+    - i
+    - '-'
+    - i
+    - bʷ
+    - o
+    - ŋ
+    - '-'
+  - language_id: mcd_woleaian
+    glottolog_name: Woleaian
+    segments:
+    - m
+    - a
+    - n
+    - n
+    - ü
+    - ɸʷ
+    - o
+    - ŋ
+    - i
+    alignment:
+    - '-'
+    - '-'
+    - m
+    - a
+    - n
+    - '-'
+    - n
+    - ü
+    - ɸʷ
+    - o
+    - ŋ
+    - i
+- id: oskolskayatungusic_319
+  dataset: oskolskayatungusic
+  gloss: ROPE
+  parameter_id: oskolskayatungusic_91_ropen
+  forms:
+  - language_id: oskolskayatungusic_Even
+    glottolog_name: Even
+    segments:
+    - u
+    - s
+    - i
+    alignment: []
+  - language_id: oskolskayatungusic_Evenki_Chiringda
+    glottolog_name: Hissing Evenki
+    segments:
+    - u
+    - h
+    - iː
+    alignment: []
+  - language_id: oskolskayatungusic_Evenki_Strelka_Chun
+    glottolog_name: Hissing Evenki
+    segments:
+    - u
+    - ś/ʃ
+    - iː
+    - k
+    - oː
+    - n
+    alignment: []
+  - language_id: oskolskayatungusic_Evenki_Tutonchany
+    glottolog_name: Ilimpeya
+    segments:
+    - u
+    - h
+    - iː
+    alignment: []
+  - language_id: oskolskayatungusic_Negidal
+    glottolog_name: Negidal
+    segments:
+    - u
+    - s
+    - iː
+    alignment: []
+  - language_id: oskolskayatungusic_Solon
+    glottolog_name: Solon
+    segments:
+    - u
+    - ʃ
+    - iː
+    - l
+    - ə
+    - ŋ
+    alignment: []
+- id: gravinachadic_2736
+  dataset: gravinachadic
+  gloss: HELP
+  parameter_id: gravinachadic_308_help
+  forms:
+  - language_id: gravinachadic_Mpade
+    glottolog_name: Mpade
+    segments:
+    - d
+    - a
+    - h
+    - a
+    - l
+    alignment: []
+  - language_id: gravinachadic_ShoaArabic
+    glottolog_name: Chadian Arabic
+    segments:
+    - s
+    - a
+    - hː
+    - a
+    - l
+    alignment: []
+- id: iecor_1968
+  dataset: iecor
+  gloss: RIGHT
+  parameter_id: iecor_124
+  forms:
+  - language_id: iecor_124
+    glottolog_name: Iron Ossetian
+    segments:
+    - r
+    - ɑ
+    - χ
+    - i
+    - ʒ
+    alignment: []
+  - language_id: iecor_125
+    glottolog_name: Digor Ossetian
+    segments:
+    - r
+    - ɑ
+    - χ
+    - e
+    - s
+    alignment: []
+  - language_id: iecor_296
+    glottolog_name: Sarikoli
+    segments: []
+    alignment: []
+- id: robinsonap_186_millet-1
+  dataset: robinsonap
+  gloss: MILLET
+  parameter_id: robinsonap_186_millet
+  forms:
+  - language_id: robinsonap_abui
+    glottolog_name: Abui
+    segments:
+    - k
+    - a
+    - l
+    - a
+    alignment: []
+  - language_id: robinsonap_westernpantar
+    glottolog_name: Western Pantar
+    segments:
+    - k
+    - a
+    - l
+    - a
+    - k
+    - e
+    alignment: []
+- id: kahd_1638
+  dataset: kahd
+  gloss: MOTH
+  parameter_id: kahd_331_moth
+  forms:
+  - language_id: kahd_Amarakaeri
+    glottolog_name: Amarakaeri
+    segments:
+    - s
+    - i
+    - mb
+    - u
+    alignment:
+    - s
+    - i
+    - '-'
+    - '-'
+    - mb
+    - u
+  - language_id: kahd_Arasairi
+    glottolog_name: Arasairi
+    segments:
+    - s
+    - e
+    - p
+    - p
+    - o
+    alignment:
+    - s
+    - e
+    - p
+    - '-'
+    - p
+    - o
+  - language_id: kahd_Arasairi
+    glottolog_name: Arasairi
+    segments:
+    - s
+    - e
+    - b
+    - a
+    - k
+    - o
+    alignment:
+    - s
+    - e
+    - b
+    - a
+    - k
+    - o
+- id: robinsonap_340_toknow-0
+  dataset: robinsonap
+  gloss: KNOW
+  parameter_id: robinsonap_340_toknow
+  forms:
+  - language_id: robinsonap_blagar
+    glottolog_name: Blagar
+    segments:
+    - v
+    - e
+    - ŋ
+    - k
+    - r
+    - u
+    - a
+    - ŋ
+    alignment: []
+  - language_id: robinsonap_teiwa
+    glottolog_name: Teiwa
+    segments:
+    - w
+    - a
+    - n
+    - k
+    - r
+    - u
+    - w
+    - a
+    - n
+    alignment: []
+- id: smithborneo_4047
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_316_land
+  forms:
+  - language_id: smithborneo_Jangkang
+    glottolog_name: Jangkang
+    segments:
+    - p
+    - o
+    - j
+    - a
+    alignment: []
+  - language_id: smithborneo_Pangkodan_Sanggau
+    glottolog_name: Sanggau
+    segments:
+    - p
+    - o
+    - j
+    - a
+    alignment: []
+  - language_id: smithborneo_Ribun
+    glottolog_name: Ribun
+    segments:
+    - p
+    - o
+    - j
+    - oː
+    alignment: []
+- id: gravinachadic_979
+  dataset: gravinachadic
+  gloss: EIGHTEEN
+  parameter_id: gravinachadic_192_eighteen18
+  forms:
+  - language_id: gravinachadic_Afade
+    glottolog_name: Afade
+    segments:
+    - k
+    - a
+    - n
+    - +
+    - g
+    - o
+    - +
+    - g
+    - a
+    - ɗ
+    - e
+    - g
+    - a
+    - ɗ
+    - e
+    alignment: []
+  - language_id: gravinachadic_Kanuri
+    glottolog_name: Kanuric
+    segments:
+    - w
+    - u
+    - s
+    - k
+    - u
+    - n
+    alignment: []
+  - language_id: gravinachadic_Lagwan
+    glottolog_name: Lagwan
+    segments:
+    - x
+    - k
+    - a
+    - n
+    - +
+    - k
+    - a
+    - +
+    - v
+    - ɨ
+    - n
+    - j
+    - a
+    - ɗ
+    - e
+    alignment: []
+  - language_id: gravinachadic_Malgbe
+    glottolog_name: Malgbe
+    segments:
+    - k
+    - a
+    - n
+    - +
+    - g
+    - a
+    - +
+    - f
+    - r
+    - e
+    - g
+    - a
+    - n
+    - ɗ
+    - e
+    alignment: []
+  - language_id: gravinachadic_Mpade
+    glottolog_name: Mpade
+    segments:
+    - k
+    - a
+    - n
+    - +
+    - g
+    - o
+    - +
+    - j
+    - i
+    - l
+    - i
+    - g
+    - a
+    - ɗ
+    - e
+    alignment: []
+  - language_id: gravinachadic_Mser
+    glottolog_name: Mser
+    segments:
+    - k
+    - a
+    - n
+    - +
+    - d
+    - ɨ
+    - n
+    - +
+    - v
+    - r
+    - e
+    - k
+    - a
+    - ɗ
+    - e
+    alignment: []
+  - language_id: gravinachadic_ShoaArabic
+    glottolog_name: Chadian Arabic
+    segments:
+    - t
+    - a
+    - m
+    - a
+    - n
+    - t
+    - a
+    - c
+    - a
+    - r
+    alignment: []
+- id: smithborneo_8397
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_640_wall
+  forms:
+  - language_id: smithborneo_Penan_Beku
+    glottolog_name: Western Penan
+    segments:
+    - t
+    - a
+    - p
+    - i
+    - ʔ
+    alignment: []
+  - language_id: smithborneo_Penan_Jekitan
+    glottolog_name: Penan Silat
+    segments:
+    - t
+    - a
+    - p
+    - i
+    - ʔ
+    alignment: []
+- id: savelyevturkic_788
+  dataset: savelyevturkic
+  gloss: ROTTEN
+  parameter_id: savelyevturkic_223_tobecomerottenv
+  forms:
+  - language_id: savelyevturkic_Dolgan
+    glottolog_name: Dolgan
+    segments:
+    - h
+    - ɯ
+    - t
+    - ɯ
+    - j
+    alignment:
+    - h
+    - ɯ
+    - t
+    - ɯ
+    - j
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+  - language_id: savelyevturkic_Khakas
+    glottolog_name: Khakas
+    segments:
+    - tɕ
+    - ɯ
+    - z
+    - ɯ
+    alignment:
+    - t
+    - ʃ
+    - ɯ
+    - z
+    - ɯ
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+  - language_id: savelyevturkic_Khalaj
+    glottolog_name: Turkic Khalaj
+    segments:
+    - j
+    - ɯ
+    - d
+    - +
+    - k
+    - ø
+    - t
+    - y
+    - r
+    alignment:
+    - j
+    - ɯ
+    - d
+    - '-'
+    - '-'
+    - +
+    - k
+    - ø
+    - t
+    - y
+    - r
+  - language_id: savelyevturkic_SarygYugur
+    glottolog_name: West Yugur
+    segments:
+    - j
+    - i
+    - z
+    alignment:
+    - j
+    - i
+    - z
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+  - language_id: savelyevturkic_Tofa
+    glottolog_name: Tofa
+    segments:
+    - tɕ
+    - ɯ
+    - d
+    - ɯ
+    alignment:
+    - t
+    - ʃ
+    - ɯ
+    - d
+    - ɯ
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+  - language_id: savelyevturkic_Tuvan
+    glottolog_name: Tuvinian
+    segments:
+    - tɕ
+    - ɯ
+    - d
+    - ɯ
+    alignment:
+    - t
+    - ʃ
+    - ɯ
+    - d
+    - ɯ
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+  - language_id: savelyevturkic_Yakut
+    glottolog_name: Sakha
+    segments:
+    - s
+    - ɯ
+    - t
+    - ɯ
+    - j
+    alignment:
+    - s
+    - ɯ
+    - t
+    - ɯ
+    - j
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+- id: tuled_12563
+  dataset: tuled
+  gloss: PESTLE
+  parameter_id: tuled_287
+  forms:
+  - language_id: tuled_Juruna
+    glottolog_name: Jurúna
+    segments:
+    - ʔ
+    - e
+    - ʔ
+    - ã́
+    alignment:
+    - ʔ
+    - e
+    - ʔ
+    - ã́
+  - language_id: tuled_Kuruaya
+    glottolog_name: Kuruáya
+    segments:
+    - ʔ
+    - ẽ
+    - tʃ
+    - õ
+    alignment:
+    - ʔ
+    - ẽ
+    - tʃ
+    - õ
+  - language_id: tuled_Munduruku
+    glottolog_name: Mundurukú
+    segments:
+    - ʔ
+    - ẽ
+    alignment:
+    - ʔ
+    - ẽ
+    - '-'
+    - '-'
+  - language_id: tuled_Xipaya
+    glottolog_name: Xipaya
+    segments:
+    - h
+    - ẽã
+    alignment:
+    - h
+    - ẽã
+    - '-'
+    - '-'
+- id: mcd_3343
+  dataset: mcd
+  gloss: ''
+  parameter_id: mcd_seatinacanoe
+  forms:
+  - language_id: mcd_kosraean
+    glottolog_name: Kosraean
+    segments:
+    - l
+    - ɒ
+    alignment: []
+  - language_id: mcd_mokilese
+    glottolog_name: Mokilese
+    segments:
+    - l
+    - ɔ
+    alignment: []
+  - language_id: mcd_pohnpeian
+    glottolog_name: Pohnpeian
+    segments:
+    - l
+    - oː
+    alignment: []
+  - language_id: mcd_protomicronesian
+    glottolog_name: Micronesian
+    segments:
+    - l
+    - oː
+    - <<[>>
+    - w
+    - <<Ø>>
+    - <<]>>
+    - a
+    alignment: []
+- id: smithborneo_3194
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_239_gills
+  forms:
+  - language_id: smithborneo_Badeng
+    glottolog_name: Usun Apau Kenyah
+    segments:
+    - p
+    - i
+    - p
+    - i
+    alignment: []
+  - language_id: smithborneo_Sawa
+    glottolog_name: Usun Apau Kenyah
+    segments:
+    - p
+    - i
+    - p
+    - i
+    alignment: []
+- id: constenlachibchan_1181
+  dataset: constenlachibchan
+  gloss: KNOW (SOMETHING)
+  parameter_id: constenlachibchan_91_saber
+  forms:
+  - language_id: constenlachibchan_Boruca
+    glottolog_name: Boruca
+    segments:
+    - u
+    - í/i
+    alignment: []
+  - language_id: constenlachibchan_Bribri
+    glottolog_name: Bribri
+    segments:
+    - u
+    - x
+    - tʃ
+    - +
+    - ẽ
+    alignment: []
+  - language_id: constenlachibchan_Buglere
+    glottolog_name: Buglere
+    segments:
+    - u
+    - ɲ
+    - +
+    - e
+    alignment: []
+  - language_id: constenlachibchan_Cabecar
+    glottolog_name: Cabécar
+    segments:
+    - h
+    - u
+    - dʒ
+    - +
+    - ẽ
+    alignment: []
+  - language_id: constenlachibchan_Chimila
+    glottolog_name: Chimila
+    segments:
+    - w
+    - i
+    alignment: []
+  - language_id: constenlachibchan_SanBlasKuna
+    glottolog_name: San Blas Kuna
+    segments:
+    - w
+    - i
+    - s
+    - i
+    alignment: []
+  - language_id: constenlachibchan_Teribe
+    glottolog_name: Teribe
+    segments:
+    - h
+    - m
+    - í/i
+    - d
+    - ɪ̀/ɪ
+    alignment: []
+- id: carvalhopurus_118
+  dataset: carvalhopurus
+  gloss: SEED
+  parameter_id: carvalhopurus_118_seed
+  forms:
+  - language_id: carvalhopurus_Apurina
+    glottolog_name: Apurinã
+    segments:
+    - k
+    - ɨ
+    alignment: []
+  - language_id: carvalhopurus_Inapari
+    glottolog_name: Iñapari
+    segments:
+    - r
+    - a
+    - n
+    - á/a
+    - +
+    - h
+    - ɨ
+    alignment: []
+  - language_id: carvalhopurus_ProtoPurus
+    glottolog_name: Purus
+    segments:
+    - k
+    - ɨ
+    alignment: []
+  - language_id: carvalhopurus_Yine
+    glottolog_name: Yine
+    segments:
+    - h
+    - i
+    - +
+    - ç
+    - i
+    alignment: []
+- id: bdpa_52
+  dataset: bdpa
+  gloss: HEART
+  parameter_id: bdpa_36_heart
+  forms:
+  - language_id: bdpa_Huancane
+    glottolog_name: ''
+    segments:
+    - tʃ
+    - ʉ
+    - j
+    - m
+    - ɐ
+    alignment:
+    - tʃ
+    - ʉ
+    - j
+    - m
+    - ɐ
+  - language_id: bdpa_Jaqaru
+    glottolog_name: ''
+    segments:
+    - j
+    - u
+    - j
+    - a
+    alignment:
+    - j
+    - u
+    - j
+    - '-'
+    - a
+  - language_id: bdpa_Oruro
+    glottolog_name: ''
+    segments:
+    - tʃ
+    - ʉ
+    - j
+    - m
+    - a
+    alignment:
+    - tʃ
+    - ʉ
+    - j
+    - m
+    - a
+  - language_id: bdpa_Tiwanaku
+    glottolog_name: ''
+    segments:
+    - tʃ
+    - u
+    - j
+    - m
+    - ɐ
+    alignment:
+    - tʃ
+    - u
+    - j
+    - m
+    - ɐ
+- id: walworthpolynesian_292
+  dataset: walworthpolynesian
+  gloss: FIFTY
+  parameter_id: walworthpolynesian_208_fifty
+  forms:
+  - language_id: walworthpolynesian_EastFutuna
+    glottolog_name: East Futuna
+    segments:
+    - k
+    - a
+    - u
+    - +
+    - l
+    - i
+    - m
+    - a
+    alignment: []
+  - language_id: walworthpolynesian_Pukapuka
+    glottolog_name: Pukapuka
+    segments:
+    - l
+    - a
+    - u
+    - +
+    - l
+    - i
+    - m
+    - a
+    alignment: []
+- id: utoaztecan_90_stonerock-40
+  dataset: utoaztecan
+  gloss: STONE OR ROCK
+  parameter_id: utoaztecan_90_stonerock
+  forms:
+  - language_id: utoaztecan_Acoma
+    glottolog_name: Acoma Keres
+    segments:
+    - ỷ/k
+    - â/a
+    - u
+    - n
+    - i
+    alignment: []
+  - language_id: utoaztecan_ProtoKeresan
+    glottolog_name: Keresan
+    segments:
+    - ỷ/k
+    - â/a
+    - u
+    - n
+    - i
+    alignment: []
+  - language_id: utoaztecan_SantaAna
+    glottolog_name: Santa Ana
+    segments:
+    - ỷ/k
+    - â/a
+    - u
+    - n
+    - i
+    alignment: []
+  - language_id: utoaztecan_SantaDomingo
+    glottolog_name: Santo Domingo
+    segments:
+    - ỷ/k
+    - â/a
+    - u
+    - n
+    - i
+    alignment: []
+- id: sidwellvietic_255
+  dataset: sidwellvietic
+  gloss: BLUE OR GREEN
+  parameter_id: sidwellvietic_45_greenblue
+  forms:
+  - language_id: sidwellvietic_Kri
+    glottolog_name: Kha Phong
+    segments:
+    - s
+    - a
+    - ɽ
+    - ɛu̯
+    - ³⁴
+    alignment: []
+  - language_id: sidwellvietic_KriPhoong
+    glottolog_name: Kha Phong
+    segments:
+    - s
+    - a
+    - r
+    - ɛ
+    - w
+    - ³²³
+    alignment: []
+  - language_id: sidwellvietic_Malang
+    glottolog_name: Malieng
+    segments:
+    - s
+    - ə
+    - r
+    - ɛː
+    - w
+    alignment: []
+  - language_id: sidwellvietic_Pakatan
+    glottolog_name: Malieng
+    segments:
+    - s
+    - a
+    - l
+    - ɛː
+    - w
+    - ³²⁴
+    alignment: []
+  - language_id: sidwellvietic_ThavungF
+    glottolog_name: Thavung
+    segments:
+    - s
+    - a
+    - l
+    - ɛː
+    - w
+    - ¹
+    alignment: []
+  - language_id: sidwellvietic_ThavungPS
+    glottolog_name: Thavung
+    segments:
+    - s
+    - a
+    - l
+    - ɛ̂ː/ɛ
+    - w
+    alignment: []
+  - language_id: sidwellvietic_ThavungS
+    glottolog_name: Thavung
+    segments:
+    - s
+    - a
+    - l
+    - ɛ̂ː/ɛ
+    - w
+    alignment: []
+- id: yanglalo_433
+  dataset: yanglalo
+  gloss: PADDY FIELD
+  parameter_id: yanglalo_396_fieldwetfield
+  forms:
+  - language_id: yanglalo_Diaocao
+    glottolog_name: Dongshanba Lalo
+    segments:
+    - tɕʰ
+    - i
+    - ⁵⁵
+    - +
+    - t
+    - ɛ
+    - ⁵⁵
+    - +
+    - m
+    - i
+    - ³³
+    alignment:
+    - tɕʰ
+    - i
+    - ⁵⁵
+    - +
+    - t
+    - ɛ
+    - ⁵⁵
+    - +
+    - m
+    - i
+    - ³³
+  - language_id: yanglalo_Mangdi
+    glottolog_name: Southern Lalo
+    segments:
+    - d
+    - ɛ
+    - ⁵⁵
+    alignment:
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - d
+    - ɛ
+    - ⁵⁵
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+  - language_id: yanglalo_ProtoLalo
+    glottolog_name: ''
+    segments:
+    - d
+    - e
+    - ¹
+    - +
+    - m
+    - i
+    - ¹
+    alignment:
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - d
+    - e
+    - ¹
+    - +
+    - m
+    - i
+    - ¹
+  - language_id: yanglalo_Qingyun
+    glottolog_name: Xishanba Lalo
+    segments:
+    - tɕʰ
+    - i
+    - ⁵⁵
+    - +
+    - m
+    - i
+    - ⁵⁵
+    alignment:
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - tɕʰ
+    - i
+    - ⁵⁵
+    - +
+    - m
+    - i
+    - ⁵⁵
+  - language_id: yanglalo_Shuizhuping
+    glottolog_name: Western Lalu
+    segments:
+    - t
+    - i
+    - ²⁴
+    - +
+    - m
+    - i
+    - ³³
+    alignment:
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - t
+    - i
+    - ²⁴
+    - +
+    - m
+    - i
+    - ³³
+  - language_id: yanglalo_Xuzhang
+    glottolog_name: Xuzhang Lalo
+    segments:
+    - d
+    - i
+    - ²⁴
+    - +
+    - m
+    - v̩˞/v̩
+    - ⁴⁵³
+    alignment:
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - d
+    - i
+    - ²⁴
+    - +
+    - m
+    - v̩˞/v̩
+    - ⁴⁵³
+  - language_id: yanglalo_Yangliu
+    glottolog_name: Yangliu
+    segments:
+    - t
+    - i
+    - ³³
+    - +
+    - m
+    - i
+    - ³³
+    alignment:
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - t
+    - i
+    - ³³
+    - +
+    - m
+    - i
+    - ³³
+  - language_id: yanglalo_Yijiacun
+    glottolog_name: Eka
+    segments:
+    - d
+    - ɛ
+    - ³³
+    alignment:
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - d
+    - ɛ
+    - ³³
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+- id: dunnaslian_21_dirty_1
+  dataset: dunnaslian
+  gloss: DIRTY
+  parameter_id: dunnaslian_21_dirty
+  forms:
+  - language_id: dunnaslian_Batek_Deq_Koh
+    glottolog_name: Batek
+    segments:
+    - k
+    - a
+    - m
+    - a
+    - h
+    alignment: []
+  - language_id: dunnaslian_Batek_Deq_Terengganu
+    glottolog_name: Batek
+    segments:
+    - k
+    - a
+    - m
+    - a
+    - h
+    alignment: []
+  - language_id: dunnaslian_Batek_Teh_Lebir
+    glottolog_name: Batek
+    segments:
+    - k
+    - a
+    - m
+    - a
+    - h
+    alignment: []
+  - language_id: dunnaslian_Ceq_Wong
+    glottolog_name: Chewong
+    segments:
+    - k
+    - a
+    - m
+    - a
+    - h
+    alignment: []
+  - language_id: dunnaslian_Kensiw_Kedah
+    glottolog_name: Kensiu
+    segments:
+    - k
+    - a
+    - m
+    - a
+    - h
+    alignment: []
+  - language_id: dunnaslian_Kensiw_Perak
+    glottolog_name: Kensiu
+    segments:
+    - k
+    - a
+    - m
+    - a
+    - h
+    alignment: []
+  - language_id: dunnaslian_Kintaq
+    glottolog_name: Kintaq
+    segments:
+    - k
+    - a
+    - m
+    - a
+    - h
+    alignment: []
+  - language_id: dunnaslian_Semnam_Bal
+    glottolog_name: Semnam
+    segments:
+    - k
+    - a
+    - m
+    - aː
+    - h
+    alignment: []
+- id: bowernpny_64-fall
+  dataset: bowernpny
+  gloss: FALL
+  parameter_id: bowernpny_116_fall
+  forms:
+  - language_id: bowernpny_BidyaraGungabula
+    glottolog_name: Southern Maric
+    segments:
+    - w
+    - a
+    - ɖ
+    - a
+    alignment: []
+  - language_id: bowernpny_Gangulu
+    glottolog_name: Gangulu
+    segments:
+    - w
+    - u
+    - d
+    - e
+    alignment: []
+- id: walworthpolynesian_1
+  dataset: walworthpolynesian
+  gloss: FIFTY
+  parameter_id: walworthpolynesian_208_fifty
+  forms:
+  - language_id: walworthpolynesian_Mangareva
+    glottolog_name: Mangareva
+    segments:
+    - r
+    - i
+    - m
+    - a
+    - +
+    - r
+    - o
+    - ŋ
+    - o
+    - +
+    - ʔ
+    - u
+    - r
+    - u
+    alignment: []
+  - language_id: walworthpolynesian_Pukapuka
+    glottolog_name: Pukapuka
+    segments:
+    - l
+    - i
+    - m
+    - a
+    - +
+    - ŋ
+    - a
+    - +
+    - u
+    - l
+    - u
+    alignment: []
+  - language_id: walworthpolynesian_Rarotongan
+    glottolog_name: Southern Cook Island Maori
+    segments:
+    - r
+    - i
+    - m
+    - a
+    - +
+    - ŋ
+    - a
+    - +
+    - u
+    - r
+    - u
+    alignment: []
+  - language_id: walworthpolynesian_Samoan
+    glottolog_name: Samoan
+    segments:
+    - l
+    - i
+    - m
+    - a
+    - +
+    - g
+    - a
+    - +
+    - f
+    - u
+    - l
+    - u
+    alignment: []
+  - language_id: walworthpolynesian_Samoan
+    glottolog_name: Samoan
+    segments:
+    - l
+    - i
+    - m
+    - a
+    - +
+    - s
+    - e
+    - +
+    - f
+    - u
+    - l
+    - u
+    alignment: []
+  - language_id: walworthpolynesian_Tongan
+    glottolog_name: Tonga (Tonga Islands)
+    segments:
+    - n
+    - i
+    - m
+    - a
+    - +
+    - ŋ
+    - o
+    - +
+    - f
+    - u
+    - l
+    - u
+    alignment: []
+- id: lundgrenomagoa_1032
+  dataset: lundgrenomagoa
+  gloss: ''
+  parameter_id: lundgrenomagoa_739_goupriverintr
+  forms:
+  - language_id: lundgrenomagoa_Kokama
+    glottolog_name: Cocama
+    segments:
+    - j
+    - a
+    - j
+    - a
+    - k
+    - a
+    - t
+    - i
+    alignment:
+    - j
+    - a
+    - j
+    - a
+    - k
+    - a
+    - t
+    - i
+  - language_id: lundgrenomagoa_Omagua
+    glottolog_name: Omagua
+    segments:
+    - j
+    - a
+    - j
+    - k
+    - a
+    - t
+    - i
+    alignment:
+    - j
+    - a
+    - j
+    - '-'
+    - k
+    - a
+    - t
+    - i
+- id: chaconcolumbian_26727
+  dataset: chaconcolumbian
+  gloss: BLOOD
+  parameter_id: chaconcolumbian_99_blood
+  forms:
+  - language_id: chaconcolumbian_Kakua
+    glottolog_name: Kakua
+    segments:
+    - b
+    - ẽ
+    - p
+    alignment: []
+  - language_id: chaconcolumbian_Nukak
+    glottolog_name: Nukak Makú
+    segments:
+    - m
+    - ɛ
+    - ʔ
+    - ɛ
+    - p
+    alignment: []
+- id: bowernpny_35-squeeze
+  dataset: bowernpny
+  gloss: SQUEEZE
+  parameter_id: bowernpny_275_squeeze
+  forms:
+  - language_id: bowernpny_Bularnu
+    glottolog_name: Bularnu
+    segments:
+    - d̪
+    - u
+    - ɳ
+    - m
+    - a
+    alignment: []
+  - language_id: bowernpny_Muruwari
+    glottolog_name: Muruwari
+    segments:
+    - t̪
+    - u
+    - n
+    - m
+    - a
+    alignment: []
+  - language_id: bowernpny_Warluwarra
+    glottolog_name: Warluwara
+    segments:
+    - t̪
+    - u
+    - n
+    - m
+    - a
+    alignment: []
+- id: bodtkhobwa_21
+  dataset: bodtkhobwa
+  gloss: ''
+  parameter_id: bodtkhobwa_259_khoitampeople
+  forms:
+  - language_id: bodtkhobwa_Jerigaon
+    glottolog_name: Jerigaon
+    segments:
+    - kʰ
+    - +
+    - t
+    - a
+    - m
+    - +
+    - dʑ
+    - i
+    alignment:
+    - kʰ
+    - '-'
+    - '-'
+  - language_id: bodtkhobwa_Khispi
+    glottolog_name: Khispi
+    segments:
+    - kʰ
+    - u
+    - s
+    - +
+    - t
+    - a
+    - m
+    - +
+    - b
+    - i
+    alignment:
+    - kʰ
+    - u
+    - s
+  - language_id: bodtkhobwa_Khoina
+    glottolog_name: Khoina
+    segments:
+    - g
+    - ə
+    - +
+    - t
+    - a
+    - m
+    - +
+    - dʑ
+    - i
+    alignment:
+    - g
+    - ə
+    - '-'
+  - language_id: bodtkhobwa_Rupa
+    glottolog_name: Rupa
+    segments:
+    - g
+    - ə
+    - +
+    - t
+    - a
+    - m
+    - +
+    - dʑ
+    - i
+    alignment:
+    - g
+    - ə
+    - '-'
+  - language_id: bodtkhobwa_Shergaon
+    glottolog_name: Shergaon
+    segments:
+    - k
+    - a
+    - +
+    - t
+    - a
+    - m
+    - +
+    - dʑ
+    - i
+    alignment:
+    - k
+    - a
+    - '-'
+- id: gaotb_846_full-12
+  dataset: gaotb
+  gloss: FULL
+  parameter_id: gaotb_846_full
+  forms:
+  - language_id: gaotb_BijangBai
+    glottolog_name: Northern Bai
+    segments:
+    - m
+    - j
+    - e
+    - ³³
+    alignment: []
+  - language_id: gaotb_DaliBai
+    glottolog_name: Southern Bai
+    segments:
+    - m
+    - ɑ
+    - ³³
+    alignment: []
+  - language_id: gaotb_JianchuanBai
+    glottolog_name: Central Bai
+    segments:
+    - m
+    - ɑ
+    - ³³
+    alignment: []
+  - language_id: gaotb_MojiangYi
+    glottolog_name: Nuclear Nisu
+    segments:
+    - m
+    - ɯ
+    - ²¹
+    alignment: []
+  - language_id: gaotb_Tuja
+    glottolog_name: Northern Tujia
+    segments:
+    - m
+    - a
+    - n
+    - ⁵³
+    alignment: []
+  - language_id: gaotb_rGyalrongSomo
+    glottolog_name: Northern Gyalrong
+    segments:
+    - k
+    - ə
+    - +
+    - m
+    - ȵ
+    - o
+    - k
+    alignment: []
+- id: houchinese_674
+  dataset: houchinese
+  gloss: ABOVE
+  parameter_id: houchinese_130_on
+  forms:
+  - language_id: houchinese_Changsha
+    glottolog_name: Changsha
+    segments:
+    - ʂ
+    - a
+    - n
+    - ¹¹
+    - +
+    - m
+    - j
+    - ẽ
+    alignment: []
+  - language_id: houchinese_Chengdu
+    glottolog_name: Chengdu Mandarin
+    segments:
+    - s
+    - a
+    - ŋ
+    - ¹³
+    - +
+    - m
+    - j
+    - a
+    - n
+    - ¹³
+    alignment: []
+- id: robinsonap_294_tall-1
+  dataset: robinsonap
+  gloss: TALL
+  parameter_id: robinsonap_294_tall
+  forms:
+  - language_id: robinsonap_adang
+    glottolog_name: Adang
+    segments:
+    - l
+    - a
+    - w
+    - e
+    - n
+    alignment: []
+  - language_id: robinsonap_nedebang
+    glottolog_name: Nedebang
+    segments:
+    - l
+    - i
+    - a
+    - w
+    - a
+    - ŋ
+    alignment: []
+- id: lundgrenomagoa_2055
+  dataset: lundgrenomagoa
+  gloss: SON-IN-LAW
+  parameter_id: lundgrenomagoa_1476_soninlaw
+  forms:
+  - language_id: lundgrenomagoa_Kokama
+    glottolog_name: Cocama
+    segments:
+    - i
+    - tʃ
+    - i
+    - m
+    - a
+    - ɾ
+    - i
+    alignment:
+    - i
+    - tʃ
+    - i
+    - m
+    - a
+    - ɾ
+    - i
+  - language_id: lundgrenomagoa_Omagua
+    glottolog_name: Omagua
+    segments:
+    - i
+    - ʃ
+    - i
+    - m
+    - a
+    - ɾ
+    - i
+    alignment:
+    - i
+    - ʃ
+    - i
+    - m
+    - a
+    - ɾ
+    - i
+- id: bowernpny_76-fatn
+  dataset: bowernpny
+  gloss: FAT (ORGANIC SUBSTANCE)
+  parameter_id: bowernpny_119_fatgrease
+  forms:
+  - language_id: bowernpny_Badjiri
+    glottolog_name: Badjiri
+    segments:
+    - w
+    - u
+    - ɳ
+    - t
+    - u
+    alignment: []
+  - language_id: bowernpny_KukuYalanjiCurr
+    glottolog_name: ''
+    segments:
+    - w
+    - o
+    - n
+    - d
+    - o
+    - l
+    - e
+    alignment: []
+  - language_id: bowernpny_Nyamal
+    glottolog_name: Nyamal
+    segments:
+    - w
+    - o
+    - ɳ
+    - d
+    - o
+    alignment: []
+- id: mannburmish_183 184
+  dataset: mannburmish
+  gloss: BRAIN
+  parameter_id: mannburmish_121_brain
+  forms:
+  - language_id: mannburmish_Achang
+    glottolog_name: Longchuan Achang
+    segments:
+    - ʔ
+    - u
+    - ⁴⁵
+    - +
+    - n
+    - u
+    - k
+    - ⁴²
+    alignment: []
+  - language_id: mannburmish_Bela
+    glottolog_name: Pela
+    segments:
+    - ʔ
+    - u
+    - +
+    - n
+    - au
+    - ʔ
+    - ²³
+    alignment: []
+  - language_id: mannburmish_Lashi
+    glottolog_name: Lashi
+    segments:
+    - w
+    - ə
+    - ⁵
+    - +
+    - n
+    - o
+    - ʔ
+    - ⁵¹
+    alignment: []
+  - language_id: mannburmish_Maru
+    glottolog_name: Maru
+    segments:
+    - ʔ
+    - au
+    - ³
+    - +
+    - n
+    - au
+    - ʔ
+    - ⁴²
+    alignment: []
+  - language_id: mannburmish_Phon
+    glottolog_name: Hpon
+    segments:
+    - ʔ
+    - o
+    - ³¹
+    - +
+    - n
+    - o
+    - k
+    - ʔ
+    - ³¹
+    alignment: []
+  - language_id: mannburmish_WrittenBurmese
+    glottolog_name: Old Burmese
+    segments:
+    - ʔ
+    - uː
+    - +
+    - h
+    - n
+    - au
+    - k
+    alignment: []
+  - language_id: mannburmish_Zaiwa
+    glottolog_name: Zaiwa
+    segments:
+    - ʔ
+    - u
+    - ³⁴
+    - +
+    - n
+    - u
+    - ʔ
+    - ⁵
+    alignment: []
+- id: bdpa_608
+  dataset: bdpa
+  gloss: TOOTH
+  parameter_id: bdpa_597_tooth
+  forms:
+  - language_id: bdpa_French
+    glottolog_name: ''
+    segments:
+    - d
+    - ɑ̃
+    alignment:
+    - d
+    - ɑ̃
+    - '-'
+    - '-'
+    - '-'
+  - language_id: bdpa_Italian
+    glottolog_name: ''
+    segments:
+    - d
+    - e
+    - n
+    - t
+    - e
+    alignment:
+    - d
+    - e
+    - n
+    - t
+    - e
+  - language_id: bdpa_Ladino
+    glottolog_name: ''
+    segments:
+    - d
+    - ɜ
+    - n
+    - t
+    alignment:
+    - d
+    - ɜ
+    - n
+    - t
+    - '-'
+  - language_id: bdpa_Ligurian
+    glottolog_name: ''
+    segments:
+    - d
+    - ɛː
+    - n
+    - t
+    - e
+    alignment:
+    - d
+    - ɛː
+    - n
+    - t
+    - e
+  - language_id: bdpa_LombardEast
+    glottolog_name: ''
+    segments:
+    - d
+    - e
+    - t
+    alignment:
+    - d
+    - e
+    - '-'
+    - t
+    - '-'
+  - language_id: bdpa_LombardWest
+    glottolog_name: ''
+    segments:
+    - d
+    - iː
+    - n
+    - tʃ
+    alignment:
+    - d
+    - iː
+    - n
+    - tʃ
+    - '-'
+  - language_id: bdpa_Occitan
+    glottolog_name: ''
+    segments:
+    - d
+    - ʌ
+    - n
+    - t
+    alignment:
+    - d
+    - ʌ
+    - n
+    - t
+    - '-'
+  - language_id: bdpa_Venetian
+    glottolog_name: ''
+    segments:
+    - d
+    - e
+    - n
+    - t
+    - e
+    alignment:
+    - d
+    - e
+    - n
+    - t
+    - e
+- id: iecor_1679
+  dataset: iecor
+  gloss: SMOOTH
+  parameter_id: iecor_150
+  forms:
+  - language_id: iecor_111
+    glottolog_name: Maithili
+    segments:
+    - tʃ
+    - ɪ
+    - k
+    - ə
+    - n
+    alignment: []
+  - language_id: iecor_144
+    glottolog_name: Magahi
+    segments:
+    - c
+    - i
+    - kː
+    - ə
+    - n
+    alignment: []
+  - language_id: iecor_222
+    glottolog_name: Bhojpuri
+    segments:
+    - tʃ
+    - ɪ
+    - k
+    - ə
+    - n
+    alignment: []
+  - language_id: iecor_266
+    glottolog_name: Eastern Panjabi
+    segments: []
+    alignment: []
+  - language_id: iecor_35
+    glottolog_name: Hindi
+    segments:
+    - tʃ
+    - ɪ
+    - k
+    - n
+    - ɑ
+    alignment: []
+- id: smithborneo_8598
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_655_whirlpool
+  forms:
+  - language_id: smithborneo_Ambalo
+    glottolog_name: Embaloh
+    segments:
+    - b
+    - u
+    - b
+    - u
+    - l
+    - i
+    alignment: []
+  - language_id: smithborneo_Kejaman
+    glottolog_name: Kajaman
+    segments:
+    - k
+    - ə
+    - l
+    - ə
+    - c
+    - a
+    - w
+    alignment: []
+  - language_id: smithborneo_Kiput
+    glottolog_name: Kiput
+    segments:
+    - k
+    - ə
+    - b
+    - u
+    - l
+    - i
+    - h
+    alignment: []
+  - language_id: smithborneo_Punan_Bah
+    glottolog_name: Punan Bah
+    segments:
+    - k
+    - ə
+    - l
+    - a
+    - l
+    - i
+    - s
+    - u
+    alignment: []
+  - language_id: smithborneo_Sekapan
+    glottolog_name: Sekapan
+    segments:
+    - k
+    - ə
+    - l
+    - ə
+    - s
+    - ə
+    - w
+    alignment: []
+- id: bowernpny_21-stab
+  dataset: bowernpny
+  gloss: STAB
+  parameter_id: bowernpny_276_stabpierce
+  forms:
+  - language_id: bowernpny_Kaurna
+    glottolog_name: Kaurna
+    segments:
+    - p
+    - u
+    - ŋ
+    - g
+    - o
+    - n
+    - d
+    - i
+    alignment: []
+  - language_id: bowernpny_Muruwari
+    glottolog_name: Muruwari
+    segments:
+    - p
+    - i
+    - ŋ
+    - k
+    - a
+    alignment: []
+- id: smithborneo_8257
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_630_urine
+  forms:
+  - language_id: smithborneo_BrDusun
+    glottolog_name: Brunei
+    segments:
+    - a
+    - i
+    - g
+    - +
+    - s
+    - a
+    - b
+    - u
+    alignment: []
+  - language_id: smithborneo_Burusu
+    glottolog_name: Burusu
+    segments:
+    - s
+    - ə
+    - s
+    - a
+    - b
+    - u
+    alignment: []
+  - language_id: smithborneo_LBisaya
+    glottolog_name: Brunei Bisaya-Dusun
+    segments:
+    - a
+    - i
+    - g
+    - +
+    - s
+    - a
+    - b
+    - u
+    alignment: []
+  - language_id: smithborneo_Lotud
+    glottolog_name: Lotud
+    segments:
+    - s
+    - o
+    - b
+    - u
+    alignment: []
+  - language_id: smithborneo_SBisaya
+    glottolog_name: Sabah Bisaya
+    segments:
+    - s
+    - o
+    - s
+    - o
+    - b
+    - u
+    alignment: []
+- id: dunnaslian_3_bad_7
+  dataset: dunnaslian
+  gloss: BAD
+  parameter_id: dunnaslian_3_bad
+  forms:
+  - language_id: dunnaslian_Khmer_Siem_Reap
+    glottolog_name: Central Khmer
+    segments:
+    - m
+    - ə
+    - n
+    - +
+    - l
+    - ʔ
+    - ɒː
+    alignment: []
+  - language_id: dunnaslian_Khmer_Surin
+    glottolog_name: Surin
+    segments:
+    - m
+    - ə
+    - n
+    - +
+    - l
+    - ʔ
+    - ɒː
+    alignment: []
+- id: robinsonap_372_turtle-0
+  dataset: robinsonap
+  gloss: TORTOISE
+  parameter_id: robinsonap_372_turtle
+  forms:
+  - language_id: robinsonap_abui
+    glottolog_name: Abui
+    segments:
+    - j
+    - o
+    - u
+    - k
+    - o
+    alignment: []
+  - language_id: robinsonap_kaera
+    glottolog_name: Kaera
+    segments:
+    - j
+    - i
+    - r
+    - k
+    - o
+    alignment: []
+  - language_id: robinsonap_kamang
+    glottolog_name: Kamang
+    segments:
+    - j
+    - o
+    - k
+    - e
+    - e
+    alignment: []
+  - language_id: robinsonap_teiwa
+    glottolog_name: Teiwa
+    segments:
+    - j
+    - e
+    - r
+    - +
+    - k
+    - u
+    - a
+    alignment: []
+  - language_id: robinsonap_westernpantar
+    glottolog_name: Western Pantar
+    segments:
+    - j
+    - i
+    - a
+    - k
+    - a
+    - u
+    alignment: []
+- id: crossandean_427
+  dataset: crossandean
+  gloss: LEAF
+  parameter_id: crossandean_92_leaf
+  forms:
+  - language_id: crossandean_Jaqaru
+    glottolog_name: Jaqaru
+    segments:
+    - n
+    - a
+    - pʰ
+    - r
+    - a
+    alignment:
+    - n
+    - a
+    - pʰ
+    - r
+    - a
+  - language_id: crossandean_Kawki
+    glottolog_name: Cauqui of Cachuy
+    segments:
+    - n
+    - a
+    - pʰ
+    - r
+    - a
+    alignment:
+    - n
+    - a
+    - pʰ
+    - r
+    - a
+- id: bowernpny_11-head
+  dataset: bowernpny
+  gloss: HEAD
+  parameter_id: bowernpny_151_head
+  forms:
+  - language_id: bowernpny_Kukatja
+    glottolog_name: Kukatja
+    segments:
+    - l
+    - u
+    - k
+    - u
+    - r
+    - p
+    - a
+    alignment: []
+  - language_id: bowernpny_PintupiLuritja
+    glottolog_name: Pintupi-Luritja
+    segments:
+    - l
+    - u
+    - k
+    - u
+    - r
+    - p
+    - a
+    alignment: []
+- id: smithborneo_7761
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_596_throw
+  forms:
+  - language_id: smithborneo_SegaiBasap
+    glottolog_name: Segai
+    segments:
+    - a
+    - r
+    - i
+    alignment: []
+  - language_id: smithborneo_SegaiBasap
+    glottolog_name: Segai
+    segments:
+    - i
+    - a
+    - r
+    - i
+    - h
+    alignment: []
+- id: zhangrgyalrong_110
+  dataset: zhangrgyalrong
+  gloss: ARROW
+  parameter_id: zhangrgyalrong_261_thearrow
+  forms:
+  - language_id: zhangrgyalrong_Japhug
+    glottolog_name: dGonpa
+    segments:
+    - t
+    - ɯ
+    - +
+    - d
+    - i
+    alignment:
+    - t
+    - ɯ
+    - +
+    - d
+    - i
+    - '-'
+    - '-'
+    - '-'
+  - language_id: zhangrgyalrong_MiddleChinese
+    glottolog_name: Middle Chinese
+    segments:
+    - ɕ
+    - i
+    - j
+    - X/¹⁵
+    alignment:
+    - '-'
+    - '-'
+    - '-'
+    - ɕ
+    - i
+    - j
+    - '-'
+    - X/¹⁵
+  - language_id: zhangrgyalrong_OldChinese
+    glottolog_name: Old Chinese
+    segments:
+    - l̥
+    - i
+    - j
+    - ʔ
+    alignment:
+    - '-'
+    - '-'
+    - '-'
+    - l̥
+    - i
+    - j
+    - ʔ
+    - '-'
+- id: robinsonap_302_thick-0
+  dataset: robinsonap
+  gloss: THICK
+  parameter_id: robinsonap_302_thick
+  forms:
+  - language_id: robinsonap_sawila
+    glottolog_name: Sawila
+    segments:
+    - d
+    - u
+    - m
+    - u
+    alignment: []
+  - language_id: robinsonap_wersing
+    glottolog_name: Wersing
+    segments:
+    - d
+    - u
+    - m
+    alignment: []
+  - language_id: robinsonap_westernpantar
+    glottolog_name: Western Pantar
+    segments:
+    - d
+    - u
+    - m
+    - m
+    - a
+    alignment: []
+- id: chaconcolumbian_26929
+  dataset: chaconcolumbian
+  gloss: EARTH (SOIL)
+  parameter_id: chaconcolumbian_111_earth
+  forms:
+  - language_id: chaconcolumbian_Wayuu
+    glottolog_name: Wayuu
+    segments:
+    - mː
+    - a
+    alignment: []
+  - language_id: chaconcolumbian_Wayuu
+    glottolog_name: Wayuu
+    segments:
+    - w
+    - o
+    - u
+    - m
+    - a
+    - i
+    - n
+    alignment: []
+  - language_id: chaconcolumbian_Wayuu
+    glottolog_name: Wayuu
+    segments:
+    - m
+    - a
+    alignment: []
+- id: mcd_P2-88
+  dataset: mcd
+  gloss: ''
+  parameter_id: mcd_atreecanangaodorata
+  forms:
+  - language_id: mcd_chuukese
+    glottolog_name: Chuukese
+    segments:
+    - pʷ
+    - uː
+    - r
+    alignment: []
+  - language_id: mcd_pohnpeian
+    glottolog_name: Pohnpeian
+    segments:
+    - pʷ
+    - u
+    - r
+    - e
+    - n
+    - w
+    - a
+    - y
+    alignment: []
+  - language_id: mcd_mokilese
+    glottolog_name: Mokilese
+    segments:
+    - pʷ
+    - u
+    - r
+    alignment: []
+  - language_id: mcd_pohnpeian
+    glottolog_name: Pohnpeian
+    segments:
+    - pʷ
+    - uː
+    - r
+    alignment: []
+- id: blustaustronesian_838
+  dataset: blustaustronesian
+  gloss: BACK
+  parameter_id: blustaustronesian_13_back
+  forms:
+  - language_id: blustaustronesian_iban
+    glottolog_name: Iban
+    segments:
+    - b
+    - e
+    - l
+    - a
+    - k
+    - a
+    - ŋ
+    alignment: []
+  - language_id: blustaustronesian_maloh
+    glottolog_name: Embaloh
+    segments:
+    - b
+    - a
+    - l
+    - a
+    - k
+    - a
+    - ŋ
+    alignment: []
+- id: mcd_P2-155
+  dataset: mcd
+  gloss: ''
+  parameter_id: mcd_becomeflatflat
+  forms:
+  - language_id: mcd_woleaian
+    glottolog_name: Woleaian
+    segments:
+    - ʂ
+    - aː
+    - p
+    - aː
+    - p
+    - e
+    alignment: []
+  - language_id: mcd_chuukese
+    glottolog_name: Chuukese
+    segments:
+    - tʂ
+    - aː
+    - p
+    - aː
+    - p
+    alignment: []
+  - language_id: mcd_saipancarolinian
+    glottolog_name: Carolinian
+    segments:
+    - ʂ
+    - aː
+    - p
+    - aː
+    - p
+    alignment: []
+  - language_id: mcd_saipancaroliniant
+    glottolog_name: Tanapag
+    segments:
+    - ɻ
+    - aː
+    - p
+    - aː
+    - p
+    alignment: []
+- id: gaotb_170_egg-16
+  dataset: gaotb
+  gloss: EGG
+  parameter_id: gaotb_170_egg
+  forms:
+  - language_id: gaotb_BijangBai
+    glottolog_name: Northern Bai
+    segments:
+    - s
+    - ẽ
+    - ⁴²
+    alignment: []
+  - language_id: gaotb_DaliBai
+    glottolog_name: Southern Bai
+    segments:
+    - s
+    - e
+    - ⁴²
+    alignment: []
+  - language_id: gaotb_Guiqiong
+    glottolog_name: Guiqiong
+    segments:
+    - n
+    - ɑ
+    - ³³
+    - +
+    - ʃ
+    - ɿ
+    - ⁵³
+    alignment: []
+  - language_id: gaotb_JianchuanBai
+    glottolog_name: Central Bai
+    segments:
+    - s
+    - ẽ
+    - ⁴²
+    alignment: []
+  - language_id: gaotb_Puroik
+    glottolog_name: Puroikic
+    segments:
+    - m
+    - ə
+    - ³³
+    - +
+    - r
+    - i
+    - ³³
+    alignment: []
+  - language_id: gaotb_ShixingXumi
+    glottolog_name: Shixing
+    segments:
+    - r
+    - ɛ
+    - ³³
+    - +
+    - ʁ
+    - o
+    - ³⁵
+    alignment: []
+- id: chaconbaniwa_1084
+  dataset: chaconbaniwa
+  gloss: NAVEL
+  parameter_id: chaconbaniwa_Chacon-2019-220-140_navel
+  forms:
+  - language_id: chaconbaniwa_Mauliene
+    glottolog_name: Baniwa do Icana
+    segments:
+    - n
+    - u
+    - m
+    - u
+    - tʃ
+    - i
+    alignment: []
+  - language_id: chaconbaniwa_Werekena
+    glottolog_name: Warekéna do Xiê
+    segments:
+    - n
+    - u
+    - m
+    - u
+    - d
+    - ɛ
+    alignment: []
+- id: tuled_15012
+  dataset: tuled
+  gloss: SNAKE
+  parameter_id: tuled_348
+  forms:
+  - language_id: tuled_Arikem
+    glottolog_name: Arikem
+    segments:
+    - tʃ
+    - a
+    - t
+    alignment:
+    - tʃ
+    - a
+    - t
+  - language_id: tuled_Makurap
+    glottolog_name: Makuráp
+    segments:
+    - tʃ
+    - aː
+    - t
+    alignment:
+    - tʃ
+    - aː
+    - t
+  - language_id: tuled_Tupari
+    glottolog_name: Tuparí
+    segments:
+    - h
+    - aa
+    - t
+    alignment:
+    - h
+    - aa
+    - t
+  - language_id: tuled_Wayoro
+    glottolog_name: Wayoró
+    segments:
+    - n/d
+    - a
+    - t
+    alignment:
+    - n/d
+    - a
+    - t
+- id: liusinitic_609
+  dataset: liusinitic
+  gloss: ROTTEN
+  parameter_id: liusinitic_35_rotten
+  forms:
+  - language_id: liusinitic_Fuzhou
+    glottolog_name: Houguan
+    segments:
+    - a
+    - ŋ
+    - ³²
+    - +
+    - p
+    - ou
+    - ²⁴²
+    alignment: []
+  - language_id: liusinitic_Fuzhou
+    glottolog_name: Houguan
+    segments:
+    - a
+    - ŋ
+    - ³²
+    alignment: []
+  - language_id: liusinitic_Guangzhou
+    glottolog_name: Guangzhou
+    segments:
+    - j
+    - ɐ
+    - m
+    - ³⁵
+    alignment: []
+- id: bowernpny_2-nonot
+  dataset: bowernpny
+  gloss: NO OR NOT
+  parameter_id: bowernpny_213_nonot
+  forms:
+  - language_id: bowernpny_Badimaya
+    glottolog_name: Badimaya
+    segments:
+    - w
+    - a
+    - c
+    - i
+    alignment: []
+  - language_id: bowernpny_Diyari
+    glottolog_name: Dieri
+    segments:
+    - w
+    - a
+    - t
+    - a
+    alignment: []
+  - language_id: bowernpny_Ngamini
+    glottolog_name: Ngamini
+    segments:
+    - w
+    - a
+    - t
+    - a
+    alignment: []
+  - language_id: bowernpny_Wathiwathi
+    glottolog_name: Wadiwadi
+    segments:
+    - w
+    - o
+    - tː
+    - i
+    alignment: []
+  - language_id: bowernpny_Yawarrawarrka
+    glottolog_name: Yawarawarga
+    segments:
+    - w
+    - a
+    - t
+    - c
+    - a
+    alignment: []
+- id: iecor_3001
+  dataset: iecor
+  gloss: THICK
+  parameter_id: iecor_171
+  forms:
+  - language_id: iecor_201
+    glottolog_name: Apulia-Calabrian Greek
+    segments:
+    - x
+    - r
+    - o̞
+    - n
+    - d
+    - o̞
+    alignment: []
+  - language_id: iecor_211
+    glottolog_name: Pontic
+    segments:
+    - x
+    - o̞
+    - n
+    - d
+    - r
+    - o̞
+    - s
+    alignment: []
+  - language_id: iecor_32
+    glottolog_name: Modern Greek
+    segments:
+    - x
+    - o̞
+    - n
+    - d
+    - r
+    - o̞
+    - s
+    alignment: []
+- id: peirosaustroasiatic_4657
+  dataset: peirosaustroasiatic
+  gloss: SIT
+  parameter_id: peirosaustroasiatic_74_sit
+  forms:
+  - language_id: peirosaustroasiatic_Thavung
+    glottolog_name: Thavung
+    segments:
+    - c/ts
+    - u
+    - ŋ
+    alignment: []
+  - language_id: peirosaustroasiatic_ThavungSo
+    glottolog_name: Thavung
+    segments:
+    - c/ts
+    - u
+    - ŋ
+    - ³
+    alignment: []
+- id: iecor_3260
+  dataset: iecor
+  gloss: PULL
+  parameter_id: iecor_119
+  forms:
+  - language_id: iecor_124
+    glottolog_name: Iron Ossetian
+    segments:
+    - l
+    - ɑ
+    - ʃ
+    - ɘ
+    - n
+    alignment: []
+  - language_id: iecor_125
+    glottolog_name: Digor Ossetian
+    segments:
+    - l
+    - ɑ
+    - s
+    - u
+    - n
+    alignment: []
+- id: sagartst_882
+  dataset: sagartst
+  gloss: SUN
+  parameter_id: sagartst_205_thesun
+  forms:
+  - language_id: sagartst_Atsi
+    glottolog_name: Zaiwa
+    segments:
+    - p
+    - u
+    - i
+    - ⁵¹
+    alignment: []
+  - language_id: sagartst_Bola
+    glottolog_name: Pela
+    segments:
+    - p
+    - u
+    - i
+    - ⁵⁵
+    alignment: []
+  - language_id: sagartst_Lashi
+    glottolog_name: Lashi
+    segments:
+    - p
+    - e
+    - i
+    - ³¹
+    alignment: []
+  - language_id: sagartst_Maru
+    glottolog_name: Maru
+    segments:
+    - p
+    - a
+    - ³¹
+    alignment: []
+- id: bowernpny_17-below
+  dataset: bowernpny
+  gloss: BELOW OR UNDER
+  parameter_id: bowernpny_41_below
+  forms:
+  - language_id: bowernpny_Dhayyi
+    glottolog_name: Dayi
+    segments:
+    - ŋ
+    - o
+    - j
+    alignment: []
+  - language_id: bowernpny_Rirratjingu
+    glottolog_name: Rirratjingu
+    segments:
+    - ŋ
+    - o
+    - j
+    - ŋ
+    - a
+    alignment: []
+- id: yanglalo_680
+  dataset: yanglalo
+  gloss: KILL
+  parameter_id: yanglalo_618_kill
+  forms:
+  - language_id: yanglalo_Diaocao
+    glottolog_name: Dongshanba Lalo
+    segments:
+    - s
+    - ei
+    - ⁴²
+    alignment: []
+  - language_id: yanglalo_Mangdi
+    glottolog_name: Southern Lalo
+    segments:
+    - ɕ
+    - ɛ̠
+    - ²¹
+    alignment: []
+  - language_id: yanglalo_ProtoLalo
+    glottolog_name: ''
+    segments:
+    - s
+    - e̠
+    - ᶫ/³
+    alignment: []
+  - language_id: yanglalo_Qingyun
+    glottolog_name: Xishanba Lalo
+    segments:
+    - s
+    - ɛ̠
+    - ²¹
+    alignment: []
+  - language_id: yanglalo_Shuizhuping
+    glottolog_name: Western Lalu
+    segments:
+    - s
+    - e
+    - ⁵³
+    alignment: []
+  - language_id: yanglalo_Xuzhang
+    glottolog_name: Xuzhang Lalo
+    segments:
+    - s
+    - ɛi̠/ɛ̠i
+    - ³³
+    alignment: []
+  - language_id: yanglalo_Yangliu
+    glottolog_name: Yangliu
+    segments:
+    - s
+    - ai
+    - ⁵³
+    alignment: []
+  - language_id: yanglalo_Yijiacun
+    glottolog_name: Eka
+    segments:
+    - s
+    - u̠
+    - ʔ
+    - ³³
+    alignment: []
+- id: smithborneo_1724
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_124_crab
+  forms:
+  - language_id: smithborneo_Beketan
+    glottolog_name: Bukitan
+    segments:
+    - k
+    - e
+    - v
+    - a
+    - ŋ
+    alignment:
+    - k
+    - e
+    - v
+    - a
+    - ŋ
+  - language_id: smithborneo_Buket
+    glottolog_name: Bukat
+    segments:
+    - k
+    - e
+    - v
+    - a
+    - ŋ
+    alignment:
+    - k
+    - e
+    - v
+    - a
+    - ŋ
+  - language_id: smithborneo_Hovongan
+    glottolog_name: Hobongan
+    segments:
+    - k
+    - e
+    - v
+    - a
+    - ŋ
+    alignment:
+    - k
+    - e
+    - v
+    - a
+    - ŋ
+  - language_id: smithborneo_Punan_Aput
+    glottolog_name: Punan Aput
+    segments:
+    - k
+    - e
+    - v
+    - a
+    - ŋ
+    alignment:
+    - k
+    - e
+    - v
+    - a
+    - ŋ
+  - language_id: smithborneo_Punan_Lisum
+    glottolog_name: Bukat-Ukit-Beketan-Lugat-Lisum
+    segments:
+    - k
+    - e
+    - v
+    - a
+    - ŋ
+    alignment:
+    - k
+    - e
+    - v
+    - a
+    - ŋ
+  - language_id: smithborneo_Ukit
+    glottolog_name: Ukit
+    segments:
+    - k
+    - e
+    - v
+    - a
+    - ŋ
+    alignment:
+    - k
+    - e
+    - v
+    - a
+    - ŋ
+- id: gravinachadic_19548
+  dataset: gravinachadic
+  gloss: ANIMAL
+  parameter_id: gravinachadic_15_animal
+  forms:
+  - language_id: gravinachadic_Buwal
+    glottolog_name: Buwal
+    segments:
+    - s
+    - ə
+    - k
+    - ɑ
+    - n
+    alignment: []
+  - language_id: gravinachadic_Buwal
+    glottolog_name: Buwal
+    segments:
+    - s
+    - ə
+    - k
+    - ɑ
+    - n
+    alignment: []
+- id: constenlachibchan_1194
+  dataset: constenlachibchan
+  gloss: SALT
+  parameter_id: constenlachibchan_92_sal
+  forms:
+  - language_id: constenlachibchan_Buglere
+    glottolog_name: Buglere
+    segments:
+    - tʃ
+    - o
+    alignment: []
+  - language_id: constenlachibchan_Chimila
+    glottolog_name: Chimila
+    segments:
+    - '''n/n'
+    - oː
+    - ʔ
+    - m
+    - a
+    - r
+    - i
+    - n
+    - d
+    - a
+    alignment: []
+  - language_id: constenlachibchan_Rama
+    glottolog_name: Rama
+    segments:
+    - t
+    - a
+    - u
+    - l
+    - i
+    alignment: []
+- id: bowernpny_21-fatn
+  dataset: bowernpny
+  gloss: FAT (ORGANIC SUBSTANCE)
+  parameter_id: bowernpny_119_fatgrease
+  forms:
+  - language_id: bowernpny_Bilinarra
+    glottolog_name: Bilinara
+    segments:
+    - w
+    - a
+    - ɹ
+    - a
+    - l
+    alignment: []
+  - language_id: bowernpny_Gurindji
+    glottolog_name: Gurindji
+    segments:
+    - w
+    - a
+    - ɹ
+    - a
+    - r
+    alignment: []
+  - language_id: bowernpny_Malngin
+    glottolog_name: Malngin
+    segments:
+    - w
+    - a
+    - ɹ
+    - aː
+    - r
+    alignment: []
+  - language_id: bowernpny_Ngarinyman
+    glottolog_name: Ngarinman
+    segments:
+    - w
+    - a
+    - r
+    - a
+    - r
+    alignment: []
+  - language_id: bowernpny_Warlmanpa
+    glottolog_name: Warlmanpa
+    segments:
+    - w
+    - a
+    - ɹ
+    - a
+    alignment: []
+- id: smithborneo_2175
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_159_dry
+  forms:
+  - language_id: smithborneo_Kadorih
+    glottolog_name: Kadorih
+    segments:
+    - t
+    - o
+    - c
+    - a
+    - h
+    alignment: []
+  - language_id: smithborneo_Ngaju
+    glottolog_name: Ngaju
+    segments:
+    - t
+    - e
+    - a
+    - h
+    alignment: []
+- id: utoaztecan_42_hair-X
+  dataset: utoaztecan
+  gloss: HAIR
+  parameter_id: utoaztecan_42_hair
+  forms:
+  - language_id: utoaztecan_Kitanemuk
+    glottolog_name: Kitanemuk
+    segments:
+    - p
+    - o
+    - h
+    - o
+    - ts
+    alignment: []
+  - language_id: utoaztecan_Kitanemuk
+    glottolog_name: Kitanemuk
+    segments:
+    - sh/ʃ
+    - u
+    - h
+    - i
+    - ts
+    alignment: []
+- id: walworthpolynesian_616
+  dataset: walworthpolynesian
+  gloss: TURN
+  parameter_id: walworthpolynesian_8_toturn
+  forms:
+  - language_id: walworthpolynesian_Pukapuka
+    glottolog_name: Pukapuka
+    segments:
+    - n
+    - i
+    - +
+    - n
+    - i
+    - w
+    - i
+    alignment: []
+  - language_id: walworthpolynesian_RakahangaManihiki
+    glottolog_name: Rakahanga-Manihiki
+    segments:
+    - f
+    - a
+    - k
+    - a
+    - +
+    - n
+    - i
+    - +
+    - n
+    - i
+    - h
+    - i
+    alignment: []
+- id: sidwellbahnaric_2457
+  dataset: sidwellbahnaric
+  gloss: NEAR
+  parameter_id: sidwellbahnaric_85_near
+  forms:
+  - language_id: sidwellbahnaric_alak
+    glottolog_name: Alak
+    segments:
+    - tʼ
+    - i
+    - a
+    - p
+    alignment: []
+  - language_id: sidwellbahnaric_nyaheun
+    glottolog_name: Nyaheun
+    segments:
+    - tʰ
+    - aː
+    - p
+    alignment: []
+  - language_id: sidwellbahnaric_sapuan
+    glottolog_name: Sapuan
+    segments:
+    - d
+    - i
+    - a
+    - p
+    alignment: []
+- id: blustaustronesian_843
+  dataset: blustaustronesian
+  gloss: FLY (MOVE THROUGH AIR)
+  parameter_id: blustaustronesian_101_tofly
+  forms:
+  - language_id: blustaustronesian_chamorro
+    glottolog_name: Chamorro
+    segments:
+    - g
+    - u
+    - p
+    - u
+    alignment: []
+  - language_id: blustaustronesian_mailu
+    glottolog_name: Mailu
+    segments:
+    - l
+    - e
+    - v
+    - o
+    - l
+    - e
+    - v
+    - o
+    alignment: []
+  - language_id: blustaustronesian_palauan
+    glottolog_name: Palauan
+    segments:
+    - s
+    - u
+    - ʔ
+    - e
+    - b
+    - e
+    - k
+    alignment: []
+- id: smithborneo_5922
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_450_rest
+  forms:
+  - language_id: smithborneo_Benuaq
+    glottolog_name: Benua
+    segments:
+    - t
+    - e
+    - h
+    - u
+    - r
+    alignment: []
+  - language_id: smithborneo_Tawoyan
+    glottolog_name: Tawoyan
+    segments:
+    - t
+    - e
+    - h
+    - u
+    - r
+    alignment: []
+- id: sagartst_954
+  dataset: sagartst
+  gloss: CLOUD
+  parameter_id: sagartst_25_thecloud
+  forms:
+  - language_id: sagartst_Bola
+    glottolog_name: Pela
+    segments:
+    - tʃ
+    - a̰
+    - m
+    - ⁵⁵
+    alignment: []
+  - language_id: sagartst_Lashi
+    glottolog_name: Lashi
+    segments:
+    - ts
+    - ɔ̰
+    - m
+    - ⁵⁵
+    - +
+    - m
+    - o./o
+    - u
+    - ⁵⁵
+    alignment: []
+  - language_id: sagartst_Lushai
+    glottolog_name: Mizo
+    segments:
+    - tʃʰ
+    - û/u
+    - m
+    alignment: []
+  - language_id: sagartst_Maru
+    glottolog_name: Maru
+    segments:
+    - tʃ
+    - a̰
+    - m
+    - ³¹
+    - +
+    - tʰ
+    - ɔ
+    - i
+    - ³⁵
+    alignment: []
+- id: peirosaustroasiatic_3637
+  dataset: peirosaustroasiatic
+  gloss: FISH
+  parameter_id: peirosaustroasiatic_29_fish
+  forms:
+  - language_id: peirosaustroasiatic_Parengi
+    glottolog_name: Gorum-Parenga
+    segments:
+    - a
+    - j
+    - u
+    - ʔ
+    alignment: []
+  - language_id: peirosaustroasiatic_Sora
+    glottolog_name: Sora
+    segments:
+    - ə
+    - +
+    - j
+    - o
+    alignment: []
+- id: bodtkhobwa_698
+  dataset: bodtkhobwa
+  gloss: MORNING
+  parameter_id: bodtkhobwa_314_morning
+  forms:
+  - language_id: bodtkhobwa_Khoitam
+    glottolog_name: Khoitam
+    segments:
+    - n
+    - ə
+    - +
+    - r
+    - uː
+    alignment:
+    - n
+    - ə
+  - language_id: bodtkhobwa_Rahung
+    glottolog_name: Rahung
+    segments:
+    - n
+    - ə
+    - +
+    - r
+    - uː
+    alignment:
+    - n
+    - ə
+  - language_id: bodtkhobwa_Rupa
+    glottolog_name: Rupa
+    segments:
+    - ɲ
+    - ə
+    - +
+    - r
+    - uː
+    alignment:
+    - ɲ
+    - ə
+  - language_id: bodtkhobwa_Shergaon
+    glottolog_name: Shergaon
+    segments:
+    - ɲ
+    - y
+    - +
+    - r
+    - uː
+    alignment:
+    - ɲ
+    - y
+- id: bowernpny_8-tail
+  dataset: bowernpny
+  gloss: TAIL
+  parameter_id: bowernpny_289_tail
+  forms:
+  - language_id: bowernpny_JaruMcC
+    glottolog_name: ''
+    segments:
+    - ŋ
+    - i
+    - ɳ
+    - d
+    - i
+    alignment: []
+  - language_id: bowernpny_Warlmanpa
+    glottolog_name: Warlmanpa
+    segments:
+    - ŋ
+    - i
+    - ɳ
+    - t
+    - i
+    alignment: []
+  - language_id: bowernpny_Warlpiri
+    glottolog_name: Warlpiri
+    segments:
+    - ŋ
+    - i
+    - ɳ
+    - t
+    - i
+    alignment: []
+- id: robinsonap_234_rotten-1
+  dataset: robinsonap
+  gloss: ROTTEN
+  parameter_id: robinsonap_234_rotten
+  forms:
+  - language_id: robinsonap_kaera
+    glottolog_name: Kaera
+    segments:
+    - m
+    - i
+    - n
+    - o
+    alignment:
+    - '-'
+    - '-'
+    - m
+    - i
+    - '-'
+    - n
+    - o
+  - language_id: robinsonap_nedebang
+    glottolog_name: Nedebang
+    segments:
+    - g
+    - a
+    - m
+    - i
+    - n
+    - i
+    alignment:
+    - g
+    - a
+    - m
+    - i
+    - '-'
+    - n
+    - i
+  - language_id: robinsonap_teiwa
+    glottolog_name: Teiwa
+    segments:
+    - m
+    - u
+    - u
+    - n
+    alignment:
+    - '-'
+    - '-'
+    - m
+    - u
+    - u
+    - n
+    - '-'
+- id: iecor_3280
+  dataset: iecor
+  gloss: NECK
+  parameter_id: iecor_109
+  forms:
+  - language_id: iecor_124
+    glottolog_name: Iron Ossetian
+    segments:
+    - b
+    - ɜ
+    - r
+    - ʒ
+    - ɜ
+    - j
+    alignment: []
+  - language_id: iecor_125
+    glottolog_name: Digor Ossetian
+    segments:
+    - b
+    - ɜ
+    - r
+    - z
+    - ɜ
+    - j
+    alignment: []
+- id: kahd_121
+  dataset: kahd
+  gloss: WHISTLE
+  parameter_id: kahd_616_whistle
+  forms:
+  - language_id: kahd_Banawa
+    glottolog_name: Banawa
+    segments:
+    - k
+    - o
+    - w
+    - a
+    alignment:
+    - k
+    - o
+    - w
+    - '-'
+    - '-'
+    - a
+  - language_id: kahd_Jamamadi
+    glottolog_name: Madi
+    segments:
+    - k
+    - o
+    - w
+    - a
+    alignment:
+    - k
+    - o
+    - w
+    - '-'
+    - '-'
+    - a
+  - language_id: kahd_Jarawara
+    glottolog_name: Jarawara
+    segments:
+    - k
+    - o
+    - w
+    - a
+    alignment:
+    - k
+    - o
+    - w
+    - '-'
+    - '-'
+    - a
+  - language_id: kahd_ProtoArawan
+    glottolog_name: ''
+    segments:
+    - k
+    - o
+    - w
+    - i
+    - k
+    - a
+    alignment:
+    - k
+    - o
+    - w
+    - i
+    - k
+    - a
+  - language_id: kahd_Sorowaha
+    glottolog_name: Suruahá
+    segments:
+    - k
+    - o
+    - w
+    - i
+    - k
+    - a
+    alignment:
+    - k
+    - o
+    - w
+    - i
+    - k
+    - a
+- id: gravinachadic_19347
+  dataset: gravinachadic
+  gloss: PULL
+  parameter_id: gravinachadic_480_pull
+  forms:
+  - language_id: gravinachadic_Buwal
+    glottolog_name: Buwal
+    segments:
+    - d
+    - ɑ
+    - ɗ
+    alignment: []
+  - language_id: gravinachadic_Buwal
+    glottolog_name: Buwal
+    segments:
+    - d
+    - ɑ
+    - ɗ
+    alignment: []
+- id: peirosaustroasiatic_3505
+  dataset: peirosaustroasiatic
+  gloss: ROUND
+  parameter_id: peirosaustroasiatic_69_round
+  forms:
+  - language_id: peirosaustroasiatic_Kantu
+    glottolog_name: Western Katu
+    segments:
+    - p
+    - a
+    - p
+    - ɔ
+    - l
+    alignment: []
+  - language_id: peirosaustroasiatic_Pakoh
+    glottolog_name: Pacoh
+    segments:
+    - p
+    - ə
+    - p
+    - o
+    - l
+    - T/¹⁵
+    alignment: []
+  - language_id: peirosaustroasiatic_Taoih
+    glottolog_name: Upper Ta'oih
+    segments:
+    - p
+    - a
+    - p
+    - o
+    - l
+    - T/¹⁵
+    alignment: []
+- id: robinsonap_282_stomach-3
+  dataset: robinsonap
+  gloss: STOMACH
+  parameter_id: robinsonap_282_stomach
+  forms:
+  - language_id: robinsonap_klon
+    glottolog_name: Klon
+    segments:
+    - g
+    - ə
+    - b
+    - ɛ
+    - t
+    alignment: []
+  - language_id: robinsonap_kui
+    glottolog_name: Kui
+    segments:
+    - t
+    - a
+    - b
+    - e
+    - t
+    - e
+    - r
+    alignment: []
+- id: peirosaustroasiatic_850
+  dataset: peirosaustroasiatic
+  gloss: TOOTH
+  parameter_id: peirosaustroasiatic_89_tooth
+  forms:
+  - language_id: peirosaustroasiatic_KSurin
+    glottolog_name: Northern Khmer
+    segments:
+    - th/tʰ
+    - m
+    - e
+    - ɲ
+    alignment: []
+  - language_id: peirosaustroasiatic_Khmer
+    glottolog_name: Central Khmer
+    segments:
+    - dh/dʰ
+    - ə
+    - m
+    - ə
+    - ɲ
+    alignment: []
+  - language_id: peirosaustroasiatic_Mang
+    glottolog_name: Mang
+    segments:
+    - m
+    - ɨ
+    - n
+    - ⁵¹
+    alignment: []
+  - language_id: peirosaustroasiatic_Paliu
+    glottolog_name: Bolyu
+    segments:
+    - m
+    - a
+    - n
+    - ³¹
+    alignment: []
+  - language_id: peirosaustroasiatic_Semai
+    glottolog_name: Semai
+    segments:
+    - l
+    - m
+    - u
+    - ɲ
+    alignment: []
+  - language_id: peirosaustroasiatic_Semelai
+    glottolog_name: Semelai
+    segments:
+    - l
+    - ə
+    - m
+    - ɔ
+    - ɲ
+    alignment: []
+  - language_id: peirosaustroasiatic_SemoqBeri
+    glottolog_name: Semaq Beri
+    segments:
+    - l
+    - ə
+    - m
+    - ɔ
+    - ɲ
+    alignment: []
+  - language_id: peirosaustroasiatic_Temiar
+    glottolog_name: Temiar
+    segments:
+    - m
+    - ɔ
+    - ɲ
+    alignment: []
+- id: nagarajakhasian_90_live_a
+  dataset: nagarajakhasian
+  gloss: BE ALIVE
+  parameter_id: nagarajakhasian_90_live
+  forms:
+  - language_id: nagarajakhasian_Khasi
+    glottolog_name: Khasi
+    segments:
+    - i
+    - m
+    alignment:
+    - '-'
+    - '-'
+    - i
+    - m
+  - language_id: nagarajakhasian_Lyngngam
+    glottolog_name: India Lyngam
+    segments:
+    - ɨ
+    - nː
+    - i
+    - m
+    alignment:
+    - ɨ
+    - nː
+    - i
+    - m
+  - language_id: nagarajakhasian_Palaung
+    glottolog_name: Shwe Palaung
+    segments:
+    - i
+    - m
+    alignment:
+    - '-'
+    - '-'
+    - i
+    - m
+  - language_id: nagarajakhasian_PnarJaintia
+    glottolog_name: Jaintia
+    segments:
+    - ɪ
+    - m
+    alignment:
+    - '-'
+    - '-'
+    - ɪ
+    - m
+  - language_id: nagarajakhasian_WarLamin
+    glottolog_name: War-Jaintia
+    segments:
+    - p
+    - ʔ
+    - e
+    - m
+    alignment:
+    - p
+    - ʔ
+    - e
+    - m
+- id: bowernpny_4-where
+  dataset: bowernpny
+  gloss: WHERE
+  parameter_id: bowernpny_333_where
+  forms:
+  - language_id: bowernpny_MangalaMcK
+    glottolog_name: ''
+    segments:
+    - c
+    - a
+    - n
+    - i
+    alignment: []
+  - language_id: bowernpny_MangalaNW
+    glottolog_name: ''
+    segments:
+    - d
+    - c
+    - a
+    - n
+    - d
+    - u
+    alignment: []
+- id: bodtkhobwa_596
+  dataset: bodtkhobwa
+  gloss: LANGUAGE
+  parameter_id: bodtkhobwa_266_language
+  forms:
+  - language_id: bodtkhobwa_Duhumbi
+    glottolog_name: Duhumbi
+    segments:
+    - ŋ
+    - a
+    - k~p/k
+    alignment:
+    - ŋ
+    - a
+    - k~p/k
+  - language_id: bodtkhobwa_Jerigaon
+    glottolog_name: Jerigaon
+    segments:
+    - n
+    - u~ɔ/u
+    alignment:
+    - n
+    - u~ɔ/u
+    - '-'
+  - language_id: bodtkhobwa_Khispi
+    glottolog_name: Khispi
+    segments:
+    - ŋ
+    - a
+    - k~p/k
+    alignment:
+    - ŋ
+    - a
+    - k~p/k
+  - language_id: bodtkhobwa_Khoina
+    glottolog_name: Khoina
+    segments:
+    - n
+    - ɔ
+    alignment:
+    - n
+    - ɔ
+    - '-'
+  - language_id: bodtkhobwa_Khoitam
+    glottolog_name: Khoitam
+    segments:
+    - n
+    - u
+    alignment:
+    - n
+    - u
+    - '-'
+  - language_id: bodtkhobwa_Rahung
+    glottolog_name: Rahung
+    segments:
+    - n
+    - u
+    - k
+    alignment:
+    - n
+    - u
+    - k
+  - language_id: bodtkhobwa_Rupa
+    glottolog_name: Rupa
+    segments:
+    - ɲ
+    - u
+    - (k)/k
+    alignment:
+    - ɲ
+    - u
+    - (k)/k
+  - language_id: bodtkhobwa_Shergaon
+    glottolog_name: Shergaon
+    segments:
+    - ɲ
+    - ɔ
+    alignment:
+    - ɲ
+    - ɔ
+    - '-'
+- id: sidwellbahnaric_4917
+  dataset: sidwellbahnaric
+  gloss: KICK
+  parameter_id: sidwellbahnaric_162_tokick
+  forms:
+  - language_id: sidwellbahnaric_bahnargolar
+    glottolog_name: Bahnar
+    segments:
+    - k
+    - ə
+    - d
+    - a
+    - h
+    alignment: []
+  - language_id: sidwellbahnaric_bahnarkontum
+    glottolog_name: Bahnar
+    segments:
+    - k
+    - ə
+    - d
+    - a
+    - h
+    alignment: []
+  - language_id: sidwellbahnaric_bahnarpleiku
+    glottolog_name: Bahnar
+    segments:
+    - k
+    - ə
+    - d
+    - a
+    - h
+    alignment: []
+  - language_id: sidwellbahnaric_rengao
+    glottolog_name: Rengao
+    segments:
+    - k
+    - ə
+    - d
+    - a
+    - h
+    alignment: []
+  - language_id: sidwellbahnaric_sedang
+    glottolog_name: Sedang
+    segments:
+    - k
+    - ə
+    - t
+    - ɛ
+    - h
+    alignment: []
+- id: sagartst_29737
+  dataset: sagartst
+  gloss: WIND
+  parameter_id: sagartst_238_thewind
+  forms:
+  - language_id: sagartst_Bahing
+    glottolog_name: Bahing
+    segments:
+    - d
+    - z
+    - u
+    alignment: []
+  - language_id: sagartst_Hayu
+    glottolog_name: Wayu
+    segments:
+    - h
+    - ʊː
+    - d
+    - z
+    - ʊ
+    - ŋ
+    alignment: []
+  - language_id: sagartst_Hayu
+    glottolog_name: Wayu
+    segments:
+    - k
+    - u
+    - m
+    - d
+    - z
+    - ʊ
+    - ŋ
+    alignment: []
+  - language_id: sagartst_Khaling
+    glottolog_name: Khaling
+    segments:
+    - dzʰ
+    - ū
+    - ŋ
+    alignment: []
+  - language_id: sagartst_Thulung
+    glottolog_name: Thulung
+    segments:
+    - dz
+    - uː
+    alignment: []
+- id: sagartst_1078
+  dataset: sagartst
+  gloss: STONE
+  parameter_id: sagartst_203_thestoneapieceof
+  forms:
+  - language_id: sagartst_OldBurmese
+    glottolog_name: Old Burmese
+    segments:
+    - k
+    - j
+    - o./o
+    - k
+    alignment: []
+  - language_id: sagartst_Rangoon
+    glottolog_name: Burmese
+    segments:
+    - tɕ
+    - ɑu
+    - ʔ
+    - ⁴
+    alignment: []
+- id: gravinachadic_5616
+  dataset: gravinachadic
+  gloss: LIGHT (WEIGHT)
+  parameter_id: gravinachadic_368_belightnotheavy
+  forms:
+  - language_id: gravinachadic_Afade
+    glottolog_name: Afade
+    segments:
+    - k
+    - a
+    - m
+    - p
+    - o
+    - j
+    alignment: []
+  - language_id: gravinachadic_Kanuri
+    glottolog_name: Kanuric
+    segments:
+    - k
+    - a
+    - m
+    - b
+    - a
+    - i
+    alignment: []
+  - language_id: gravinachadic_Lagwan
+    glottolog_name: Lagwan
+    segments:
+    - k
+    - ɨ
+    - l
+    - a
+    - h
+    - ɨ
+    alignment: []
+  - language_id: gravinachadic_Malgbe
+    glottolog_name: Malgbe
+    segments:
+    - f
+    - e
+    - j
+    - d
+    - i
+    - s
+    - ɨ
+    - n
+    alignment: []
+  - language_id: gravinachadic_Mpade
+    glottolog_name: Mpade
+    segments:
+    - k
+    - a
+    - m
+    - p
+    - o
+    - j
+    alignment: []
+  - language_id: gravinachadic_Mser
+    glottolog_name: Mser
+    segments:
+    - k
+    - l
+    - a
+    - h
+    - o
+    alignment: []
+  - language_id: gravinachadic_Zina
+    glottolog_name: Zina
+    segments:
+    - k
+    - a
+    - f
+    - u
+    alignment: []
+- id: utoaztecan_36_bone-40
+  dataset: utoaztecan
+  gloss: BONE
+  parameter_id: utoaztecan_36_bone
+  forms:
+  - language_id: utoaztecan_Acoma
+    glottolog_name: Acoma Keres
+    segments:
+    - h
+    - â/a
+    - +
+    - s
+    - k
+    - a
+    - n
+    - i
+    alignment: []
+  - language_id: utoaztecan_SantaAna
+    glottolog_name: Santa Ana
+    segments:
+    - h
+    - à/a
+    - +
+    - s
+    - g
+    - iː
+    - n
+    - i
+    alignment: []
+  - language_id: utoaztecan_SantaDomingo
+    glottolog_name: Santo Domingo
+    segments:
+    - h
+    - ái/ai
+    - s
+    - g
+    - iː
+    - n
+    - i
+    alignment: []
+- id: iecor_3229
+  dataset: iecor
+  gloss: SEA
+  parameter_id: iecor_136
+  forms:
+  - language_id: iecor_124
+    glottolog_name: Iron Ossetian
+    segments:
+    - d
+    - ɛ
+    - n
+    - dʒ
+    - ɘ
+    - ʒ
+    alignment: []
+  - language_id: iecor_125
+    glottolog_name: Digor Ossetian
+    segments:
+    - d
+    - e
+    - n
+    - ɡ
+    - i
+    - z
+    alignment: []
+- id: smithborneo_2695
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_196_fern
+  forms:
+  - language_id: smithborneo_Hovongan
+    glottolog_name: Hobongan
+    segments:
+    - c
+    - ɛ
+    - k
+    - o
+    - k
+    alignment: []
+  - language_id: smithborneo_Kapuas
+    glottolog_name: ''
+    segments:
+    - k
+    - ə
+    - l
+    - a
+    - k
+    - a
+    - j
+    alignment: []
+  - language_id: smithborneo_Kereho
+    glottolog_name: Kereho
+    segments:
+    - c
+    - ɛ
+    - k
+    - o
+    - k
+    alignment: []
+- id: bodtkhobwa_1104
+  dataset: bodtkhobwa
+  gloss: TAKE
+  parameter_id: bodtkhobwa_490_take
+  forms:
+  - language_id: bodtkhobwa_Duhumbi
+    glottolog_name: Duhumbi
+    segments:
+    - tʰ
+    - ɔ
+    - n
+    alignment:
+    - tʰ
+    - ɔ
+    - n
+  - language_id: bodtkhobwa_Jerigaon
+    glottolog_name: Jerigaon
+    segments:
+    - tʰ
+    - øː
+    alignment:
+    - tʰ
+    - øː
+    - '-'
+  - language_id: bodtkhobwa_Khispi
+    glottolog_name: Khispi
+    segments:
+    - tʰ
+    - ɔ
+    - n
+    alignment:
+    - tʰ
+    - ɔ
+    - n
+  - language_id: bodtkhobwa_Khoina
+    glottolog_name: Khoina
+    segments:
+    - tʰ
+    - øː
+    alignment:
+    - tʰ
+    - øː
+    - '-'
+  - language_id: bodtkhobwa_Khoitam
+    glottolog_name: Khoitam
+    segments:
+    - tʰ
+    - ĩː
+    alignment:
+    - tʰ
+    - ĩː
+    - '-'
+  - language_id: bodtkhobwa_Rahung
+    glottolog_name: Rahung
+    segments:
+    - tʰ
+    - ɛ
+    - n
+    alignment:
+    - tʰ
+    - ɛ
+    - n
+  - language_id: bodtkhobwa_Rupa
+    glottolog_name: Rupa
+    segments:
+    - tʰ
+    - øː
+    alignment:
+    - tʰ
+    - øː
+    - '-'
+  - language_id: bodtkhobwa_Shergaon
+    glottolog_name: Shergaon
+    segments:
+    - tʰ
+    - eː
+    alignment:
+    - tʰ
+    - eː
+    - '-'
+- id: yanglalo_261
+  dataset: yanglalo
+  gloss: EAR
+  parameter_id: yanglalo_233_ear
+  forms:
+  - language_id: yanglalo_Diaocao
+    glottolog_name: Dongshanba Lalo
+    segments:
+    - n
+    - a
+    - ²¹
+    - +
+    - p
+    - a
+    - ⁵⁵
+    alignment: []
+  - language_id: yanglalo_Mangdi
+    glottolog_name: Southern Lalo
+    segments:
+    - n
+    - o
+    - ²¹
+    - +
+    - p
+    - a
+    - ⁵⁵
+    - +
+    - k
+    - ɛ
+    - ³³
+    alignment: []
+  - language_id: yanglalo_ProtoLalo
+    glottolog_name: ''
+    segments:
+    - ˀn
+    - a
+    - ²
+    - +
+    - p
+    - a
+    - ŋ
+    - ¹
+    alignment: []
+  - language_id: yanglalo_Qingyun
+    glottolog_name: Xishanba Lalo
+    segments:
+    - ˀn
+    - a̤
+    - ²¹
+    - +
+    - p
+    - u
+    - ⁵⁵
+    alignment: []
+  - language_id: yanglalo_Shuizhuping
+    glottolog_name: Western Lalu
+    segments:
+    - n
+    - a
+    - ²¹
+    - +
+    - p
+    - u
+    - ⁴⁴
+    alignment: []
+  - language_id: yanglalo_Xuzhang
+    glottolog_name: Xuzhang Lalo
+    segments:
+    - n
+    - a
+    - ²¹
+    - +
+    - p
+    - a
+    - ⁵⁵
+    - +
+    - k
+    - v̩
+    - ³³
+    alignment: []
+  - language_id: yanglalo_Yangliu
+    glottolog_name: Yangliu
+    segments:
+    - n
+    - a
+    - ²¹
+    - +
+    - p
+    - u
+    - ³³
+    alignment: []
+  - language_id: yanglalo_Yijiacun
+    glottolog_name: Eka
+    segments:
+    - n
+    - a
+    - ²¹
+    - +
+    - p
+    - a
+    - ²⁴
+    alignment: []
+- id: kesslersignificance_666
+  dataset: kesslersignificance
+  gloss: WASH
+  parameter_id: kesslersignificance_182_wash
+  forms:
+  - language_id: kesslersignificance_English
+    glottolog_name: English
+    segments:
+    - w
+    - ɑ
+    - ʃ
+    alignment: []
+  - language_id: kesslersignificance_German
+    glottolog_name: German
+    segments:
+    - v
+    - a
+    - ʃ
+    alignment: []
+- id: bowernpny_2-good
+  dataset: bowernpny
+  gloss: GOOD
+  parameter_id: bowernpny_143_good
+  forms:
+  - language_id: bowernpny_Karajarri
+    glottolog_name: Karadjeri
+    segments:
+    - m
+    - a
+    - p
+    - u
+    alignment: []
+  - language_id: bowernpny_NorthernMangarla
+    glottolog_name: Mangala
+    segments:
+    - m
+    - a
+    - p
+    - u
+    alignment: []
+- id: bowernpny_1-sun
+  dataset: bowernpny
+  gloss: SUN
+  parameter_id: bowernpny_284_sun
+  forms:
+  - language_id: bowernpny_Mithaka
+    glottolog_name: Mithaka
+    segments:
+    - w
+    - a
+    - ɭ
+    - k
+    - a
+    alignment: []
+  - language_id: bowernpny_PittaPitta
+    glottolog_name: Pitta Pitta
+    segments:
+    - w
+    - a
+    - ɭ
+    - k
+    - a
+    alignment: []
+  - language_id: bowernpny_Wangkayutyuru
+    glottolog_name: Wanggamala
+    segments:
+    - w
+    - a
+    - ɭ
+    - k
+    - a
+    alignment: []
+- id: gaotb_545_sayspeak-8
+  dataset: gaotb
+  gloss: SPEAK
+  parameter_id: gaotb_545_sayspeak
+  forms:
+  - language_id: gaotb_DigaroMishmi
+    glottolog_name: Tawra
+    segments:
+    - m
+    - ɑ
+    - ³¹
+    - +
+    - ɹ
+    - o
+    - ⁵⁵
+    alignment: []
+  - language_id: gaotb_QiangMawo
+    glottolog_name: Northern Qiang
+    segments:
+    - ɹ
+    - u
+    alignment: []
+  - language_id: gaotb_rGyalrongSomo
+    glottolog_name: Northern Gyalrong
+    segments:
+    - t
+    - ə
+    - +
+    - r
+    - j
+    - o
+    - +
+    - k
+    - a
+    - +
+    - p
+    - a
+    alignment: []
+- id: mannburmish_553
+  dataset: mannburmish
+  gloss: HARD
+  parameter_id: mannburmish_387_hard
+  forms:
+  - language_id: mannburmish_Achang
+    glottolog_name: Longchuan Achang
+    segments:
+    - tʰ
+    - a
+    - n
+    - ³
+    alignment: []
+  - language_id: mannburmish_Lashi
+    glottolog_name: Lashi
+    segments:
+    - tʰ
+    - ãɪ
+    - ²
+    alignment: []
+  - language_id: mannburmish_Zaiwa
+    glottolog_name: Zaiwa
+    segments:
+    - tʰ
+    - a
+    - n
+    - ³²
+    alignment: []
+- id: yanglalo_1116
+  dataset: yanglalo
+  gloss: NOT
+  parameter_id: yanglalo_1012_notneg
+  forms:
+  - language_id: yanglalo_Diaocao
+    glottolog_name: Dongshanba Lalo
+    segments:
+    - m
+    - a
+    - ²¹
+    alignment: []
+  - language_id: yanglalo_Mangdi
+    glottolog_name: Southern Lalo
+    segments:
+    - m
+    - a
+    - ²¹
+    alignment: []
+  - language_id: yanglalo_ProtoLalo
+    glottolog_name: ''
+    segments:
+    - m
+    - a
+    - ²
+    alignment: []
+  - language_id: yanglalo_Qingyun
+    glottolog_name: Xishanba Lalo
+    segments:
+    - m
+    - a̤
+    - ²¹
+    alignment: []
+  - language_id: yanglalo_Shuizhuping
+    glottolog_name: Western Lalu
+    segments:
+    - m
+    - a
+    - ²¹
+    alignment: []
+  - language_id: yanglalo_Xuzhang
+    glottolog_name: Xuzhang Lalo
+    segments:
+    - a
+    - ²¹
+    alignment: []
+  - language_id: yanglalo_Yangliu
+    glottolog_name: Yangliu
+    segments:
+    - m̩
+    - ²¹
+    alignment: []
+  - language_id: yanglalo_Yijiacun
+    glottolog_name: Eka
+    segments:
+    - m
+    - a
+    - ²¹
+    alignment: []
+- id: robinsonap_391_woman-3
+  dataset: robinsonap
+  gloss: WOMAN
+  parameter_id: robinsonap_391_woman
+  forms:
+  - language_id: robinsonap_blagar
+    glottolog_name: Blagar
+    segments:
+    - dʒ
+    - a
+    - u
+    - l
+    alignment: []
+  - language_id: robinsonap_westernpantar
+    glottolog_name: Western Pantar
+    segments:
+    - e
+    - u
+    alignment: []
+- id: iecor_6453
+  dataset: iecor
+  gloss: CRY
+  parameter_id: iecor_223
+  forms:
+  - language_id: iecor_297
+    glottolog_name: Old Saxon
+    segments:
+    - w
+    - oː
+    - p
+    - j
+    - a
+    - n
+    alignment: []
+  - language_id: iecor_298
+    glottolog_name: Old English (ca. 450-1100)
+    segments:
+    - w
+    - eː
+    - p
+    - ɑ
+    - n
+    alignment: []
+  - language_id: iecor_301
+    glottolog_name: Old Frisian
+    segments:
+    - w
+    - eː
+    - p
+    - a
+    alignment: []
+- id: peirosaustroasiatic_2504
+  dataset: peirosaustroasiatic
+  gloss: SEE
+  parameter_id: peirosaustroasiatic_72_see
+  forms:
+  - language_id: peirosaustroasiatic_Arem
+    glottolog_name: Arem
+    segments:
+    - c/ts
+    - ɨ̂/ɨ
+    - ŋ
+    alignment: []
+  - language_id: peirosaustroasiatic_KhaPhong
+    glottolog_name: Kha Phong
+    segments:
+    - c/ts
+    - ɨ
+    - ŋ
+    - ³³
+    alignment: []
+  - language_id: peirosaustroasiatic_Ruc
+    glottolog_name: Ruc
+    segments:
+    - c/ts
+    - ɨ
+    - ŋ
+    - ¹
+    alignment: []
+  - language_id: peirosaustroasiatic_SemoqBeri
+    glottolog_name: Semaq Beri
+    segments:
+    - c/ts
+    - ɛ
+    - n
+    alignment: []
+- id: yanglalo_1094
+  dataset: yanglalo
+  gloss: WHAT
+  parameter_id: yanglalo_990_what
+  forms:
+  - language_id: yanglalo_Diaocao
+    glottolog_name: Dongshanba Lalo
+    segments:
+    - a
+    - ⁵⁵
+    - +
+    - ts
+    - a
+    - ⁵⁵
+    alignment: []
+  - language_id: yanglalo_Mangdi
+    glottolog_name: Southern Lalo
+    segments:
+    - a
+    - ⁵⁵
+    - +
+    - ts
+    - a
+    - ⁵⁵
+    alignment: []
+  - language_id: yanglalo_ProtoLalo
+    glottolog_name: ''
+    segments:
+    - a
+    - ¹
+    - +
+    - ts
+    - a
+    - ¹
+    alignment: []
+  - language_id: yanglalo_Qingyun
+    glottolog_name: Xishanba Lalo
+    segments:
+    - a
+    - ⁵⁵
+    - +
+    - ts
+    - a
+    - ⁵⁵
+    alignment: []
+  - language_id: yanglalo_Shuizhuping
+    glottolog_name: Western Lalu
+    segments:
+    - a
+    - ⁴⁴
+    - +
+    - ts
+    - a
+    - ⁴⁴
+    alignment: []
+  - language_id: yanglalo_Xuzhang
+    glottolog_name: Xuzhang Lalo
+    segments:
+    - a
+    - ⁴⁴
+    - +
+    - ts
+    - o
+    - ⁴⁴
+    alignment: []
+  - language_id: yanglalo_Yangliu
+    glottolog_name: Yangliu
+    segments:
+    - a
+    - ³³
+    - +
+    - ts
+    - a
+    - ⁵³
+    alignment: []
+  - language_id: yanglalo_Yijiacun
+    glottolog_name: Eka
+    segments:
+    - tʰ
+    - a
+    - ⁵⁵
+    - +
+    - l
+    - a
+    - ⁵⁵
+    alignment: []
+- id: syrjaenenuralic_2497
+  dataset: syrjaenenuralic
+  gloss: DIRTY
+  parameter_id: syrjaenenuralic_31_dirty
+  forms:
+  - language_id: syrjaenenuralic_komizyrian
+    glottolog_name: Komi-Zyrian
+    segments:
+    - ɕ
+    - ɤ
+    - d
+    alignment: []
+  - language_id: syrjaenenuralic_udmurt
+    glottolog_name: Udmurt
+    segments:
+    - ɕ
+    - ɤ
+    - d
+    alignment: []
+- id: robinsonap_270_sorewound-0
+  dataset: robinsonap
+  gloss: WOUND
+  parameter_id: robinsonap_270_sorewound
+  forms:
+  - language_id: robinsonap_blagar
+    glottolog_name: Blagar
+    segments:
+    - b
+    - a
+    - t
+    - a
+    alignment: []
+  - language_id: robinsonap_kaera
+    glottolog_name: Kaera
+    segments:
+    - i
+    - b
+    - a
+    - t
+    alignment: []
+  - language_id: robinsonap_kui
+    glottolog_name: Kui
+    segments:
+    - b
+    - a
+    - t
+    - a
+    alignment: []
+  - language_id: robinsonap_nedebang
+    glottolog_name: Nedebang
+    segments:
+    - b
+    - a
+    - t
+    - t
+    - a
+    alignment: []
+  - language_id: robinsonap_teiwa
+    glottolog_name: Teiwa
+    segments:
+    - dʒ
+    - i
+    - f
+    - a
+    - t
+    alignment: []
+- id: bowernpny_16-mouth
+  dataset: bowernpny
+  gloss: MOUTH
+  parameter_id: bowernpny_204_mouth
+  forms:
+  - language_id: bowernpny_Dhuwala
+    glottolog_name: Dhuwal-Dhuwala
+    segments:
+    - d
+    - c
+    - o
+    - l
+    - i
+    - ŋ
+    alignment: []
+  - language_id: bowernpny_Gupapuyngu
+    glottolog_name: Gupapuyngu
+    segments:
+    - d
+    - c
+    - o
+    - l
+    - i
+    - ŋ
+    alignment: []
+- id: mannburmish_399
+  dataset: mannburmish
+  gloss: SCRATCH
+  parameter_id: mannburmish_267_scratch
+  forms:
+  - language_id: mannburmish_Achang
+    glottolog_name: Longchuan Achang
+    segments:
+    - k
+    - j
+    - ɛ̰
+    - n
+    - ³
+    alignment: []
+  - language_id: mannburmish_Lashi
+    glottolog_name: Lashi
+    segments:
+    - g
+    - j
+    - ẽ
+    - ŋ
+    - ³²
+    alignment: []
+  - language_id: mannburmish_Maru
+    glottolog_name: Maru
+    segments:
+    - g
+    - ɪ
+    - n
+    - ⁴¹
+    alignment: []
+  - language_id: mannburmish_WrittenBurmese
+    glottolog_name: Old Burmese
+    segments:
+    - kʰ
+    - r
+    - a
+    - ts
+    alignment: []
+  - language_id: mannburmish_Zaiwa
+    glottolog_name: Zaiwa
+    segments:
+    - g
+    - i
+    - n
+    - ³¹
+    alignment: []
+- id: mannburmish_236
+  dataset: mannburmish
+  gloss: HEEL
+  parameter_id: mannburmish_158_heel
+  forms:
+  - language_id: mannburmish_Lashi
+    glottolog_name: Lashi
+    segments:
+    - tʰ
+    - u
+    - ŋ
+    - ⁴
+    alignment: []
+  - language_id: mannburmish_Maru
+    glottolog_name: Maru
+    segments:
+    - tʰ
+    - au
+    - ŋ
+    - ²
+    alignment: []
+  - language_id: mannburmish_Phon
+    glottolog_name: Hpon
+    segments:
+    - tʰ
+    - a
+    - ŋ
+    - ³¹
+    alignment: []
+  - language_id: mannburmish_Zaiwa
+    glottolog_name: Zaiwa
+    segments:
+    - tʰ
+    - a
+    - ŋ
+    - ⁴³
+    alignment: []
+- id: hattorijaponic_158
+  dataset: hattorijaponic
+  gloss: GIVE
+  parameter_id: hattorijaponic_70_give
+  forms:
+  - language_id: hattorijaponic_Kyoto
+    glottolog_name: Kyoto
+    segments:
+    - a
+    - ŋ
+    - e
+    - r
+    - u
+    alignment: []
+  - language_id: hattorijaponic_Tokyo
+    glottolog_name: Tōkyō
+    segments:
+    - a
+    - ŋ
+    - e
+    - r
+    - u
+    alignment: []
+- id: utoaztecan_21_man-40
+  dataset: utoaztecan
+  gloss: MAN
+  parameter_id: utoaztecan_21_man
+  forms:
+  - language_id: utoaztecan_Acoma
+    glottolog_name: Acoma Keres
+    segments:
+    - h
+    - á/a
+    - c̣/ʈʂ
+    - iː
+    - ts
+    - ai
+    alignment: []
+  - language_id: utoaztecan_SantaAna
+    glottolog_name: Santa Ana
+    segments:
+    - h
+    - á/a
+    - c̣/ʈʂ
+    - iː
+    - ts
+    - E/e
+    alignment: []
+  - language_id: utoaztecan_SantaDomingo
+    glottolog_name: Santo Domingo
+    segments:
+    - h
+    - â/a
+    - +
+    - c̣/ʈʂ
+    - iː
+    - z
+    - e
+    alignment: []
+- id: blustaustronesian_486
+  dataset: blustaustronesian
+  gloss: SALT
+  parameter_id: blustaustronesian_125_salt
+  forms:
+  - language_id: blustaustronesian_hanunoo
+    glottolog_name: Hanunoo
+    segments:
+    - a
+    - s
+    - i
+    - n
+    alignment: []
+  - language_id: blustaustronesian_tetum
+    glottolog_name: Tetun Dili
+    segments:
+    - m
+    - a
+    - s
+    - i
+    - n
+    alignment: []
+- id: bowernpny_35-climb
+  dataset: bowernpny
+  gloss: CLIMB
+  parameter_id: bowernpny_75_climb
+  forms:
+  - language_id: bowernpny_Biri
+    glottolog_name: Biri
+    segments:
+    - j
+    - a
+    - g
+    - a
+    alignment: []
+  - language_id: bowernpny_Bularnu
+    glottolog_name: Bularnu
+    segments:
+    - j
+    - a
+    - k
+    - a
+    alignment: []
+  - language_id: bowernpny_Gangulu
+    glottolog_name: Gangulu
+    segments:
+    - j
+    - a
+    - g
+    - a
+    alignment: []
+  - language_id: bowernpny_Warluwarra
+    glottolog_name: Warluwara
+    segments:
+    - j
+    - a
+    - r
+    - ɣ
+    - a
+    alignment: []
+- id: leekoreanic_239_wing-2
+  dataset: leekoreanic
+  gloss: WING
+  parameter_id: leekoreanic_239_wing
+  forms:
+  - language_id: leekoreanic_NHamgyong
+    glottolog_name: Hamgyongdo
+    segments:
+    - p
+    - u
+    - +
+    - tɕʰ
+    - u
+    - l
+    alignment: []
+  - language_id: leekoreanic_SHamgyong
+    glottolog_name: Hamgyongdo
+    segments:
+    - p
+    - u
+    - +
+    - tɕʰ
+    - u
+    - l
+    alignment: []
+- id: tuled_19168
+  dataset: tuled
+  gloss: WILD DOG
+  parameter_id: tuled_431
+  forms:
+  - language_id: tuled_Makurap
+    glottolog_name: Makuráp
+    segments:
+    - a
+    - m
+    - ẽ
+    - n/kʷ
+    - i
+    - r
+    - ã
+    - j
+    alignment:
+    - '-'
+    - '-'
+    - a
+    - m
+    - ẽ
+    - n/kʷ
+    - i
+    - r
+    - ã
+    - j
+  - language_id: tuled_Wayoro
+    glottolog_name: Wayoró
+    segments:
+    - a
+    - m
+    - ẽ
+    - n/k
+    - o
+    alignment:
+    - '-'
+    - '-'
+    - a
+    - m
+    - ẽ
+    - n/k
+    - '-'
+    - '-'
+    - o
+    - '-'
+- id: sagartst_1123
+  dataset: sagartst
+  gloss: EARTHWORM
+  parameter_id: sagartst_45_theearthworm
+  forms:
+  - language_id: sagartst_Bola
+    glottolog_name: Pela
+    segments:
+    - v
+    - a
+    - ʔ
+    - ³¹
+    - +
+    - t
+    - a
+    - i
+    - ⁵⁵
+    alignment: []
+  - language_id: sagartst_Lashi
+    glottolog_name: Lashi
+    segments:
+    - v
+    - u
+    - ʔ
+    - ³¹
+    - +
+    - t
+    - i
+    - ³¹
+    alignment: []
+  - language_id: sagartst_Maru
+    glottolog_name: Maru
+    segments:
+    - v
+    - ɔ
+    - ʔ
+    - ³¹
+    - +
+    - t
+    - ɔ
+    - i
+    - ³¹
+    alignment: []
+- id: smithborneo_3791
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_293_husk
+  forms:
+  - language_id: smithborneo_Bakumpai
+    glottolog_name: Bakumpai
+    segments:
+    - e
+    - t
+    - a
+    - ʔ
+    - +
+    - p
+    - a
+    - r
+    - e
+    alignment: []
+  - language_id: smithborneo_Beketan
+    glottolog_name: Bukitan
+    segments:
+    - k
+    - a
+    - t
+    - a
+    - ʔ
+    alignment: []
+  - language_id: smithborneo_Dusun
+    glottolog_name: Dusun Witu
+    segments:
+    - e
+    - t
+    - e
+    - ʔ
+    alignment: []
+  - language_id: smithborneo_Maanyan
+    glottolog_name: Ma'anyan
+    segments:
+    - e
+    - t
+    - e
+    - ʔ
+    alignment: []
+  - language_id: smithborneo_Tawoyan
+    glottolog_name: Tawoyan
+    segments:
+    - o
+    - t
+    - o
+    - ʔ
+    alignment: []
+- id: smithborneo_8945
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_680_youplural
+  forms:
+  - language_id: smithborneo_Begak
+    glottolog_name: Begak
+    segments:
+    - m
+    - u
+    - j
+    - u
+    alignment: []
+  - language_id: smithborneo_Idaan
+    glottolog_name: Ida'an
+    segments:
+    - m
+    - u
+    - j
+    - u
+    alignment: []
+  - language_id: smithborneo_Lun-Dayeh
+    glottolog_name: Lun Bawang
+    segments:
+    - m
+    - u
+    - j
+    - u
+    - h
+    alignment: []
+  - language_id: smithborneo_Seguliud
+    glottolog_name: Abai Sungai
+    segments:
+    - m
+    - u
+    - j
+    - u
+    alignment: []
+- id: bowernpny_2-fruit
+  dataset: bowernpny
+  gloss: FRUIT
+  parameter_id: bowernpny_140_fruit
+  forms:
+  - language_id: bowernpny_Kariyarra
+    glottolog_name: Kariyarra
+    segments:
+    - c
+    - a
+    - p
+    - a
+    - c
+    - a
+    - k
+    - u
+    alignment: []
+  - language_id: bowernpny_Ngarluma
+    glottolog_name: Ngarluma
+    segments:
+    - c
+    - a
+    - p
+    - a
+    - c
+    - a
+    alignment: []
+- id: smithborneo_1834
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_135_deep
+  forms:
+  - language_id: smithborneo_Dalat_Melanau
+    glottolog_name: Dalat
+    segments:
+    - t
+    - ə
+    - b
+    - ə
+    - n
+    alignment: []
+  - language_id: smithborneo_Kadorih
+    glottolog_name: Kadorih
+    segments:
+    - t
+    - i
+    - m
+    - b
+    - o
+    - n
+    alignment: []
+  - language_id: smithborneo_Kanowit
+    glottolog_name: Kanowit-Tanjong Melanau
+    segments:
+    - t
+    - ə
+    - b
+    - ə
+    - n
+    alignment: []
+  - language_id: smithborneo_Kejaman
+    glottolog_name: Kajaman
+    segments:
+    - t
+    - ə
+    - <<ː>>
+    - b
+    - ə
+    - ŋ
+    alignment: []
+  - language_id: smithborneo_Lahanan
+    glottolog_name: Lahanan
+    segments:
+    - t
+    - ə
+    - b
+    - ə
+    - ŋ
+    alignment: []
+  - language_id: smithborneo_Ribun
+    glottolog_name: Ribun
+    segments:
+    - t
+    - o
+    - h
+    - i
+    - n
+    alignment: []
+  - language_id: smithborneo_Sekapan
+    glottolog_name: Sekapan
+    segments:
+    - l
+    - a
+    - ɮ
+    - u
+    - +
+    - t
+    - ə
+    - b
+    - ə
+    - ŋ
+    alignment: []
+- id: chaconcolumbian_4536
+  dataset: chaconcolumbian
+  gloss: SUGAR CANE
+  parameter_id: chaconcolumbian_19_cane
+  forms:
+  - language_id: chaconcolumbian_Bari
+    glottolog_name: Barí
+    segments:
+    - b
+    - ə
+    - g
+    - tʃ
+    - i
+    - k
+    - b
+    - ə
+    - r
+    - ə
+    alignment:
+    - b
+    - ə
+    - g
+    - tʃ
+    - i
+    - k
+    - b
+    - ə
+    - '-'
+    - r
+    - ə
+  - language_id: chaconcolumbian_Ocaina
+    glottolog_name: Ocaina
+    segments:
+    - ɸ
+    - oː
+    - k
+    - a
+    - n̥
+    - ɯː
+    - ʔ
+    - tʲ
+    - a
+    alignment:
+    - ɸ
+    - oː
+    - k
+    - '-'
+    - a
+    - '-'
+    - n̥
+    - ɯː
+    - ʔ
+    - tʲ
+    - a
+  - language_id: chaconcolumbian_Muinane
+    glottolog_name: Muinane
+    segments:
+    - ɸ
+    - e
+    - g
+    - a
+    - ɨ
+    alignment:
+    - ɸ
+    - e
+    - g
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - a
+    - '-'
+    - '-'
+    - ɨ
+  - language_id: chaconcolumbian_WitotoMinica
+    glottolog_name: Minica Huitoto
+    segments:
+    - b
+    - ɯ
+    - g
+    - ɯ
+    alignment:
+    - b
+    - ɯ
+    - g
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - ɯ
+  - language_id: chaconcolumbian_WitotoMurui
+    glottolog_name: Murui Huitoto
+    segments:
+    - b
+    - ɯ
+    - g
+    - ɯ
+    alignment:
+    - b
+    - ɯ
+    - g
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - ɯ
+  - language_id: chaconcolumbian_WitotoNipode
+    glottolog_name: Nüpode Huitoto
+    segments:
+    - b
+    - ɯ
+    - g
+    - ɯ
+    alignment:
+    - b
+    - ɯ
+    - g
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - ɯ
+- id: cals_other-f
+  dataset: cals
+  gloss: OTHER
+  parameter_id: cals_other
+  forms:
+  - language_id: cals_Ydugova2
+    glottolog_name: Yagnobi
+    segments:
+    - a
+    - n
+    - i
+    alignment: []
+  - language_id: cals_Ysafedorak1
+    glottolog_name: Yagnobi
+    segments:
+    - a
+    - n
+    - i
+    alignment: []
+  - language_id: cals_Ysafedorak2
+    glottolog_name: Yagnobi
+    segments:
+    - a
+    - n
+    - i
+    alignment: []
+- id: liusinitic_734
+  dataset: liusinitic
+  gloss: THAT
+  parameter_id: liusinitic_84_that
+  forms:
+  - language_id: liusinitic_Xiamen
+    glottolog_name: Xiamen
+    segments:
+    - h
+    - i
+    - t
+    - ³²
+    alignment: []
+  - language_id: liusinitic_Xiamen
+    glottolog_name: Xiamen
+    segments:
+    - h
+    - i
+    - t
+    - ³²
+    - +
+    - t
+    - e
+    - ²¹
+    alignment: []
+- id: chaconcolumbian_19063
+  dataset: chaconcolumbian
+  gloss: LOUSE
+  parameter_id: chaconcolumbian_88_louse
+  forms:
+  - language_id: chaconcolumbian_Guambiano
+    glottolog_name: Guambiano
+    segments:
+    - p
+    - a
+    - l
+    - i
+    - t
+    - ɨ
+    alignment: []
+  - language_id: chaconcolumbian_Totoro
+    glottolog_name: Totoro
+    segments:
+    - p
+    - a
+    - l
+    - e
+    - k
+    - t
+    - ɨ
+    alignment: []
+- id: tuled_319
+  dataset: tuled
+  gloss: SHADOW
+  parameter_id: tuled_326
+  forms:
+  - language_id: tuled_CintaLarga
+    glottolog_name: Cinta Larga
+    segments:
+    - i
+    - ʃ
+    - o
+    alignment:
+    - i
+    - ʃ
+    - o
+  - language_id: tuled_Gaviao
+    glottolog_name: Gavião Do Jiparaná
+    segments:
+    - á
+    - ʃ
+    - o
+    alignment:
+    - á
+    - ʃ
+    - o
+- id: robinsonap_80_dirty-0
+  dataset: robinsonap
+  gloss: DIRTY
+  parameter_id: robinsonap_80_dirty
+  forms:
+  - language_id: robinsonap_kaera
+    glottolog_name: Kaera
+    segments:
+    - q
+    - a
+    - a
+    - s
+    - i
+    alignment:
+    - '-'
+    - '-'
+    - '-'
+    - '-'
+    - q
+    - a
+    - a
+    - s
+    - i
+  - language_id: robinsonap_nedebang
+    glottolog_name: Nedebang
+    segments:
+    - b
+    - l
+    - a
+    - q
+    - q
+    - a
+    - s
+    alignment:
+    - b
+    - l
+    - a
+    - q
+    - q
+    - a
+    - '-'
+    - s
+    - '-'
+  - language_id: robinsonap_teiwa
+    glottolog_name: Teiwa
+    segments:
+    - b
+    - l
+    - a
+    - q
+    - a
+    - s
+    alignment:
+    - b
+    - l
+    - a
+    - '-'
+    - q
+    - a
+    - '-'
+    - s
+    - '-'
+- id: gravinachadic_18538
+  dataset: gravinachadic
+  gloss: IF
+  parameter_id: gravinachadic_332_if
+  forms:
+  - language_id: gravinachadic_Kanuri
+    glottolog_name: Kanuric
+    segments:
+    - c
+    - a
+    alignment: []
+  - language_id: gravinachadic_Lagwan
+    glottolog_name: Lagwan
+    segments:
+    - k
+    - i
+    alignment: []
+  - language_id: gravinachadic_Malgbe
+    glottolog_name: Malgbe
+    segments:
+    - s
+    - ɨ
+    - r
+    - g
+    - i
+    alignment: []
+  - language_id: gravinachadic_Mpade
+    glottolog_name: Mpade
+    segments:
+    - a
+    - s
+    - a
+    alignment: []
+  - language_id: gravinachadic_Mser
+    glottolog_name: Mser
+    segments:
+    - a
+    - s
+    - ɨ
+    alignment: []
+- id: iecor_7060
+  dataset: iecor
+  gloss: NOSE
+  parameter_id: iecor_112
+  forms:
+  - language_id: iecor_179
+    glottolog_name: Parthian
+    segments:
+    - n
+    - ɑː
+    - w
+    - i
+    - tʃ
+    alignment: []
+  - language_id: iecor_296
+    glottolog_name: Sarikoli
+    segments: []
+    alignment: []
+- id: tuled_17071
+  dataset: tuled
+  gloss: TICK
+  parameter_id: tuled_392
+  forms:
+  - language_id: tuled_Gaviao
+    glottolog_name: Gavião Do Jiparaná
+    segments:
+    - g
+    - a
+    - ɾ
+    - a
+    - k
+    - a
+    - p
+    alignment:
+    - g
+    - a
+    - ɾ
+    - a
+    - k
+    - a
+    - p
+    - '-'
+  - language_id: tuled_Karo
+    glottolog_name: Karo (Brazil)
+    segments:
+    - m
+    - a
+    - g
+    - o
+    - p
+    - i
+    alignment:
+    - m
+    - a
+    - '-'
+    - '-'
+    - g
+    - o
+    - p
+    - i
+  - language_id: tuled_Monde
+    glottolog_name: Salamãi
+    segments:
+    - tʃ
+    - a
+    - k
+    - a
+    - p
+    alignment:
+    - tʃ
+    - a
+    - '-'
+    - '-'
+    - k
+    - a
+    - p
+    - '-'
+  - language_id: tuled_SuruiPaiter
+    glottolog_name: Suruí
+    segments:
+    - ŋ
+    - aː
+    - r
+    - k
+    - ɯ́ː
+    - p
+    alignment:
+    - ŋ
+    - aː
+    - r
+    - '-'
+    - k
+    - ɯ́ː
+    - p
+    - '-'
+  - language_id: tuled_Uruku
+    glottolog_name: ''
+    segments:
+    - m
+    - a
+    - g
+    - u
+    - p
+    - i
+    alignment:
+    - m
+    - a
+    - '-'
+    - '-'
+    - g
+    - u
+    - p
+    - i
+- id: bodtkhobwa_112
+  dataset: bodtkhobwa
+  gloss: BEAN
+  parameter_id: bodtkhobwa_34_beans
+  forms:
+  - language_id: bodtkhobwa_Jerigaon
+    glottolog_name: Jerigaon
+    segments:
+    - pʰ
+    - ɔ
+    - ŋ
+    - +
+    - b
+    - a
+    alignment:
+    - pʰ
+    - ɔ
+    - ŋ
+  - language_id: bodtkhobwa_Khispi
+    glottolog_name: Khispi
+    segments:
+    - pʰ
+    - o
+    - +
+    - b
+    - i
+    - n
+    alignment:
+    - pʰ
+    - o
+    - '-'
+  - language_id: bodtkhobwa_Khoina
+    glottolog_name: Khoina
+    segments:
+    - pʰ
+    - ɔ
+    - ŋ
+    - +
+    - b
+    - a
+    alignment:
+    - pʰ
+    - ɔ
+    - ŋ
+  - language_id: bodtkhobwa_Khoitam
+    glottolog_name: Khoitam
+    segments:
+    - pʰ
+    - ɔ
+    - m
+    - +
+    - b
+    - ɛ
+    alignment:
+    - pʰ
+    - ɔ
+    - m
+  - language_id: bodtkhobwa_Rahung
+    glottolog_name: Rahung
+    segments:
+    - pʰ
+    - a
+    - m
+    - +
+    - b
+    - ɛ
+    alignment:
+    - pʰ
+    - a
+    - m
+  - language_id: bodtkhobwa_Rupa
+    glottolog_name: Rupa
+    segments:
+    - pʰ
+    - a
+    - m
+    - +
+    - pʰ
+    - l
+    - a
+    alignment:
+    - pʰ
+    - a
+    - m
+- id: constenlachibchan_1325
+  dataset: constenlachibchan
+  gloss: COME
+  parameter_id: constenlachibchan_104_venir
+  forms:
+  - language_id: constenlachibchan_Cacaopera
+    glottolog_name: Cacaopera
+    segments:
+    - a
+    - j
+    - r
+    - a
+    alignment:
+    - a
+    - j
+    - r
+    - a
+  - language_id: constenlachibchan_Mayangna
+    glottolog_name: Mayangna
+    segments:
+    - a
+    - j
+    - w
+    - a
+    alignment:
+    - a
+    - j
+    - w
+    - a
+  - language_id: constenlachibchan_Ulwa
+    glottolog_name: Ulwa
+    segments:
+    - a
+    - j
+    - w
+    - a
+    alignment:
+    - a
+    - j
+    - w
+    - a
+- id: smithborneo_5068
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_391_nose
+  forms:
+  - language_id: smithborneo_Ambalo
+    glottolog_name: Embaloh
+    segments:
+    - i
+    - ŋ
+    - a
+    - r
+    alignment: []
+  - language_id: smithborneo_Taman
+    glottolog_name: Taman (Indonesia)
+    segments:
+    - i
+    - ŋ
+    - g
+    - e
+    - r
+    alignment: []
+- id: kahd_132
+  dataset: kahd
+  gloss: BEE
+  parameter_id: kahd_44_bee
+  forms:
+  - language_id: kahd_Paumari
+    glottolog_name: Paumari
+    segments:
+    - m
+    - a
+    - h
+    - i
+    alignment:
+    - m
+    - a
+    - h
+    - i
+  - language_id: kahd_Sorowaha
+    glottolog_name: Suruahá
+    segments:
+    - m
+    - a
+    - s
+    - i
+    alignment:
+    - m
+    - a
+    - s
+    - i
+- id: dunnaslian_92_see_6
+  dataset: dunnaslian
+  gloss: SEE
+  parameter_id: dunnaslian_92_see
+  forms:
+  - language_id: dunnaslian_Kammu
+    glottolog_name: Khmu
+    segments:
+    - k
+    - ù/u
+    - u
+    - ɲ
+    alignment: []
+  - language_id: dunnaslian_Khmer_Siem_Reap
+    glottolog_name: Central Khmer
+    segments:
+    - kʰ
+    - əː
+    - ɲ
+    alignment: []
+  - language_id: dunnaslian_Khmer_Surin
+    glottolog_name: Surin
+    segments:
+    - kʰ
+    - əː
+    - ɲ
+    alignment: []
+- id: simsrma_32
+  dataset: simsrma
+  gloss: SWEAT (SUBSTANCE)
+  parameter_id: simsrma_212_sweat
+  forms:
+  - language_id: simsrma_Dayang
+    glottolog_name: Dayang Pumi
+    segments:
+    - ʃ
+    - tʃʰ
+    - í/i
+    alignment: []
+  - language_id: simsrma_Lanping
+    glottolog_name: Southern Pumi
+    segments:
+    - s
+    - kʰ
+    - i
+    - ⁵⁵
+    alignment: []
+  - language_id: simsrma_Mianchi
+    glottolog_name: Mianchi Qiang
+    segments:
+    - ʈʂʰ
+    - ù/u
+    alignment: []
+  - language_id: simsrma_Qinghua
+    glottolog_name: Qinghua Pumi
+    segments:
+    - s
+    - kʰ
+    - i
+    - ⁵⁵
+    alignment: []
+  - language_id: simsrma_Taoping
+    glottolog_name: Taoping Qiang
+    segments:
+    - χ
+    - ʈʂ
+    - u/w
+    - ə
+    - ⁵⁵
+    alignment: []
+  - language_id: simsrma_Yonghe
+    glottolog_name: Yonghe Qiang
+    segments:
+    - tɕʰ
+    - w
+    - í/i
+    alignment: []
+- id: utoaztecan_114_yousing-4
+  dataset: utoaztecan
+  gloss: THOU
+  parameter_id: utoaztecan_114_yousing
+  forms:
+  - language_id: utoaztecan_AztecTetelcingo
+    glottolog_name: Tetelcingo Nahuatl
+    segments:
+    - t
+    - ɑ
+    - h
+    - ɑ
+    alignment: []
+  - language_id: utoaztecan_ClassicalAztec
+    glottolog_name: Classical Nahuatl
+    segments:
+    - t
+    - e
+    - h
+    alignment: []
+  - language_id: utoaztecan_Huichol
+    glottolog_name: Huichol
+    segments:
+    - i
+    - ɑ
+    - k
+    - u
+    alignment: []
+  - language_id: utoaztecan_Pipil
+    glottolog_name: Pipil
+    segments:
+    - t
+    - ɑ
+    - h
+    - ɑ
+    alignment: []
+- id: mannburmish_232
+  dataset: mannburmish
+  gloss: CALF
+  parameter_id: mannburmish_155_calf
+  forms:
+  - language_id: mannburmish_Achang
+    glottolog_name: Longchuan Achang
+    segments:
+    - p
+    - ṵ
+    - ʔ
+    - ⁵⁴
+    alignment: []
+  - language_id: mannburmish_Lashi
+    glottolog_name: Lashi
+    segments:
+    - b
+    - u
+    - ʔ
+    - ⁵³
+    alignment: []
+  - language_id: mannburmish_Maru
+    glottolog_name: Maru
+    segments:
+    - b
+    - au
+    - ³
+    alignment: []
+  - language_id: mannburmish_Zaiwa
+    glottolog_name: Zaiwa
+    segments:
+    - b
+    - u
+    - ³
+    alignment: []
+- id: utoaztecan_51_foot-3
+  dataset: utoaztecan
+  gloss: FOOT
+  parameter_id: utoaztecan_51_foot
+  forms:
+  - language_id: utoaztecan_Cahuilla
+    glottolog_name: Cahuilla
+    segments:
+    - ʔ
+    - i
+    alignment: []
+  - language_id: utoaztecan_Luiseno
+    glottolog_name: Luiseno-Juaneño
+    segments:
+    - é/e
+    - +
+    - t
+    alignment: []
+- id: smithborneo_6663
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_506_shrimp
+  forms:
+  - language_id: smithborneo_Jangkang
+    glottolog_name: Jangkang
+    segments:
+    - a
+    - ŋ
+    - o
+    - ʔ
+    alignment: []
+  - language_id: smithborneo_Kanowit
+    glottolog_name: Kanowit-Tanjong Melanau
+    segments:
+    - s
+    - ə
+    - n
+    - e
+    - ʔ
+    alignment: []
+  - language_id: smithborneo_Pangkodan_Sanggau
+    glottolog_name: Sanggau
+    segments:
+    - a
+    - ŋ
+    - o
+    - ʔ
+    alignment: []
+- id: tuled_5639
+  dataset: tuled
+  gloss: FAR
+  parameter_id: tuled_126
+  forms:
+  - language_id: tuled_CintaLarga
+    glottolog_name: Cinta Larga
+    segments:
+    - p
+    - o
+    - r
+    - i
+    - k
+    - ã
+    alignment:
+    - p
+    - o
+    - r
+    - i
+    - k
+    - '-'
+    - ã
+    - '-'
+  - language_id: tuled_Gaviao
+    glottolog_name: Gavião Do Jiparaná
+    segments:
+    - b
+    - o
+    - l
+    - i
+    - g
+    - ṍ
+    - ò
+    - p
+    alignment:
+    - b
+    - o
+    - l
+    - i
+    - g
+    - ṍ
+    - ò
+    - p
+- id: mcd_P2-371
+  dataset: mcd
+  gloss: ''
+  parameter_id: mcd_befedupannoyed
+  forms:
+  - language_id: mcd_saipancarolinian
+    glottolog_name: Carolinian
+    segments:
+    - x
+    - u
+    alignment: []
+  - language_id: mcd_saipancaroliniant
+    glottolog_name: Tanapag
+    segments:
+    - g
+    - u
+    alignment: []
+  - language_id: mcd_chuukese
+    glottolog_name: Chuukese
+    segments:
+    - k
+    - u
+    alignment: []
+  - language_id: mcd_woleaian
+    glottolog_name: Woleaian
+    segments:
+    - x
+    - uː
+    alignment: []
+- id: bowernpny_7-open
+  dataset: bowernpny
+  gloss: OPEN
+  parameter_id: bowernpny_222_openuncover
+  forms:
+  - language_id: bowernpny_Arabana
+    glottolog_name: Arabana
+    segments:
+    - p
+    - a
+    - ɭ
+    - u
+    alignment: []
+  - language_id: bowernpny_NorthernNyangumarta
+    glottolog_name: Northern Coastal Nyangumarta
+    segments:
+    - p
+    - i
+    - ɭ
+    - i
+    - +
+    - c
+    - i
+    - n
+    - i
+    alignment: []
+- id: cals_toblow-f
+  dataset: cals
+  gloss: BLOW (OF WIND)
+  parameter_id: cals_toblow
+  forms:
+  - language_id: cals_Tkamangaron4
+    glottolog_name: Tajik
+    segments:
+    - h
+    - u
+    - f
+    alignment: []
+  - language_id: cals_Tnushor2
+    glottolog_name: Tajik
+    segments:
+    - h
+    - a
+    - v
+    - o
+    alignment: []
+  - language_id: cals_Ydugova1
+    glottolog_name: Yagnobi
+    segments:
+    - h
+    - a
+    - β
+    - ɔ
+    alignment: []
+- id: smithborneo_7325
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_565_supernaturalstorm
+  forms:
+  - language_id: smithborneo_Ambalo
+    glottolog_name: Embaloh
+    segments:
+    - k
+    - u
+    - d
+    - i
+    - ʔ
+    alignment: []
+  - language_id: smithborneo_Jangkang
+    glottolog_name: Jangkang
+    segments:
+    - t
+    - u
+    - l
+    - a
+    - h
+    alignment: []
+  - language_id: smithborneo_Pangkodan_Sanggau
+    glottolog_name: Sanggau
+    segments:
+    - t
+    - u
+    - l
+    - a
+    - h
+    - +
+    - ɣ
+    - a
+    - ŋ
+    - k
+    - a
+    - h
+    alignment: []
+  - language_id: smithborneo_Ribun
+    glottolog_name: Ribun
+    segments:
+    - t
+    - u
+    - l
+    - a
+    - h
+    alignment: []
+  - language_id: smithborneo_Tawoyan
+    glottolog_name: Tawoyan
+    segments:
+    - t
+    - o
+    - u
+    - j
+    - ʔ
+    alignment: []
+- id: bowernpny_17-fish
+  dataset: bowernpny
+  gloss: FISH
+  parameter_id: bowernpny_130_fish
+  forms:
+  - language_id: bowernpny_Malyangapa
+    glottolog_name: Malyangapa
+    segments:
+    - k
+    - u
+    - j
+    - a
+    alignment: []
+  - language_id: bowernpny_Paakantyi
+    glottolog_name: Paakantyi
+    segments:
+    - p
+    - a
+    - ɳ
+    - t
+    - u
+    alignment: []
+- id: zhangrgyalrong_94
+  dataset: zhangrgyalrong
+  gloss: SMOKE (INHALE)
+  parameter_id: zhangrgyalrong_249_tosmoke
+  forms:
+  - language_id: zhangrgyalrong_BragbarSitu
+    glottolog_name: Maerkang
+    segments:
+    - t
+    - a
+    - +
+    - kʰ
+    - û
+    alignment: []
+  - language_id: zhangrgyalrong_CogtseSitu
+    glottolog_name: Maerkang
+    segments:
+    - t
+    - ə
+    - +
+    - kʰ
+    - ə̂
+    alignment: []
+  - language_id: zhangrgyalrong_Japhug
+    glottolog_name: dGonpa
+    segments:
+    - t
+    - ɤ
+    - +
+    - kʰ
+    - ɯ
+    alignment: []
+  - language_id: zhangrgyalrong_MiddleChinese
+    glottolog_name: Middle Chinese
+    segments:
+    - x
+    - j
+    - u
+    - n
+    alignment: []
+  - language_id: zhangrgyalrong_OldChinese
+    glottolog_name: Old Chinese
+    segments:
+    - qʰ
+    - u
+    - n
+    alignment: []
+- id: tuled_14910
+  dataset: tuled
+  gloss: SMOKE (EXHAUST)
+  parameter_id: tuled_346
+  forms:
+  - language_id: tuled_Kuruaya
+    glottolog_name: Kuruáya
+    segments:
+    - w
+    - a
+    - n
+    - i
+    - ŋ
+    alignment:
+    - w
+    - a
+    - n
+    - i
+    - ŋ
+  - language_id: tuled_Makurap
+    glottolog_name: Makuráp
+    segments:
+    - n
+    - i
+    - ŋ
+    alignment:
+    - '-'
+    - '-'
+    - n
+    - i
+    - ŋ
+  - language_id: tuled_Monde
+    glottolog_name: Salamãi
+    segments:
+    - ɲ
+    - i
+    - ŋ
+    alignment:
+    - '-'
+    - '-'
+    - ɲ
+    - i
+    - ŋ
+  - language_id: tuled_Wayoro
+    glottolog_name: Wayoró
+    segments:
+    - n
+    - i
+    - ŋ
+    alignment:
+    - '-'
+    - '-'
+    - n
+    - i
+    - ŋ
+  - language_id: tuled_Xipaya
+    glottolog_name: Xipaya
+    segments:
+    - ʃ
+    - iã
+    alignment:
+    - '-'
+    - '-'
+    - ʃ
+    - iã
+    - '-'
+- id: oskolskayatungusic_284
+  dataset: oskolskayatungusic
+  gloss: RUN
+  parameter_id: oskolskayatungusic_81_runv
+  forms:
+  - language_id: oskolskayatungusic_Evenki_Strelka_Chun
+    glottolog_name: Hissing Evenki
+    segments:
+    - h
+    - u
+    - k
+    - t
+    - ɨ
+    alignment: []
+  - language_id: oskolskayatungusic_Evenki_Teteya
+    glottolog_name: Northern Evenki
+    segments:
+    - h
+    - u
+    - k
+    - t
+    - ɨ
+    alignment: []
+  - language_id: oskolskayatungusic_Xibe
+    glottolog_name: Xibe
+    segments:
+    - f
+    - ɘ
+    - x
+    - ɕ
+    - i
+    alignment: []
+- id: peirosaustroasiatic_1850
+  dataset: peirosaustroasiatic
+  gloss: WOMAN
+  parameter_id: peirosaustroasiatic_99_woman
+  forms:
+  - language_id: peirosaustroasiatic_Kharia
+    glottolog_name: Kharia
+    segments:
+    - k
+    - o
+    - n
+    - +
+    - s
+    - e
+    - l
+    - +
+    - ḍ/ɖ
+    - u
+    - g
+    alignment: []
+  - language_id: peirosaustroasiatic_Khasi
+    glottolog_name: Khasi
+    segments:
+    - k
+    - y
+    - n
+    - th/tʰ
+    - ei
+    alignment: []
+  - language_id: peirosaustroasiatic_Semai
+    glottolog_name: Semai
+    segments:
+    - k
+    - r
+    - d
+    - o
+    - r
+    alignment: []
+  - language_id: peirosaustroasiatic_Semelai
+    glottolog_name: Semelai
+    segments:
+    - k
+    - ə
+    - r
+    - d
+    - o
+    - r
+    alignment: []
+  - language_id: peirosaustroasiatic_SemoqBeri
+    glottolog_name: Semaq Beri
+    segments:
+    - k
+    - ə
+    - d
+    - o
+    - r
+    alignment: []
+  - language_id: peirosaustroasiatic_Sora
+    glottolog_name: Sora
+    segments:
+    - ə
+    - n
+    - +
+    - s
+    - ə
+    - l
+    - o
+    alignment: []
+- id: kesslersignificance_100
+  dataset: kesslersignificance
+  gloss: GUTS
+  parameter_id: kesslersignificance_66_guts
+  forms:
+  - language_id: kesslersignificance_French
+    glottolog_name: French
+    segments:
+    - ɛ̃
+    - t
+    - ɛ
+    - s
+    - t
+    - ɛ̃
+    alignment: []
+  - language_id: kesslersignificance_Latin
+    glottolog_name: Latin
+    segments:
+    - i
+    - n
+    - t
+    - e
+    - s
+    - t
+    - iː
+    - n
+    - o
+    alignment: []
+- id: tuled_1193
+  dataset: tuled
+  gloss: FALL
+  parameter_id: tuled_124
+  forms:
+  - language_id: tuled_AsuriniTocantins
+    glottolog_name: Tocantins Asurini
+    segments:
+    - k
+    - oi
+    alignment:
+    - k
+    - oi
+    - '-'
+  - language_id: tuled_AsuriniXingu
+    glottolog_name: Xingú Asuriní
+    segments:
+    - k
+    - u
+    - j
+    alignment:
+    - k
+    - u
+    - j
+  - language_id: tuled_Tupinamba
+    glottolog_name: Tupinambá
+    segments:
+    - k
+    - u
+    - j
+    alignment:
+    - k
+    - u
+    - j
+- id: chaconcolumbian_24178
+  dataset: chaconcolumbian
+  gloss: ONE
+  parameter_id: chaconcolumbian_117_one
+  forms:
+  - language_id: chaconcolumbian_Saliba
+    glottolog_name: Sáliba
+    segments:
+    - h
+    - o
+    - t
+    - a
+    - b
+    - e
+    alignment: []
+  - language_id: chaconcolumbian_Saliba
+    glottolog_name: Sáliba
+    segments:
+    - h
+    - o
+    - t
+    - a
+    - n
+    - a
+    alignment: []
+- id: bowernpny_6-roof
+  dataset: bowernpny
+  gloss: ROOF
+  parameter_id: bowernpny_240_roof
+  forms:
+  - language_id: bowernpny_Arabana
+    glottolog_name: Arabana
+    segments:
+    - p
+    - u
+    - ŋ
+    - a
+    - ŋ
+    - a
+    - l
+    - p
+    - a
+    alignment: []
+  - language_id: bowernpny_Diyari
+    glottolog_name: Dieri
+    segments:
+    - p
+    - u
+    - ŋ
+    - a
+    - ŋ
+    - a
+    - l
+    - p
+    - a
+    alignment: []
+  - language_id: bowernpny_Guyani
+    glottolog_name: Guyani
+    segments:
+    - p
+    - u
+    - ŋ
+    - a
+    - ŋ
+    - a
+    - l
+    - p
+    - a
+    alignment: []
+  - language_id: bowernpny_Ngamini
+    glottolog_name: Ngamini
+    segments:
+    - p
+    - u
+    - ŋ
+    - a
+    - ŋ
+    - a
+    - l
+    - p
+    - a
+    alignment: []
+  - language_id: bowernpny_Wangkangurru
+    glottolog_name: Wangganguru
+    segments:
+    - p
+    - u
+    - ŋ
+    - a
+    - ŋ
+    - a
+    - l
+    - p
+    - a
+    alignment: []
+- id: smithborneo_4746
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_363_monkey
+  forms:
+  - language_id: smithborneo_Bahau_Saq
+    glottolog_name: Bahau
+    segments:
+    - h
+    - i
+    - oː
+    - k
+    alignment: []
+  - language_id: smithborneo_Kelai
+    glottolog_name: Kelai
+    segments:
+    - j
+    - ɒ
+    - k
+    alignment: []
+  - language_id: smithborneo_Long_Gelat
+    glottolog_name: Long Glat
+    segments:
+    - j
+    - o
+    - a̯
+    - k
+    alignment: []
+  - language_id: smithborneo_Modang_woeg_helag
+    glottolog_name: Kelingan (Indonesia)
+    segments:
+    - j
+    - o
+    - k
+    alignment: []
+- id: kahd_1995
+  dataset: kahd
+  gloss: HERE
+  parameter_id: kahd_231_here
+  forms:
+  - language_id: kahd_Amarakaeri
+    glottolog_name: Amarakaeri
+    segments:
+    - i
+    - n
+    - +
+    - t
+    - e
+    alignment:
+    - i
+    - n
+  - language_id: kahd_Sapiteri
+    glottolog_name: Sapiteri
+    segments:
+    - i
+    - n
+    - +
+    - t
+    - e
+    alignment:
+    - i
+    - n
+  - language_id: kahd_Toyeri
+    glottolog_name: Toyeri
+    segments:
+    - i
+    - n
+    - +
+    - t
+    - e
+    alignment:
+    - i
+    - n
+- id: gravinachadic_19839
+  dataset: gravinachadic
+  gloss: YELLOW
+  parameter_id: gravinachadic_710_beyellow
+  forms:
+  - language_id: gravinachadic_Afade
+    glottolog_name: Afade
+    segments:
+    - g
+    - u
+    - r
+    - g
+    - u
+    - m
+    alignment: []
+  - language_id: gravinachadic_Buduma
+    glottolog_name: Buduma
+    segments:
+    - a
+    - ə
+    - s
+    - u
+    - ə
+    - b
+    - ə
+    - r
+    alignment: []
+  - language_id: gravinachadic_Kanuri
+    glottolog_name: Kanuric
+    segments:
+    - k
+    - u
+    - r
+    - w
+    - u
+    - m
+    alignment: []
+  - language_id: gravinachadic_Lagwan
+    glottolog_name: Lagwan
+    segments:
+    - h
+    - u
+    - r
+    - g
+    - u
+    - m
+    alignment: []
+  - language_id: gravinachadic_Malgbe
+    glottolog_name: Malgbe
+    segments:
+    - j
+    - a
+    - +
+    - g
+    - u
+    - r
+    - g
+    - u
+    - m
+    alignment: []
+  - language_id: gravinachadic_Mpade
+    glottolog_name: Mpade
+    segments:
+    - k
+    - u
+    - r
+    - g
+    - u
+    - m
+    alignment: []
+  - language_id: gravinachadic_Mser
+    glottolog_name: Mser
+    segments:
+    - k
+    - u
+    - r
+    - g
+    - u
+    - m
+    alignment: []
+  - language_id: gravinachadic_Zina
+    glottolog_name: Zina
+    segments:
+    - h
+    - u
+    - r
+    - u
+    - g
+    - u
+    - m
+    alignment: []
+- id: smithborneo_674
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_41_bee
+  forms:
+  - language_id: smithborneo_Penan_Jekitan
+    glottolog_name: Penan Silat
+    segments:
+    - ɲ
+    - i
+    - w
+    - a
+    - n
+    alignment: []
+  - language_id: smithborneo_Sungkung
+    glottolog_name: Bidayuh-Southern Land Dayak
+    segments:
+    - ɲ
+    - a
+    - w
+    - a
+    - n
+    alignment: []
+- id: constenlachibchan_308
+  dataset: constenlachibchan
+  gloss: EAT
+  parameter_id: constenlachibchan_24_comer
+  forms:
+  - language_id: constenlachibchan_Buglere
+    glottolog_name: Buglere
+    segments:
+    - b
+    - l
+    - i
+    - ɾ
+    - e
+    alignment: []
+  - language_id: constenlachibchan_Ngabere
+    glottolog_name: Ngäbere
+    segments:
+    - m
+    - ɾ
+    - ɤ
+    - ɾ
+    - e
+    alignment: []
+- id: smithborneo_4467
+  dataset: smithborneo
+  gloss: ''
+  parameter_id: smithborneo_344_long
+  forms:
+  - language_id: smithborneo_Buket
+    glottolog_name: Bukat
+    segments:
+    - l
+    - o
+    - e
+    - ŋ
+    alignment: []
+  - language_id: smithborneo_Punan_Lisum
+    glottolog_name: Bukat-Ukit-Beketan-Lugat-Lisum
+    segments:
+    - l
+    - o
+    - e
+    - ŋ
+    alignment: []
+  - language_id: smithborneo_Ukit
+    glottolog_name: Ukit
+    segments:
+    - l
+    - o
+    - i
+    - ŋ
+    alignment: []
+- id: lundgrenomagoa_1261
+  dataset: lundgrenomagoa
+  gloss: KNOW (SOMETHING)
+  parameter_id: lundgrenomagoa_913_knowtrans
+  forms:
+  - language_id: lundgrenomagoa_Kokama
+    glottolog_name: Cocama
+    segments:
+    - i
+    - +
+    - k
+    - u
+    - a
+    alignment:
+    - i
+    - +
+    - k
+    - u
+    - '-'
+    - a
+    - '-'
+    - '-'
+  - language_id: lundgrenomagoa_Omagua
+    glottolog_name: Omagua
+    segments:
+    - i
+    - +
+    - k
+    - u
+    - a
+    alignment:
+    - i
+    - +
+    - k
+    - u
+    - '-'
+    - a
+    - '-'
+    - '-'
+- id: yanglalo_961
+  dataset: yanglalo
+  gloss: SALTY
+  parameter_id: yanglalo_868_salty
+  forms:
+  - language_id: yanglalo_Qingyun
+    glottolog_name: Xishanba Lalo
+    segments:
+    - ɛ
+    - ⁵⁵
+    alignment: []
+  - language_id: yanglalo_Shuizhuping
+    glottolog_name: Western Lalu
+    segments:
+    - kʰ
+    - a
+    - ²¹
+    alignment: []
+  - language_id: yanglalo_Xuzhang
+    glottolog_name: Xuzhang Lalo
+    segments:
+    - kʰ
+    - a
+    - ²¹
+    alignment: []
+  - language_id: yanglalo_Yangliu
+    glottolog_name: Yangliu
+    segments:
+    - kʰ
+    - a
+    - ²¹
+    alignment: []
+  - language_id: yanglalo_Yijiacun
+    glottolog_name: Eka
+    segments:
+    - kʰ
+    - a
+    - ²¹
+    alignment: []
+- id: bowernpny_6-dog
+  dataset: bowernpny
+  gloss: DOG
+  parameter_id: bowernpny_99_dog
+  forms:
+  - language_id: bowernpny_Gumbaynggir
+    glottolog_name: Kumbainggar
+    segments:
+    - w
+    - aː
+    - ɲ
+    - c
+    - i
+    alignment: []
+  - language_id: bowernpny_Kurrama
+    glottolog_name: Kurrama
+    segments:
+    - w
+    - a
+    - ɲ
+    - c
+    - a
+    alignment: []
+  - language_id: bowernpny_Ngarluma
+    glottolog_name: Ngarluma
+    segments:
+    - w
+    - a
+    - ɲ
+    - c
+    - a
+    alignment: []
+  - language_id: bowernpny_Yindjibarndi
+    glottolog_name: Yindjibarndi
+    segments:
+    - w
+    - a
+    - ɲ
+    - c
+    - a
+    alignment: []
+- id: leekoreanic_108_river-2
+  dataset: leekoreanic
+  gloss: RIVER
+  parameter_id: leekoreanic_108_river
+  forms:
+  - language_id: leekoreanic_Gyeonggi
+    glottolog_name: Seoul
+    segments:
+    - k
+    - a
+    - ŋ
+    alignment: []
+  - language_id: leekoreanic_MKorean
+    glottolog_name: Middle Korean
+    segments:
+    - k
+    - a
+    - ŋ
+    alignment: []
+  - language_id: leekoreanic_SJeolla
+    glottolog_name: Jollado
+    segments:
+    - k͈
+    - a
+    - ŋ
+    - +
+    - k
+    - ɛ
+    alignment: []
+- id: chaconcolumbian_19135
+  dataset: chaconcolumbian
+  gloss: FEATHER
+  parameter_id: chaconcolumbian_89_feather
+  forms:
+  - language_id: chaconcolumbian_Inga
+    glottolog_name: Colombian Inga
+    segments:
+    - p
+    - l
+    - u
+    - m
+    - a
+    alignment: []
+  - language_id: chaconcolumbian_Kamsa
+    glottolog_name: Camsá
+    segments:
+    - p
+    - l
+    - u
+    - m
+    - ɨ
+    - b
+    - x
+    - u
+    - a
+    alignment: []
