@@ -186,6 +186,8 @@ markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "integration: marks tests as integration tests",
     "regression: marks tests that validate against gold-standard data",
+    "property: marks property-based tests using Hypothesis",
+    "benchmark: marks performance benchmark tests",
 ]
 filterwarnings = [
     "error",
