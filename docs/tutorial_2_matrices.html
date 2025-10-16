@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+<title>tutorial_2_matrices</title>
+<style>
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                         Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            color: #333;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .code-block {
+            margin: 1.5rem 0;
+        }
+        .code-input {
+            padding: 1rem;
+            border-radius: 4px 4px 0 0;
+            margin: 0;
+        }
+        .code-input pre {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+        }
+        .code-output {
+            background: #f8f8f8;
+            border: 1px solid #e1e4e8;
+            border-top: none;
+            padding: 1rem;
+            border-radius: 0 0 4px 4px;
+            margin: 0;
+        }
+        .error {
+            color: #d73a49;
+            background: #ffeef0;
+            padding: 1rem;
+            border-radius: 4px;
+            border: 1px solid #ffdce0;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Footer */
+        .nhandu-footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e1e4e8;
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+        .nhandu-footer a {
+            color: #0969da;
+            text-decoration: none;
+        }
+        .nhandu-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Pygments syntax highlighting */
+        pre { line-height: 125%; }
+td.linenos .normal { color: #6e7681; background-color: #0d1117; padding-left: 5px; padding-right: 5px; }
+span.linenos { color: #6e7681; background-color: #0d1117; padding-left: 5px; padding-right: 5px; }
+td.linenos .special { color: #e6edf3; background-color: #6e7681; padding-left: 5px; padding-right: 5px; }
+span.linenos.special { color: #e6edf3; background-color: #6e7681; padding-left: 5px; padding-right: 5px; }
+.highlight .hll { background-color: #6e7681 }
+.highlight { background: #0d1117; color: #E6EDF3 }
+.highlight .c { color: #8B949E; font-style: italic } /* Comment */
+.highlight .err { color: #F85149 } /* Error */
+.highlight .esc { color: #E6EDF3 } /* Escape */
+.highlight .g { color: #E6EDF3 } /* Generic */
+.highlight .k { color: #FF7B72 } /* Keyword */
+.highlight .l { color: #A5D6FF } /* Literal */
+.highlight .n { color: #E6EDF3 } /* Name */
+.highlight .o { color: #FF7B72; font-weight: bold } /* Operator */
+.highlight .x { color: #E6EDF3 } /* Other */
+.highlight .p { color: #E6EDF3 } /* Punctuation */
+.highlight .ch { color: #8B949E; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #8B949E; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #8B949E; font-weight: bold; font-style: italic } /* Comment.Preproc */
+.highlight .cpf { color: #8B949E; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #8B949E; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #8B949E; font-weight: bold; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #FFA198; background-color: #490202 } /* Generic.Deleted */
+.highlight .ge { color: #E6EDF3; font-style: italic } /* Generic.Emph */
+.highlight .ges { color: #E6EDF3; font-weight: bold; font-style: italic } /* Generic.EmphStrong */
+.highlight .gr { color: #FFA198 } /* Generic.Error */
+.highlight .gh { color: #79C0FF; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #56D364; background-color: #0F5323 } /* Generic.Inserted */
+.highlight .go { color: #8B949E } /* Generic.Output */
+.highlight .gp { color: #8B949E } /* Generic.Prompt */
+.highlight .gs { color: #E6EDF3; font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #79C0FF } /* Generic.Subheading */
+.highlight .gt { color: #FF7B72 } /* Generic.Traceback */
+.highlight .g-Underline { color: #E6EDF3; text-decoration: underline } /* Generic.Underline */
+.highlight .kc { color: #79C0FF } /* Keyword.Constant */
+.highlight .kd { color: #FF7B72 } /* Keyword.Declaration */
+.highlight .kn { color: #FF7B72 } /* Keyword.Namespace */
+.highlight .kp { color: #79C0FF } /* Keyword.Pseudo */
+.highlight .kr { color: #FF7B72 } /* Keyword.Reserved */
+.highlight .kt { color: #FF7B72 } /* Keyword.Type */
+.highlight .ld { color: #79C0FF } /* Literal.Date */
+.highlight .m { color: #A5D6FF } /* Literal.Number */
+.highlight .s { color: #A5D6FF } /* Literal.String */
+.highlight .na { color: #E6EDF3 } /* Name.Attribute */
+.highlight .nb { color: #E6EDF3 } /* Name.Builtin */
+.highlight .nc { color: #F0883E; font-weight: bold } /* Name.Class */
+.highlight .no { color: #79C0FF; font-weight: bold } /* Name.Constant */
+.highlight .nd { color: #D2A8FF; font-weight: bold } /* Name.Decorator */
+.highlight .ni { color: #FFA657 } /* Name.Entity */
+.highlight .ne { color: #F0883E; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #D2A8FF; font-weight: bold } /* Name.Function */
+.highlight .nl { color: #79C0FF; font-weight: bold } /* Name.Label */
+.highlight .nn { color: #FF7B72 } /* Name.Namespace */
+.highlight .nx { color: #E6EDF3 } /* Name.Other */
+.highlight .py { color: #79C0FF } /* Name.Property */
+.highlight .nt { color: #7EE787 } /* Name.Tag */
+.highlight .nv { color: #79C0FF } /* Name.Variable */
+.highlight .ow { color: #FF7B72; font-weight: bold } /* Operator.Word */
+.highlight .pm { color: #E6EDF3 } /* Punctuation.Marker */
+.highlight .w { color: #6E7681 } /* Text.Whitespace */
+.highlight .mb { color: #A5D6FF } /* Literal.Number.Bin */
+.highlight .mf { color: #A5D6FF } /* Literal.Number.Float */
+.highlight .mh { color: #A5D6FF } /* Literal.Number.Hex */
+.highlight .mi { color: #A5D6FF } /* Literal.Number.Integer */
+.highlight .mo { color: #A5D6FF } /* Literal.Number.Oct */
+.highlight .sa { color: #79C0FF } /* Literal.String.Affix */
+.highlight .sb { color: #A5D6FF } /* Literal.String.Backtick */
+.highlight .sc { color: #A5D6FF } /* Literal.String.Char */
+.highlight .dl { color: #79C0FF } /* Literal.String.Delimiter */
+.highlight .sd { color: #A5D6FF } /* Literal.String.Doc */
+.highlight .s2 { color: #A5D6FF } /* Literal.String.Double */
+.highlight .se { color: #79C0FF } /* Literal.String.Escape */
+.highlight .sh { color: #79C0FF } /* Literal.String.Heredoc */
+.highlight .si { color: #A5D6FF } /* Literal.String.Interpol */
+.highlight .sx { color: #A5D6FF } /* Literal.String.Other */
+.highlight .sr { color: #79C0FF } /* Literal.String.Regex */
+.highlight .s1 { color: #A5D6FF } /* Literal.String.Single */
+.highlight .ss { color: #A5D6FF } /* Literal.String.Symbol */
+.highlight .bp { color: #E6EDF3 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #D2A8FF; font-weight: bold } /* Name.Function.Magic */
+.highlight .vc { color: #79C0FF } /* Name.Variable.Class */
+.highlight .vg { color: #79C0FF } /* Name.Variable.Global */
+.highlight .vi { color: #79C0FF } /* Name.Variable.Instance */
+.highlight .vm { color: #79C0FF } /* Name.Variable.Magic */
+.highlight .il { color: #A5D6FF } /* Literal.Number.Integer.Long */
+        
+</style>
+</head>
+<body>
+<h1>MAlign Tutorial 2: Scoring Matrices</h1>
+<p>This tutorial explains how to create, use, and customize scoring matrices
+for alignment operations.</p>
+<h2>What are Scoring Matrices?</h2>
+<p>Scoring matrices define the cost/benefit of aligning symbols:</p>
+<ul>
+<li><strong>Match</strong>: High positive score (symbols align well)</li>
+<li><strong>Mismatch</strong>: Lower or negative score (symbols don't match)</li>
+<li><strong>Gap</strong>: Penalty for inserting gaps</li>
+<li><strong>Asymmetric</strong>: A→B can differ from B→A</li>
+</ul>
+<h2>Creating Matrices</h2>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">malign</span>
+</pre></div>
+</div>
+</div>
+<h3>Identity Matrix (automatic)</h3>
+<p>If no matrix is provided, MAlign creates an identity matrix:</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="n">sequences</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ACGT&quot;</span><span class="p">,</span> <span class="s2">&quot;AGCT&quot;</span><span class="p">]</span>
+<span class="n">alms</span> <span class="o">=</span> <span class="n">malign</span><span class="o">.</span><span class="n">align</span><span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Uses default identity matrix</span>
+</pre></div>
+</div>
+</div>
+<h3>From Sequences (NEW in Phase 2)</h3>
+<p>Create a matrix from sequence alphabets with simple match/mismatch scoring:</p>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="n">matrix</span> <span class="o">=</span> <span class="n">malign</span><span class="o">.</span><span class="n">ScoringMatrix</span><span class="o">.</span><span class="n">from_sequences</span><span class="p">(</span>
+    <span class="n">sequences</span><span class="o">=</span><span class="p">[[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s2">&quot;G&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;А&quot;</span><span class="p">,</span> <span class="s2">&quot;В&quot;</span><span class="p">,</span> <span class="s2">&quot;Г&quot;</span><span class="p">,</span> <span class="s2">&quot;Т&quot;</span><span class="p">]],</span>
+    <span class="n">match</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">mismatch</span><span class="o">=-</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">gap_score</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<h3>From YAML File (NEW in Phase 2)</h3>
+<p>Load a previously saved matrix:</p>
+
+<h3>From Scores (programmatic)</h3>
+
+<div class="code-block">
+<div class="code-input"><div class="highlight"><pre><span></span><span class="n">scores</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;А&quot;</span><span class="p">):</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;В&quot;</span><span class="p">):</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;Г&quot;</span><span class="p">):</span> <span class="o">-</span><span class="mf">0.3</span><span class="p">,</span>
+    <span class="c1"># ... more scores</span>
+<span class="p">}</span>
+<span class="c1"># matrix = malign.ScoringMatrix.from_scores(scores, domains=[...], gap=&quot;-&quot;)</span>
+</pre></div>
+</div>
+</div>
+<h2>TODO: Complete in Phase 4</h2>
+<ul>
+<li>Demonstrate matrix imputation</li>
+<li>Show asymmetric scoring examples</li>
+<li>Explain YAML format</li>
+<li>Integration with freqprob/asymcat</li>
+</ul>
+
+<footer class="nhandu-footer">
+Made with <a href="https://pypi.org/project/nhandu" target="_blank" rel="noopener noreferrer">Nhandu</a>
+</footer>
+</body>
+</html>
