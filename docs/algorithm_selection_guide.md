@@ -165,7 +165,7 @@ Use **ANW** for reliability:
 sequences = [["k", "a", "t"], ["c", "a", "t"], ["k", "a", "t", "z"]]
 
 # Use YenKSP for maximum quality
-alms = malign.multi_align(sequences, k=10, method="yenksp")
+alms = malign.align(sequences, k=10, method="yenksp")
 ```
 
 ### Example 2: Aligning 6 language forms
@@ -174,7 +174,7 @@ alms = malign.multi_align(sequences, k=10, method="yenksp")
 sequences = [[...], [...], [...], [...], [...], [...]]  # 6 sequences
 
 # Use ANW (YenKSP would be too slow)
-alms = malign.multi_align(sequences, k=5, method="anw")
+alms = malign.align(sequences, k=5, method="anw")
 ```
 
 ### Example 3: Exploring alignment space
@@ -183,7 +183,7 @@ alms = malign.multi_align(sequences, k=5, method="anw")
 sequences = [["A", "B", "C"], ["A", "B", "D"]]
 
 # Use ANW (k=50 would be slow in YenKSP)
-alms = malign.multi_align(sequences, k=50, method="anw")
+alms = malign.align(sequences, k=50, method="anw")
 ```
 
 ## Summary

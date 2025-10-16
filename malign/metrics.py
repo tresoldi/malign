@@ -4,7 +4,7 @@ This module provides metrics to evaluate alignment quality by comparing
 predicted alignments against gold-standard reference alignments.
 """
 
-from collections.abc import Hashable, Sequence
+from collections.abc import Hashable
 
 from .alignment import Alignment
 

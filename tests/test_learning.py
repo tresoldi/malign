@@ -40,7 +40,7 @@ def test_learn_matrix_em_basic():
 
     # Verify matrix can be used for alignment
     test_seqs = [["A", "C", "G", "T"], ["A", "C", "G", "T"]]
-    alms = malign.multi_align(test_seqs, k=1, matrix=matrix)
+    alms = malign.align(test_seqs, k=1, matrix=matrix)
     assert len(alms) == 1
     assert alms[0].score is not None
 
@@ -63,7 +63,7 @@ def test_learn_matrix_gradient_descent_basic():
 
     # Verify matrix can be used for alignment
     test_seqs = [["A", "C", "G", "T"], ["A", "C", "G", "T"]]
-    alms = malign.multi_align(test_seqs, k=1, matrix=matrix)
+    alms = malign.align(test_seqs, k=1, matrix=matrix)
     assert len(alms) == 1
 
 
@@ -115,7 +115,7 @@ def test_learn_matrix_improves_scores():
     # Calculate total score with poor matrix
     poor_total = 0.0
     for cog_set in DNA_COGNATES:
-        alms = malign.multi_align(cog_set, k=1, matrix=poor_matrix)
+        alms = malign.align(cog_set, k=1, matrix=poor_matrix)
         if alms:
             poor_total += alms[0].score
 
@@ -130,7 +130,7 @@ def test_learn_matrix_improves_scores():
     # Calculate total score with learned matrix
     learned_total = 0.0
     for cog_set in DNA_COGNATES:
-        alms = malign.multi_align(cog_set, k=1, matrix=learned)
+        alms = malign.align(cog_set, k=1, matrix=learned)
         if alms:
             learned_total += alms[0].score
 
@@ -158,8 +158,8 @@ def test_learn_matrix_em_convergence():
     # They might have different scores (due to more iterations)
     # But both should work for alignment
     test_seqs = [["A", "C"], ["A", "C"]]
-    alms_2 = malign.multi_align(test_seqs, k=1, matrix=matrix_2iter)
-    alms_10 = malign.multi_align(test_seqs, k=1, matrix=matrix_10iter)
+    alms_2 = malign.align(test_seqs, k=1, matrix=matrix_2iter)
+    alms_10 = malign.align(test_seqs, k=1, matrix=matrix_10iter)
     assert len(alms_2) > 0
     assert len(alms_10) > 0
 
@@ -178,7 +178,7 @@ def test_learn_matrix_gradient_descent_convergence():
 
     # Test that it works for alignment
     test_seqs = [["A", "C", "G"], ["A", "C", "G"]]
-    alms = malign.multi_align(test_seqs, k=1, matrix=matrix)
+    alms = malign.align(test_seqs, k=1, matrix=matrix)
     assert len(alms) > 0
 
 
@@ -233,7 +233,7 @@ def test_learn_matrix_multisequence():
 
     # Test alignment with 3 sequences
     test_seqs = [["A"], ["A"], ["A"]]
-    alms = malign.multi_align(test_seqs, k=1, matrix=matrix)
+    alms = malign.align(test_seqs, k=1, matrix=matrix)
     assert len(alms) > 0
 
 
@@ -297,7 +297,7 @@ def test_em_convergence_early_stopping():
 
     # Verify matrix works for alignment
     test_seqs = [["A", "A"], ["A", "A"]]
-    alms = malign.multi_align(test_seqs, k=1, matrix=matrix)
+    alms = malign.align(test_seqs, k=1, matrix=matrix)
     assert len(alms) > 0
 
 

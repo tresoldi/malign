@@ -5,7 +5,7 @@ import malign
 
 def test_tabulate_alms():
     """Test alignment tabulation."""
-    alms = malign.multi_align(["ACGT", "AGCT"], k=1)
+    alms = malign.align(["ACGT", "AGCT"], k=1)
     table = malign.tabulate_alms(alms)
     assert isinstance(table, str)
     assert len(table) > 0

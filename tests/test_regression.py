@@ -57,7 +57,7 @@ def test_regression_smoke_test():
             gold_alignment = cognate_set_to_gold_alignment(cog_set)
 
             # Align using ANW method
-            predicted_alms = malign.multi_align(sequences, k=1, method="anw")
+            predicted_alms = malign.align(sequences, k=1, method="anw")
 
             if predicted_alms:
                 predicted_alignment = predicted_alms[0]
@@ -127,7 +127,7 @@ def test_regression_accuracy_threshold_anw():
             gold_alignment = cognate_set_to_gold_alignment(cog_set)
 
             # Align using ANW method
-            predicted_alms = malign.multi_align(sequences, k=1, method="anw")
+            predicted_alms = malign.align(sequences, k=1, method="anw")
 
             if not predicted_alms:
                 failed_tests.append((cog_set.id, "No alignments produced"))
@@ -219,7 +219,7 @@ def test_regression_accuracy_threshold_yenksp():
             gold_alignment = cognate_set_to_gold_alignment(cog_set)
 
             # Align using YenKSP method
-            predicted_alms = malign.multi_align(sequences, k=1, method="yenksp")
+            predicted_alms = malign.align(sequences, k=1, method="yenksp")
 
             if not predicted_alms:
                 failed_tests.append((cog_set.id, "No alignments produced"))
@@ -302,7 +302,7 @@ def test_regression_per_dataset_quality():
             try:
                 sequences = cognate_set_to_sequences(cog_set)
                 gold_alignment = cognate_set_to_gold_alignment(cog_set)
-                predicted_alms = malign.multi_align(sequences, k=1, method="anw")
+                predicted_alms = malign.align(sequences, k=1, method="anw")
 
                 if predicted_alms:
                     acc = alignment_accuracy(predicted_alms[0], gold_alignment)

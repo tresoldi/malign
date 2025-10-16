@@ -90,7 +90,7 @@ def _evaluate_matrix_accuracy(matrix, eval_cognate_sets):
             gold_alignment = cognate_set_to_gold_alignment(cog_set)
 
             # Align with learned matrix
-            predicted_alms = malign.multi_align(sequences, k=1, matrix=matrix, method="anw")
+            predicted_alms = malign.align(sequences, k=1, matrix=matrix, method="anw")
 
             if predicted_alms:
                 predicted_alignment = predicted_alms[0]

@@ -335,7 +335,7 @@ class ScoringMatrix:
             ... )
         """
         # Build domains from sequences, ensuring gap is included
-        domains = [sorted(set([gap, *seq])) for seq in sequences]
+        domains = [sorted({gap, *seq}) for seq in sequences]
 
         # Create scores dictionary with basic identity scoring
         scores = {}

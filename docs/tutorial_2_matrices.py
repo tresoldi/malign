@@ -19,7 +19,7 @@ import malign
 #' If no matrix is provided, MAlign creates an identity matrix:
 
 sequences = ["ACGT", "AGCT"]
-alms = malign.multi_align(sequences, k=1)  # Uses default identity matrix
+alms = malign.align(sequences, k=1)  # Uses default identity matrix
 
 #' ### From Sequences (NEW in Phase 2)
 #'
