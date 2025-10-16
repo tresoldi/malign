@@ -5,7 +5,7 @@ import malign
 
 def test_dumb_basic():
     """Test basic dumb alignment."""
-    alms = malign.multi_align(["ACGT", "AGCT"], k=1, method="dumb")
+    alms = malign.align(["ACGT", "AGCT"], k=1, method="dumb")
     assert len(alms) == 1
     assert len(alms[0].seqs) == 2
 

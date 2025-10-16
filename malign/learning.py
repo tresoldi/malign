@@ -14,8 +14,7 @@ from collections.abc import Hashable, Sequence
 import numpy as np
 from scipy.optimize import minimize
 
-from .alignment import Alignment
-from .malign import multi_align
+from .malign import align
 from .scoring_matrix import ScoringMatrix
 
 
@@ -78,7 +77,7 @@ def learn_matrix(
             verbose=verbose,
             **kwargs,
         )
-    elif method == "gradient_descent":
+    if method == "gradient_descent":
         return _gradient_descent_learning(
             cognate_sets,
             max_iter,
@@ -89,8 +88,7 @@ def learn_matrix(
             verbose=verbose,
             **kwargs,
         )
-    else:
-        raise ValueError(f"Unknown learning method: {method}. Use 'em' or 'gradient_descent'.")
+    raise ValueError(f"Unknown learning method: {method}. Use 'em' or 'gradient_descent'.")
 
 
 def _initialize_matrix(
@@ -194,7 +192,7 @@ def _em_learning(
 
         for cog_set in cognate_sets:
             # Get best alignment for this cognate set
-            alms = multi_align(cog_set, k=1, matrix=matrix)
+            alms = align(cog_set, k=1, matrix=matrix)
             if alms:
                 alignments.append(alms[0])
                 if alms[0].score is not None:
@@ -342,10 +340,9 @@ def _gradient_descent_learning(
         total_score = 0.0
 
         for cog_set in cognate_sets:
-            alms = multi_align(cog_set, k=1, matrix=mat)
-            if alms:
-                if alms[0].score is not None:
-                    total_score += alms[0].score
+            alms = align(cog_set, k=1, matrix=mat)
+            if alms and alms[0].score is not None:
+                total_score += alms[0].score
 
         # Return negative (we minimize, but want to maximize score)
         return -total_score

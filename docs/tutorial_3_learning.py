@@ -34,7 +34,7 @@ learned_matrix = malign.learn_matrix(
 
 # Use the learned matrix for alignment
 test_seqs = [["A", "C", "G", "T"], ["A", "G", "G", "T"]]
-alignments = malign.multi_align(test_seqs, k=1, matrix=learned_matrix)
+alignments = malign.align(test_seqs, k=1, matrix=learned_matrix)
 print("Learned matrix alignment:")
 print(malign.tabulate_alms(alignments))
 
@@ -50,8 +50,8 @@ gd_matrix = malign.learn_matrix(
 )
 
 # Compare results
-em_alm = malign.multi_align(test_seqs, k=1, matrix=learned_matrix)[0]
-gd_alm = malign.multi_align(test_seqs, k=1, matrix=gd_matrix)[0]
+em_alm = malign.align(test_seqs, k=1, matrix=learned_matrix)[0]
+gd_alm = malign.align(test_seqs, k=1, matrix=gd_matrix)[0]
 
 print(f"EM score: {em_alm.score:.3f}")
 print(f"Gradient descent score: {gd_alm.score:.3f}")

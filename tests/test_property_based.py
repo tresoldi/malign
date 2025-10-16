@@ -24,7 +24,7 @@ test_settings = settings(max_examples=50, deadline=2000)
 @test_settings
 def test_property_alignment_length_consistency(seqs):
     """Property: All sequences in an alignment must have equal length."""
-    alms = malign.multi_align(seqs, k=10, method="anw")
+    alms = malign.align(seqs, k=10, method="anw")
 
     for alm in alms:
         lengths = [len(seq) for seq in alm.seqs]
@@ -41,7 +41,7 @@ def test_property_alignment_length_consistency(seqs):
 @test_settings
 def test_property_symbol_preservation(seqs):
     """Property: Removing gaps from alignment should yield original sequence."""
-    alms = malign.multi_align(seqs, k=1, method="anw")
+    alms = malign.align(seqs, k=1, method="anw")
 
     for idx, original_seq in enumerate(seqs):
         aligned = [s for s in alms[0].seqs[idx] if s != "-"]
@@ -59,7 +59,7 @@ def test_property_symbol_preservation(seqs):
 @test_settings
 def test_property_score_ordering(seqs, k):
     """Property: k-best alignments should be sorted by descending score."""
-    alms = malign.multi_align(seqs, k=k, method="anw")
+    alms = malign.align(seqs, k=k, method="anw")
 
     if len(alms) > 1:
         scores = [alm.score for alm in alms]
@@ -78,7 +78,7 @@ def test_property_score_ordering(seqs, k):
 @test_settings
 def test_property_k_best_uniqueness(seqs):
     """Property: All k-best alignments should be distinct."""
-    alms = malign.multi_align(seqs, k=10, method="anw")
+    alms = malign.align(seqs, k=10, method="anw")
 
     # Convert to tuples for comparison
     alm_tuples = [tuple(tuple(seq) for seq in alm.seqs) for alm in alms]
@@ -145,7 +145,7 @@ def test_property_learning_produces_valid_matrix(cognate_sets):
 
         # Should be able to align with it
         test_seqs = cognate_sets[0] if cognate_sets else [["A"], ["A"]]
-        alms = malign.multi_align(test_seqs, k=1, matrix=learned)
+        alms = malign.align(test_seqs, k=1, matrix=learned)
 
         # Basic validity checks
         assert len(alms) >= 1, "No alignments produced"
@@ -180,7 +180,7 @@ try:
     @slow_settings
     def test_property_alignment_length_consistency_slow(seqs):
         """Slow variant: Test with more examples and larger alphabet."""
-        alms = malign.multi_align(seqs, k=5, method="yenksp")
+        alms = malign.align(seqs, k=5, method="yenksp")
         for alm in alms:
             lengths = [len(seq) for seq in alm.seqs]
             assert len(set(lengths)) == 1
@@ -197,7 +197,7 @@ try:
     @slow_settings
     def test_property_symbol_preservation_slow(seqs):
         """Slow variant: Test with more examples and longer sequences."""
-        alms = malign.multi_align(seqs, k=1, method="yenksp")
+        alms = malign.align(seqs, k=1, method="yenksp")
         for idx, original_seq in enumerate(seqs):
             aligned = [s for s in alms[0].seqs[idx] if s != "-"]
             assert aligned == list(original_seq)

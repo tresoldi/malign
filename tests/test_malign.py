@@ -13,7 +13,7 @@ import malign
 def test_dumb_pw_align():
     """Test `dumb` pairwise alignment."""
 
-    alms = malign.multi_align(["tra", "fatata"], method="dumb")
+    alms = malign.align(["tra", "fatata"], method="dumb")
     assert len(alms) == 1
     assert tuple(alms[0].seqs[0]) == ("-", "t", "r", "a", "-", "-")
     assert tuple(alms[0].seqs[1]) == ("f", "a", "t", "a", "t", "a")
@@ -23,7 +23,7 @@ def test_dumb_pw_align():
 def test_nw_pw_align():
     """Test `nw` pairwise alignment."""
 
-    alms = malign.multi_align(["tra", "fata"], k=2, method="anw")
+    alms = malign.align(["tra", "fata"], k=2, method="anw")
     assert len(alms) == 1
     assert tuple(alms[0].seqs[0]) == ("-", "-", "t", "r", "a")
     assert tuple(alms[0].seqs[1]) == ("f", "a", "t", "-", "a")
@@ -35,7 +35,7 @@ def test_yenksp_pw_align():
     """Test `kbest` pairwise alignment."""
 
     # Test with basic alignment, no scorer
-    alms = malign.multi_align(["tra", "fata"], k=4, method="yenksp")
+    alms = malign.align(["tra", "fata"], k=4, method="yenksp")
     assert len(alms) == 4
     assert tuple(alms[0].seqs[0]) == ("t", "r", "-", "a")
     assert tuple(alms[0].seqs[1]) == ("f", "a", "t", "a")
@@ -127,7 +127,7 @@ def test_tabulation():
 
     # TODO: assertMultiLineEqual() is failing, only keeping here for coverage
 
-    alms = malign.multi_align(["tra", "fatata"], method="anw", k=3)
+    alms = malign.align(["tra", "fatata"], method="anw", k=3)
     output = malign.tabulate_alms(alms)
 
     ref = """
@@ -144,19 +144,19 @@ def test_tabulation():
 def test_error_k_less_than_one():
     """Test that k < 1 raises ValueError."""
     with pytest.raises(ValueError, match="At least one alignment must be returned"):
-        malign.multi_align(["ACGT", "ACGT"], k=0)
+        malign.align(["ACGT", "ACGT"], k=0)
 
     with pytest.raises(ValueError, match="At least one alignment must be returned"):
-        malign.multi_align(["ACGT", "ACGT"], k=-1)
+        malign.align(["ACGT", "ACGT"], k=-1)
 
 
 def test_error_invalid_method():
     """Test that invalid method raises ValueError."""
     with pytest.raises(ValueError, match="Invalid alignment method"):
-        malign.multi_align(["ACGT", "ACGT"], method="invalid")
+        malign.align(["ACGT", "ACGT"], method="invalid")
 
     with pytest.raises(ValueError, match="Invalid alignment method"):
-        malign.multi_align(["ACGT", "ACGT"], method="upgma")
+        malign.align(["ACGT", "ACGT"], method="upgma")
 
 
 def test_multiwise_alignment_varying_lengths():
@@ -171,7 +171,7 @@ def test_multiwise_alignment_varying_lengths():
         ["A", "C", "G", "T", "T"],  # Long
     ]
 
-    alms = malign.multi_align(seqs, method="anw", k=2)
+    alms = malign.align(seqs, method="anw", k=2)
 
     # Should produce valid alignments
     assert len(alms) >= 1
@@ -197,7 +197,7 @@ def test_multiwise_alignment_four_sequences():
         ["T", "G"],
     ]
 
-    alms = malign.multi_align(seqs, method="anw", k=3)
+    alms = malign.align(seqs, method="anw", k=3)
 
     # Should produce alignments
     assert len(alms) >= 1
@@ -219,7 +219,7 @@ def test_multiwise_alignment_five_sequences():
         ["A", "C", "G", "T", "A"],
     ]
 
-    alms = malign.multi_align(seqs, method="yenksp", k=2)
+    alms = malign.align(seqs, method="yenksp", k=2)
 
     # Should handle 5 sequences
     assert len(alms) >= 1

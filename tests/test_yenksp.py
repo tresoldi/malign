@@ -5,7 +5,7 @@ import malign
 
 def test_yenksp_basic():
     """Test basic YenKSP alignment."""
-    alms = malign.multi_align(["ACGT", "AGCT"], k=4, method="yenksp")
+    alms = malign.align(["ACGT", "AGCT"], k=4, method="yenksp")
     assert len(alms) <= 4
     assert len(alms[0].seqs) == 2
 

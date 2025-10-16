@@ -15,7 +15,7 @@ from malign.scoring_matrix import ScoringMatrix
 def test_full_pipeline_identity_matrix():
     """Test: sequences → identity matrix → align."""
     sequences = ["ACGT", "AGCT", "ATCT"]
-    alms = malign.multi_align(sequences, k=2)
+    alms = malign.align(sequences, k=2)
 
     assert len(alms) <= 2
     assert all(len(alm.seqs) == 3 for alm in alms)
@@ -37,7 +37,7 @@ def test_full_pipeline_custom_matrix():
     matrix = ScoringMatrix(scores)
 
     sequences = ["AC", "AA"]
-    alms = malign.multi_align(sequences, k=1, matrix=matrix)
+    alms = malign.align(sequences, k=1, matrix=matrix)
     assert len(alms) == 1
 
 
@@ -66,7 +66,7 @@ def test_learning_pipeline_end_to_end():
 
     # Use learned matrix to align new sequences
     test_sequences = [["A", "C", "G", "T"], ["A", "C", "G", "T"]]
-    alms = malign.multi_align(test_sequences, k=3, matrix=learned_matrix, method="anw")
+    alms = malign.align(test_sequences, k=3, matrix=learned_matrix, method="anw")
 
     # Verify alignments are valid
     assert len(alms) >= 1
@@ -114,7 +114,7 @@ def test_matrix_persistence_pipeline():
 
     # Align with original matrix
     test_sequences = [["A", "C", "G"], ["A", "G", "G"]]
-    alms_original = malign.multi_align(test_sequences, k=5, matrix=original_matrix, method="anw")
+    alms_original = malign.align(test_sequences, k=5, matrix=original_matrix, method="anw")
 
     # Save matrix to YAML
     with tempfile.NamedTemporaryFile(mode="w", suffix=".yml", delete=False) as f:
@@ -134,7 +134,7 @@ def test_matrix_persistence_pipeline():
             assert abs(loaded_matrix.scores[key] - original_matrix.scores[key]) < 1e-10
 
         # Align with loaded matrix
-        alms_loaded = malign.multi_align(test_sequences, k=5, matrix=loaded_matrix, method="anw")
+        alms_loaded = malign.align(test_sequences, k=5, matrix=loaded_matrix, method="anw")
 
         # Verify identical results
         assert len(alms_original) == len(alms_loaded)
@@ -158,8 +158,8 @@ def test_anw_vs_yenksp_consistency():
 
     # Get top-k alignments from both methods
     k = 3
-    alms_anw = malign.multi_align(sequences, k=k, method="anw")
-    alms_yenksp = malign.multi_align(sequences, k=k, method="yenksp")
+    alms_anw = malign.align(sequences, k=k, method="anw")
+    alms_yenksp = malign.align(sequences, k=k, method="yenksp")
 
     # Both should produce results
     assert len(alms_anw) >= 1
@@ -279,7 +279,7 @@ def test_large_scale_stress_test():
     ]
 
     # Should handle 6 sequences (reduced for reasonable runtime)
-    alms_large = malign.multi_align(large_sequence_set, k=2, method="anw")
+    alms_large = malign.align(large_sequence_set, k=2, method="anw")
     assert len(alms_large) >= 1
     assert len(alms_large[0].seqs) == 6
 
@@ -304,7 +304,7 @@ def test_large_scale_stress_test():
 
     # Test 3: High k value (stress k-best algorithm)
     test_seqs = [["A", "C", "G"], ["A", "G", "G"], ["T", "C", "G"]]
-    alms_high_k = malign.multi_align(test_seqs, k=20, method="anw")
+    alms_high_k = malign.align(test_seqs, k=20, method="anw")
 
     # Should return up to k alignments (may be fewer if not enough exist)
     assert 1 <= len(alms_high_k) <= 20
@@ -323,7 +323,7 @@ def test_large_scale_stress_test():
     long_seq2 = ["A", "C", "G", "T"] * 6
     long_seq2[5] = "G"  # Introduce variation
 
-    alms_long = malign.multi_align([long_seq1, long_seq2], k=3, method="anw")
+    alms_long = malign.align([long_seq1, long_seq2], k=3, method="anw")
     assert len(alms_long) >= 1
 
     # Verify sequences preserved

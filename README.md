@@ -27,13 +27,13 @@ $ pip install malign
 ```
 
 For most purposes, it is enough to pass the sequences to be aligned and
-specify one of the available methods (currently `anw`, the default, 
-and `yenksp`) to the `.multi_align()` function, along with the maximum
+specify one of the available methods (currently `anw`, the default,
+and `yenksp`) to the `.align()` function, along with the maximum
 number of alignments to be returned (`k`):
 
 ```python
->> import malign                                                                                                      
->> alms = malign.multi_align(["ATTCGGAT", "TACGGATTT"], k=2)                                                   
+>> import malign
+>> alms = malign.align(["ATTCGGAT", "TACGGATTT"], k=2)                                                   
 >> print(malign.tabulate_alms(alms))                                                                                  
 | Idx   | Seq   |   Score |  #0  |  #1  |  #2  |  #3  |  #4  |  #5  |  #6  |  #7  |  #8  |  #9  |
 |-------|-------|---------|------|------|------|------|------|------|------|------|------|------|
@@ -50,7 +50,7 @@ optimizations, or read from JSON files:
 ```python
 >> ita_rus = malign.ScoringMatrix()
 >> ita_rus.load("docs/ita_rus.matrix")
->> alms = malign.multi_align(["Giacomo", "Яков"], k=4, method="anw", matrix=ita_rus)
+>> alms = malign.align(["Giacomo", "Яков"], k=4, method="anw", matrix=ita_rus)
 >> print(malign.tabulate_alms(alms))
 | Idx   | Seq   |   Score |  #0  |  #1  |  #2  |  #3  |  #4  |  #5  |  #6  |  #7  |
 |-------|-------|---------|------|------|------|------|------|------|------|------|
@@ -72,22 +72,35 @@ be found in the documentation.
 
 ## Changelog
 
-Version 0.1:
-  - First release for an internal announcement, testing, and community outreach
+Version 0.4.0-beta.1 (2025-10-16):
+  - **Breaking**: Renamed `multi_align()` → `align()`
+  - **Breaking**: Python 3.10+ required
+  - Matrix learning via EM and gradient descent algorithms
+  - Convergence detection and early stopping
+  - YAML matrix serialization (primary format)
+  - Comprehensive testing infrastructure (77% coverage)
+  - Property-based tests with Hypothesis
+  - Regression tests on 451K+ gold standard forms
+  - Performance benchmarks and algorithm selection guide
+  - Alignment metrics (accuracy, precision, recall, F1)
+  - See [CHANGELOG.md](CHANGELOG.md) for complete details
 
-Version 0.2:
+Version 0.3 (2021):
+  - Code improvements, including type annotation, and some refactoring
+  - Allowing usage with any hashable Python object (not only strings)
+  - Add methods for matrix imputation
+  - Update of documentation
+  - General preparations for public announcement
+
+Version 0.2 (2020):
   - Major revision with asymmetric Needleman-Wunsch and Yen's `k`-shortest path
     implementation
   - Added scoring matrix object
   - Sort alignments in consistent and reproducible ways, even when the alignment
     score is the same
 
-Version 0.3
-  - Code improvements, including type annotation, and some refactoring
-  - Allowing usage with any hashable Python object (not only strings)
-  - Add methods for matrix imputation  
-  - Update of documentation
-  - General preparations for public announcement
+Version 0.1 (2019):
+  - First release for an internal announcement, testing, and community outreach
 
 ## TODO
 
@@ -101,8 +114,6 @@ Version 0.3
     baseline method
   - Allow `anw` to work within a threshold percentage of the best score
   - Implement a method combining the results of the different algorithms
-  - Add methods and demonstration for matrix optimization
-  - Move to GitHub Actions
 
 ## Community guidelines
 
@@ -129,18 +140,18 @@ No. [ERC Grant #715618](https://cordis.europa.eu/project/rcn/206320/factsheet/en
 
 If you use `malign`, please cite it as:
 
-  > Tresoldi, Tiago (2021). MALIGN, a library for multiple asymmetric alignments on
-  > different domains. Version 0.3. Uppsala: Uppsala Universitet.
+  > Tresoldi, Tiago (2025). MALIGN, a library for multiple asymmetric alignments on
+  > different domains. Version 0.4. Uppsala: Uppsala Universitet.
 
 In BibTeX:
 
 ```bibtex
-@misc{Tresoldi2021malign,
+@misc{Tresoldi2025malign,
   author = {Tresoldi, Tiago},
-  title = {MALIGN, a library for multiple asymmetric alignments on different domains. Version 0.3},
+  title = {MALIGN, a library for multiple asymmetric alignments on different domains. Version 0.4},
   howpublished = {\url{https://github.com/tresoldi/malign}},
   address = {Uppsala},
-  publisher = {Uppsala Universitet}
-  year = {2021},
+  publisher = {Uppsala Universitet},
+  year = {2025},
 }
 ```

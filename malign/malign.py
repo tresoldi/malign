@@ -169,7 +169,7 @@ def _collect_alignments(
 
 
 # TODO: gap opening/gap extension for scoring
-def multi_align(
+def align(
     sequences: list[Hashable],
     method: str = "anw",
     matrix: ScoringMatrix | None = None,
