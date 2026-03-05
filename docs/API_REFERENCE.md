@@ -1,8 +1,8 @@
 # MAlign API Reference
 
-**Version**: 0.4.0-beta.1
+**Version**: 0.5.0
 
-This document provides comprehensive API documentation for all public functions, classes, and methods in MAlign v0.4.0.
+This document provides comprehensive API documentation for all public functions, classes, and methods in MAlign v0.5.0.
 
 ---
 
@@ -372,38 +372,8 @@ Save the scoring matrix to a YAML file.
 matrix.save("my_matrix.yml")
 ```
 
-##### copy()
-
-```python
-def copy(self) -> ScoringMatrix
-```
-
-Create a deep copy of the scoring matrix.
-
-**Returns:**
-
-- `ScoringMatrix`: Copy of this matrix
-
-**Example:**
-
-```python
-matrix_copy = matrix.copy()
-matrix_copy.scores[("A", "A")] = 2.0  # Doesn't affect original
-```
-
-##### load()
-
-```python
-def load(self, filepath: str) -> None
-```
-
-Load scores from a JSON file (legacy format, YAML preferred).
-
-**Parameters:**
-
-- `filepath`: Path to JSON file
-
-**Note:** For new projects, use `ScoringMatrix.from_yaml()` instead. This method is maintained for backward compatibility.
+**Note:** `ScoringMatrix` is a frozen (immutable) dataclass. To create
+modified versions, construct a new instance with updated scores.
 
 ---
 
@@ -621,7 +591,7 @@ except FileNotFoundError:
 
 ## Type Hints
 
-MAlign uses modern Python type hints (Python 3.10+):
+MAlign uses modern Python type hints (Python 3.12+):
 
 ```python
 from collections.abc import Hashable, Sequence
@@ -656,5 +626,4 @@ alignments: list[Alignment] = malign.align(sequences)
 
 ---
 
-**Document Version**: 0.4.0-beta.1 (2025-10-16)
-**Last Updated**: Phase 2 documentation completion
+**Document Version**: 0.5.0

@@ -1,8 +1,8 @@
 # MAlign User Guide
 
-**Version**: 0.4.0-beta.1
+**Version**: 0.5.0
 
-This guide covers the essential features and usage patterns for MAlign v0.4.0. For detailed API documentation, see [API_REFERENCE.md](API_REFERENCE.md).
+This guide covers the essential features and usage patterns for MAlign v0.5.0. For detailed API documentation, see [API_REFERENCE.md](API_REFERENCE.md).
 
 ---
 
@@ -27,10 +27,10 @@ This guide covers the essential features and usage patterns for MAlign v0.4.0. F
 pip install malign
 ```
 
-For development or beta versions:
+For phonological feature-based scoring matrices:
 
 ```bash
-pip install malign==0.4.0b1
+pip install malign[features]
 ```
 
 ### Quick Start
@@ -377,16 +377,13 @@ scores:
   # ... all score pairs
 ```
 
-**Backward Compatibility:**
-
-JSON format is still supported for backward compatibility:
+**Loading from YAML:**
 
 ```python
-# Load old JSON matrices
-matrix = malign.ScoringMatrix()
-matrix.load("old_matrix.json")
+# Load a previously saved matrix
+matrix = malign.ScoringMatrix.from_yaml("my_matrix.yml")
 
-# Convert to YAML
+# Save to YAML
 matrix.save("new_matrix.yml")
 ```
 
@@ -414,7 +411,7 @@ matrix.scores[("C", "C")] = 1.0
 
 ### Matrix Learning
 
-**New in v0.4.0**: Learn scoring matrices from cognate data.
+Learn scoring matrices from cognate data.
 
 #### Expectation-Maximization (EM)
 

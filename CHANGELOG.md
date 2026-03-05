@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2025
+
+### Added
+- **Feature-based scoring**: `ScoringMatrix.from_distfeat()` builds matrices from
+  phonological feature distances (requires `pip install malign[features]`)
+- **Full pipeline**: distfeat features -> scoring matrix -> alignment -> evaluation
+
+### Changed
+- **Breaking**: Python >= 3.12 required (was 3.10+)
+- **Breaking**: `ScoringMatrix` is now a frozen dataclass (immutable)
+  - Removed `__setitem__`, `load()`, `copy()` methods
+  - Use factory classmethods: `from_yaml()`, `from_sequences()`, `from_distfeat()`
+  - `domains` is now `tuple[tuple[...], ...]` instead of `list[list[...]]`
+- **Breaking**: Dropped `networkx` dependency -- replaced with pure Python
+  Dijkstra + Yen's KSP implementation
+- EM learning creates new `ScoringMatrix` per iteration (functional style)
+- Replaced `pairwise_iter` with `itertools.pairwise` (Python 3.12+)
+- Google-style docstrings throughout
+- `Alignment` added to public API exports
+- Comprehensive ruff linting/formatting compliance
+
+### Removed
+- `networkx` dependency
+- `ScoringMatrix.__setitem__()`, `.load()`, `.copy()`
+- `pairwise_iter` utility function
+
+---
+
 ## [0.4.0-beta.1] - 2025-10-16
 
 ### Added

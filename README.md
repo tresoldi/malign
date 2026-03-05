@@ -2,138 +2,136 @@
 
 [![PyPI](https://img.shields.io/pypi/v/malign.svg)](https://pypi.org/project/malign)
 ![CI](https://github.com/tresoldi/malign/workflows/CI/badge.svg)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f6428290a03742e69a6a5cb512a99650)](https://www.codacy.com/manual/tresoldi/malign?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tresoldi/malign&amp;utm_campaign=Badge_Grade)
 
-MALIGN is a library for performing multiple alignments on sequences of different
-domains, allowing the usage of asymmetric scoring matrices. Multiple alignments
-are actual multiple alignments, scoring according to the overall probability
-of each alignment site, and not a succession of pairwise alignments gradually
-combined.
+**MAlign** is a Python library for multiple sequence alignment with asymmetric
+scoring matrices across different domains. Unlike standard alignment tools that
+assume symmetric substitution costs, MAlign supports directional scoring -- the
+cost of aligning symbol A with symbol B can differ from B with A.
 
-While intended for linguistic usage mostly, it can be used for aligning any type of
-sequential representation as long as the elements of each domain are hashable. It is
-particularly suitable as a general-purpose tool for cases where there are no prior
-hypotheses on the scoring matrices, which can be inferred or imputed (including
-from incomplete data), or optimized from observable examples to find local and
-global minima that can be used to explain the relationships between the sequences.
+While designed primarily for computational linguistics (e.g., historical
+phonology, cognate detection), MAlign works with any hashable Python objects
+and is suitable for general-purpose sequence alignment tasks.
 
-## Installation and usage
+## Key Features
 
-The library can be installed as any standard Python library with
-`pip`, preferably within a virtual environment:
+- **Asymmetric scoring**: Direction-dependent alignment costs
+- **Multiple algorithms**: Needleman-Wunsch (`anw`) and Yen's k-shortest paths (`yenksp`)
+- **k-best alignments**: Return the top-k optimal alignments, not just the best one
+- **Matrix learning**: Learn scoring matrices from cognate sets via EM or gradient descent
+- **Feature-based scoring**: Build matrices from phonological feature distances (via [distfeat](https://github.com/tresoldi/distfeat))
+- **Matrix imputation**: Fill sparse matrices using sklearn-based methods
+- **Evaluation metrics**: Accuracy, precision, recall, and F1 for alignment quality
+
+## Installation
 
 ```bash
-$ pip install malign
+pip install malign
 ```
 
-For most purposes, it is enough to pass the sequences to be aligned and
-specify one of the available methods (currently `anw`, the default,
-and `yenksp`) to the `.align()` function, along with the maximum
-number of alignments to be returned (`k`):
+For phonological feature-based scoring matrices:
+
+```bash
+pip install malign[features]
+```
+
+## Quick Start
+
+### Basic Alignment
 
 ```python
->> import malign
->> alms = malign.align(["ATTCGGAT", "TACGGATTT"], k=2)                                                   
->> print(malign.tabulate_alms(alms))                                                                                  
-| Idx   | Seq   |   Score |  #0  |  #1  |  #2  |  #3  |  #4  |  #5  |  #6  |  #7  |  #8  |  #9  |
-|-------|-------|---------|------|------|------|------|------|------|------|------|------|------|
-| 0     | A     |   -0.29 |  A   |  T   |  T   |  C   |  G   |  G   |  A   |  -   |  T   |  -   |
-| 0     | B     |   -0.29 |  -   |  T   |  A   |  C   |  G   |  G   |  A   |  T   |  T   |  T   |
-|       |       |         |      |      |      |      |      |      |      |      |      |      |
-| 1     | A     |   -0.29 |  A   |  T   |  T   |  C   |  G   |  G   |  A   |  -   |  -   |  T   |
-| 1     | B     |   -0.29 |  -   |  T   |  A   |  C   |  G   |  G   |  A   |  T   |  T   |  T   |
+import malign
+
+alms = malign.align(["ATTCGGAT", "TACGGATTT"], k=2)
+print(malign.tabulate_alms(alms))
 ```
 
-Scoring matrices can be either computed with the auxiliary methods, including various
-optimizations, or read from JSON files:
+### Custom Scoring Matrix
 
 ```python
->> ita_rus = malign.ScoringMatrix()
->> ita_rus.load("docs/ita_rus.matrix")
->> alms = malign.align(["Giacomo", "Яков"], k=4, method="anw", matrix=ita_rus)
->> print(malign.tabulate_alms(alms))
-| Idx   | Seq   |   Score |  #0  |  #1  |  #2  |  #3  |  #4  |  #5  |  #6  |  #7  |
-|-------|-------|---------|------|------|------|------|------|------|------|------|
-| 0     | A     |    2.86 |  G   |  i   |  a   |  c   |  o   |  m   |  o   |      |
-| 0     | B     |    2.86 |  -   |  Я   |  -   |  к   |  о   |  в   |  -   |      |
-|       |       |         |      |      |      |      |      |      |      |      |
-| 1     | A     |    2.29 |  G   |  i   |  a   |  c   |  o   |  m   |  o   |      |
-| 1     | B     |    2.29 |  -   |  Я   |  -   |  к   |  о   |  -   |  в   |      |
-|       |       |         |      |      |      |      |      |      |      |      |
-| 2     | A     |    2.12 |  G   |  i   |  a   |  c   |  o   |  m   |  o   |  -   |
-| 2     | B     |    2.12 |  -   |  Я   |  -   |  к   |  о   |  -   |  -   |  в   |
-|       |       |         |      |      |      |      |      |      |      |      |
-| 3     | A     |    2.12 |  G   |  i   |  a   |  c   |  o   |  m   |  o   |  -   |
-| 3     | B     |    2.12 |  -   |  Я   |  -   |  к   |  -   |  -   |  о   |  в   |
+matrix = malign.ScoringMatrix.from_sequences(
+    sequences=[["A", "C", "G", "T"], ["A", "C", "G", "T"]],
+    match=2.0, mismatch=-1.0, gap_score=-1.5,
+)
+alms = malign.align(["ACGT", "AGT"], k=1, matrix=matrix)
 ```
 
-More complex examples, including for matrix imputation and optimization, can
-be found in the documentation.
+### Full Pipeline: Features to Evaluation
 
-## Changelog
+This example shows the complete workflow for linguistic alignment -- building
+a scoring matrix from phonological feature distances, aligning cognate pairs,
+and evaluating the results:
 
-Version 0.4.0-beta.1 (2025-10-16):
-  - **Breaking**: Renamed `multi_align()` → `align()`
-  - **Breaking**: Python 3.10+ required
-  - Matrix learning via EM and gradient descent algorithms
-  - Convergence detection and early stopping
-  - YAML matrix serialization (primary format)
-  - Comprehensive testing infrastructure (77% coverage)
-  - Property-based tests with Hypothesis
-  - Regression tests on 451K+ gold standard forms
-  - Performance benchmarks and algorithm selection guide
-  - Alignment metrics (accuracy, precision, recall, F1)
-  - See [CHANGELOG.md](CHANGELOG.md) for complete details
+```python
+import malign
 
-Version 0.3 (2021):
-  - Code improvements, including type annotation, and some refactoring
-  - Allowing usage with any hashable Python object (not only strings)
-  - Add methods for matrix imputation
-  - Update of documentation
-  - General preparations for public announcement
+# Build a scoring matrix from phonological feature distances
+matrix = malign.ScoringMatrix.from_distfeat(
+    sequences=[["n", "o", "t", "e"], ["n", "o", "tʃ", "e"]],
+    gap="-", gap_score=-1.0,
+)
 
-Version 0.2 (2020):
-  - Major revision with asymmetric Needleman-Wunsch and Yen's `k`-shortest path
-    implementation
-  - Added scoring matrix object
-  - Sort alignments in consistent and reproducible ways, even when the alignment
-    score is the same
+# Align cognate sequences
+alms = malign.align(
+    [["n", "o", "t", "e"], ["n", "o", "tʃ", "e"]],
+    k=3, matrix=matrix, method="anw",
+)
+print(malign.tabulate_alms(alms[:2]))
 
-Version 0.1 (2019):
-  - First release for an internal announcement, testing, and community outreach
+# Evaluate against gold standard
+gold = malign.Alignment(
+    [("n", "o", "t", "e"), ("n", "o", "tʃ", "e")], score=0.0,
+)
+print(f"Accuracy: {malign.alignment_accuracy(alms[0], gold):.2%}")
+print(f"F1: {malign.alignment_f1(alms[0], gold):.2%}")
+```
 
-## TODO
+### Matrix Learning from Cognates
 
-  - Complete documentation and setup `readthedocs`
-  - Consider implementation of UPGMA and NJ multiple alignment
-  - Add function/method to visualize the graphs used for the `yenksp` methods
-  - Implement blocks and local search in `anw` and `yenksp`, with different
-    starting/ending positions
-  - Implement memoization where possible
-  - Consider expanding dumb_malign by adding random gaps (`pad_align`), as an additional
-    baseline method
-  - Allow `anw` to work within a threshold percentage of the best score
-  - Implement a method combining the results of the different algorithms
+```python
+cognate_sets = [
+    [["n", "o", "t", "e"], ["n", "o", "tʃ", "e"]],
+    [["f", "a", "t", "o"], ["h", "a", "d", "o"]],
+]
+matrix = malign.learn_matrix(cognate_sets, method="em", max_iter=10)
+```
 
-## Community guidelines
+## Algorithms
 
-While the author can be contacted directly for support, it is recommended
-that third parties use GitHub standard features, such as issues and
-pull requests, to contribute, report problems, or seek support.
+| Method | Description | Best for |
+|--------|-------------|----------|
+| `anw` (default) | Asymmetric Needleman-Wunsch | Pairwise alignment, small k |
+| `yenksp` | Yen's k-shortest paths on alignment graph | Large k, diverse alignments |
+| `dumb` | Gap-padding baseline | Testing and comparison |
 
-Contributing guidelines, including a code of conduct, can be found in
-the `CONTRIBUTING.md` file.
+## Requirements
 
-## Author and citation
+- Python >= 3.12
+- numpy, scipy, scikit-learn, tabulate, PyYAML
+- Optional: [distfeat](https://github.com/tresoldi/distfeat) for feature-based scoring
 
-The library is developed by Tiago Tresoldi (tiago.tresoldi@lingfil.uu.se).
+## Documentation
+
+- [User Guide](docs/USER_GUIDE.md)
+- [API Reference](docs/API_REFERENCE.md)
+- [Algorithm Selection Guide](docs/algorithm_selection_guide.md)
+- [Tutorials](docs/)
+
+## Community Guidelines
+
+Contributions, bug reports, and feature requests are welcome via
+[GitHub issues](https://github.com/tresoldi/malign/issues) and pull requests.
+See `CONTRIBUTING.md` for guidelines.
+
+## Author and Citation
+
+Developed by Tiago Tresoldi (tiago.tresoldi@lingfil.uu.se).
 
 The author has received funding from the Riksbankens Jubileumsfond
 (grant agreement ID: [MXM19-1087:1](https://www.rj.se/en/anslag/2019/cultural-evolution-of-texts/),
 [Cultural Evolution of Texts](https://github.com/evotext/)).
 
 During the first stages of development, the author received funding from the
-European Research Council (ERC) under the European Union’s Horizon 2020
+European Research Council (ERC) under the European Union's Horizon 2020
 research and innovation programme (grant agreement
 No. [ERC Grant #715618](https://cordis.europa.eu/project/rcn/206320/factsheet/en),
 [Computer-Assisted Language Comparison](https://digling.org/calc/)).
@@ -141,17 +139,21 @@ No. [ERC Grant #715618](https://cordis.europa.eu/project/rcn/206320/factsheet/en
 If you use `malign`, please cite it as:
 
   > Tresoldi, Tiago (2025). MALIGN, a library for multiple asymmetric alignments on
-  > different domains. Version 0.4. Uppsala: Uppsala Universitet.
+  > different domains. Version 0.5. Uppsala: Uppsala Universitet.
 
 In BibTeX:
 
 ```bibtex
 @misc{Tresoldi2025malign,
   author = {Tresoldi, Tiago},
-  title = {MALIGN, a library for multiple asymmetric alignments on different domains. Version 0.4},
+  title = {MALIGN, a library for multiple asymmetric alignments on different domains. Version 0.5},
   howpublished = {\url{https://github.com/tresoldi/malign}},
   address = {Uppsala},
   publisher = {Uppsala Universitet},
   year = {2025},
 }
 ```
+
+## License
+
+MIT License. See [LICENSE](LICENSE) for details.
