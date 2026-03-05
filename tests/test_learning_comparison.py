@@ -14,13 +14,11 @@ import pytest
 
 import malign
 from malign.metrics import alignment_accuracy
-
 from tests.gold_data_utils import (
     cognate_set_to_gold_alignment,
     cognate_set_to_sequences,
     load_cognate_sets,
 )
-
 
 # Path to gold data
 DATA_DIR = Path(__file__).parent / "data" / "cognates"
@@ -230,17 +228,19 @@ def test_em_vs_gradient_descent_comparison():
     print("=" * 80)
 
     print("\n## Training Performance")
-    print(f"| Method | Training Time | Relative Speed |")
-    print(f"|--------|---------------|----------------|")
+    print("| Method | Training Time | Relative Speed |")
+    print("|--------|---------------|----------------|")
     print(f"| EM | {em_time:.2f}s | 1.00x |")
-    print(f"| Gradient Descent | {gd_time:.2f}s | {gd_time/em_time:.2f}x |")
+    print(f"| Gradient Descent | {gd_time:.2f}s | {gd_time / em_time:.2f}x |")
 
     print("\n## Evaluation Accuracy")
-    print(f"| Method | Accuracy | Improvement vs Baseline |")
-    print(f"|--------|----------|-------------------------|")
+    print("| Method | Accuracy | Improvement vs Baseline |")
+    print("|--------|----------|-------------------------|")
     print(f"| Baseline (Identity) | {baseline_accuracy:.2%} | - |")
-    print(f"| EM | {em_accuracy:.2%} | +{(em_accuracy - baseline_accuracy)*100:.1f}pp |")
-    print(f"| Gradient Descent | {gd_accuracy:.2%} | +{(gd_accuracy - baseline_accuracy)*100:.1f}pp |")
+    print(f"| EM | {em_accuracy:.2%} | +{(em_accuracy - baseline_accuracy) * 100:.1f}pp |")
+    print(
+        f"| Gradient Descent | {gd_accuracy:.2%} | +{(gd_accuracy - baseline_accuracy) * 100:.1f}pp |"
+    )
 
     print("\n## Summary")
     print(f"- Training sets: {len(training_sets)}")
@@ -249,7 +249,7 @@ def test_em_vs_gradient_descent_comparison():
     print(f"- Faster training: {'EM' if em_time < gd_time else 'Gradient Descent'}")
 
     # Both methods should improve over baseline
-    print(f"\nImprovement checks:")
+    print("\nImprovement checks:")
     print(f"  EM improved: {em_accuracy > baseline_accuracy}")
     print(f"  GD improved: {gd_accuracy > baseline_accuracy}")
 
@@ -277,8 +277,7 @@ def test_em_vs_gradient_descent_comparison():
     # At minimum, at least ONE method should improve over baseline
     # Note: EM may not improve with very small training sets (5 samples)
     at_least_one_improved = (
-        em_accuracy >= baseline_accuracy * 0.95 or
-        gd_accuracy >= baseline_accuracy * 0.95
+        em_accuracy >= baseline_accuracy * 0.95 or gd_accuracy >= baseline_accuracy * 0.95
     )
 
     assert at_least_one_improved, (
@@ -290,7 +289,9 @@ def test_em_vs_gradient_descent_comparison():
     if em_accuracy >= baseline_accuracy * 0.95:
         print("\n✓ EM improved over baseline")
     else:
-        print(f"\n✗ EM did not improve (likely due to small training set: {len(training_sets)} samples)")
+        print(
+            f"\n✗ EM did not improve (likely due to small training set: {len(training_sets)} samples)"
+        )
 
     if gd_accuracy >= baseline_accuracy * 0.95:
         print("✓ Gradient Descent improved over baseline")

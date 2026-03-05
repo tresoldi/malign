@@ -5,7 +5,6 @@ import pytest
 import malign
 from malign.scoring_matrix import ScoringMatrix
 
-
 # Synthetic cognate sets for testing
 # These represent related sequences that should align well
 DNA_COGNATES = [
@@ -144,9 +143,7 @@ def test_learn_matrix_improves_scores():
 def test_learn_matrix_em_convergence():
     """Test EM learning with multiple iterations."""
     # Run for different iteration counts
-    matrix_2iter = malign.learn_matrix(
-        cognate_sets=DNA_COGNATES, method="em", max_iter=2, gap="-"
-    )
+    matrix_2iter = malign.learn_matrix(cognate_sets=DNA_COGNATES, method="em", max_iter=2, gap="-")
     matrix_10iter = malign.learn_matrix(
         cognate_sets=DNA_COGNATES, method="em", max_iter=10, gap="-"
     )
