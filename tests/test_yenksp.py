@@ -17,11 +17,4 @@ def test_yenksp_graph():
 
     graph = compute_graph("ACGT", "AGCT", DNA_MATRIX)
     assert graph is not None
-    assert len(graph.nodes) > 0
-
-
-# TODO: Phase 3 - Expand YenKSP tests
-# - Test with various k values
-# - Compare diversity vs ANW
-# - Test graph properties
-# - Performance benchmarks
+    assert len(graph) > 0
