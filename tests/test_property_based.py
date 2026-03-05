@@ -4,11 +4,12 @@ These tests verify invariant properties that should hold across all inputs.
 """
 
 import tempfile
-from hypothesis import given, strategies as st, settings
+
+from hypothesis import given, settings
+from hypothesis import strategies as st
 
 import malign
 from malign.scoring_matrix import ScoringMatrix
-
 
 # Hypothesis settings: conservative for CI
 test_settings = settings(max_examples=50, deadline=2000)
@@ -84,7 +85,7 @@ def test_property_k_best_uniqueness(seqs):
     alm_tuples = [tuple(tuple(seq) for seq in alm.seqs) for alm in alms]
     unique_alms = set(alm_tuples)
 
-    assert len(alm_tuples) == len(unique_alms), f"Duplicate alignments found"
+    assert len(alm_tuples) == len(unique_alms), "Duplicate alignments found"
 
 
 @given(
@@ -115,7 +116,9 @@ def test_property_matrix_yaml_roundtrip(match_score, mismatch_score, gap_score):
         # Verify equality
         assert matrix1.scores.keys() == matrix2.scores.keys(), "Keys don't match"
         for key in matrix1.scores:
-            assert abs(matrix1.scores[key] - matrix2.scores[key]) < 1e-6, f"Score mismatch for {key}"
+            assert abs(matrix1.scores[key] - matrix2.scores[key]) < 1e-6, (
+                f"Score mismatch for {key}"
+            )
         assert matrix1.domains == matrix2.domains, "Domains don't match"
         assert matrix1.gap == matrix2.gap, "Gap symbol doesn't match"
     finally:
@@ -159,7 +162,9 @@ def test_property_learning_produces_valid_matrix(cognate_sets):
     except Exception as e:
         # Some random cognate sets might be pathological, that's OK
         # But the method shouldn't crash
-        assert isinstance(e, (ValueError, ZeroDivisionError, IndexError)), f"Unexpected error: {type(e).__name__}: {e}"
+        assert isinstance(e, (ValueError, ZeroDivisionError, IndexError)), (
+            f"Unexpected error: {type(e).__name__}: {e}"
+        )
 
 
 # Mark slow tests
@@ -184,7 +189,6 @@ try:
         for alm in alms:
             lengths = [len(seq) for seq in alm.seqs]
             assert len(set(lengths)) == 1
-
 
     @pytest.mark.slow
     @given(

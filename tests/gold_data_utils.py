@@ -167,9 +167,7 @@ def filter_cognate_sets(
     if has_gaps is not None:
         if has_gaps:
             # Keep only sets where at least one form has gaps
-            filtered = [
-                cs for cs in filtered if any("-" in form.alignment for form in cs.forms)
-            ]
+            filtered = [cs for cs in filtered if any("-" in form.alignment for form in cs.forms)]
         else:
             # Keep only sets where no form has gaps
             filtered = [

@@ -10,13 +10,11 @@ import pytest
 
 import malign
 from malign.metrics import alignment_accuracy, alignment_f1
-
 from tests.gold_data_utils import (
     cognate_set_to_gold_alignment,
     cognate_set_to_sequences,
     load_cognate_sets,
 )
-
 
 # Path to gold data
 DATA_DIR = Path(__file__).parent / "data" / "cognates"
@@ -155,19 +153,19 @@ def test_regression_accuracy_threshold_anw():
     avg_f1 = sum(f1_scores) / len(f1_scores)
 
     # Report results
-    print(f"\n{'='*80}")
-    print(f"REGRESSION TEST RESULTS (ANW Method)")
-    print(f"{'='*80}")
+    print(f"\n{'=' * 80}")
+    print("REGRESSION TEST RESULTS (ANW Method)")
+    print(f"{'=' * 80}")
     print(f"Total cognate sets: {len(cognate_sets)}")
     print(f"Successfully tested: {successful_tests}")
     print(f"Failed tests: {len(failed_tests)}")
     print(f"Average accuracy: {avg_accuracy:.2%}")
     print(f"Average F1 score: {avg_f1:.2%}")
     print(f"Accuracy range: [{min(accuracies):.2%}, {max(accuracies):.2%}]")
-    print(f"{'='*80}")
+    print(f"{'=' * 80}")
 
     if failed_tests:
-        print(f"\nFailed tests (first 10):")
+        print("\nFailed tests (first 10):")
         for cog_id, error in failed_tests[:10]:
             print(f"  {cog_id}: {error}")
 
@@ -247,19 +245,19 @@ def test_regression_accuracy_threshold_yenksp():
     avg_f1 = sum(f1_scores) / len(f1_scores)
 
     # Report results
-    print(f"\n{'='*80}")
-    print(f"REGRESSION TEST RESULTS (YenKSP Method)")
-    print(f"{'='*80}")
+    print(f"\n{'=' * 80}")
+    print("REGRESSION TEST RESULTS (YenKSP Method)")
+    print(f"{'=' * 80}")
     print(f"Total cognate sets: {len(cognate_sets)}")
     print(f"Successfully tested: {successful_tests}")
     print(f"Failed tests: {len(failed_tests)}")
     print(f"Average accuracy: {avg_accuracy:.2%}")
     print(f"Average F1 score: {avg_f1:.2%}")
     print(f"Accuracy range: [{min(accuracies):.2%}, {max(accuracies):.2%}]")
-    print(f"{'='*80}")
+    print(f"{'=' * 80}")
 
     if failed_tests:
-        print(f"\nFailed tests (first 10):")
+        print("\nFailed tests (first 10):")
         for cog_id, error in failed_tests[:10]:
             print(f"  {cog_id}: {error}")
 
@@ -318,12 +316,14 @@ def test_regression_per_dataset_quality():
             }
 
     # Report per-dataset results
-    print(f"\n{'='*80}")
-    print(f"PER-DATASET ACCURACY")
-    print(f"{'='*80}")
-    for dataset, results in sorted(dataset_results.items(), key=lambda x: x[1]["avg_accuracy"], reverse=True):
+    print(f"\n{'=' * 80}")
+    print("PER-DATASET ACCURACY")
+    print(f"{'=' * 80}")
+    for dataset, results in sorted(
+        dataset_results.items(), key=lambda x: x[1]["avg_accuracy"], reverse=True
+    ):
         print(f"{dataset:30} {results['count']:3} sets, {results['avg_accuracy']:.2%} accuracy")
-    print(f"{'='*80}")
+    print(f"{'=' * 80}")
 
     # Verify at least 3 datasets tested
     assert len(dataset_results) >= 3, f"Only {len(dataset_results)} datasets tested"

@@ -9,9 +9,10 @@ This script extracts curated subsets for:
 
 import csv
 import random
-import yaml
 from collections import defaultdict
 from pathlib import Path
+
+import yaml
 
 
 def load_cognate_sets(csv_path):
@@ -22,15 +23,17 @@ def load_cognate_sets(csv_path):
         reader = csv.DictReader(f)
         for row in reader:
             cognacy = row["Cognacy"].split(";")[0]
-            cognate_sets[cognacy].append({
-                "dataset": row["Dataset"],
-                "language_id": row["Language_ID"],
-                "glottolog_name": row["Glottolog_Name"],
-                "parameter_id": row["Parameter_ID"],
-                "gloss": row["Concepticon_Gloss"],
-                "segments": row["Segments"].split(),
-                "alignment": row["Alignment"].split(),
-            })
+            cognate_sets[cognacy].append(
+                {
+                    "dataset": row["Dataset"],
+                    "language_id": row["Language_ID"],
+                    "glottolog_name": row["Glottolog_Name"],
+                    "parameter_id": row["Parameter_ID"],
+                    "gloss": row["Concepticon_Gloss"],
+                    "segments": row["Segments"].split(),
+                    "alignment": row["Alignment"].split(),
+                }
+            )
 
     return cognate_sets
 
@@ -44,7 +47,8 @@ def extract_regression_set(cognate_sets, n=100, min_size=3, max_size=10):
     """Extract diverse cognate sets for regression testing."""
     # Filter: size 3-10, has gaps, high quality
     candidates = [
-        (cognacy, forms) for cognacy, forms in cognate_sets.items()
+        (cognacy, forms)
+        for cognacy, forms in cognate_sets.items()
         if min_size <= len(forms) <= max_size and has_gaps(forms)
     ]
 
@@ -63,7 +67,7 @@ def extract_regression_set(cognate_sets, n=100, min_size=3, max_size=10):
         items = by_dataset[dataset]
         random.shuffle(items)
         # Take up to 10 from each dataset
-        selected.extend(items[:min(10, len(items))])
+        selected.extend(items[: min(10, len(items))])
         if len(selected) >= n:
             break
 
@@ -73,7 +77,8 @@ def extract_regression_set(cognate_sets, n=100, min_size=3, max_size=10):
 def extract_learning_training_set(cognate_sets, n=200, min_size=2, max_size=8):
     """Extract cognate sets for matrix learning training."""
     candidates = [
-        (cognacy, forms) for cognacy, forms in cognate_sets.items()
+        (cognacy, forms)
+        for cognacy, forms in cognate_sets.items()
         if min_size <= len(forms) <= max_size
     ]
 
@@ -87,7 +92,8 @@ def extract_learning_eval_set(cognate_sets, training_set_ids, n=100):
     training_ids = set(cog_id for cog_id, _ in training_set_ids)
 
     candidates = [
-        (cognacy, forms) for cognacy, forms in cognate_sets.items()
+        (cognacy, forms)
+        for cognacy, forms in cognate_sets.items()
         if cognacy not in training_ids and 2 <= len(forms) <= 8 and has_gaps(forms)
     ]
 
@@ -126,7 +132,7 @@ def save_as_yaml(cognate_sets_list, output_path, description):
         "description": description,
         "source": "Arca Verborum (forms_with_alignments.csv)",
         "count": len(cognate_sets_list),
-        "cognate_sets": []
+        "cognate_sets": [],
     }
 
     for cognacy_id, forms in cognate_sets_list:
@@ -135,16 +141,18 @@ def save_as_yaml(cognate_sets_list, output_path, description):
             "dataset": forms[0]["dataset"],
             "gloss": forms[0]["gloss"],
             "parameter_id": forms[0]["parameter_id"],
-            "forms": []
+            "forms": [],
         }
 
         for form in forms:
-            cognate_set["forms"].append({
-                "language_id": form["language_id"],
-                "glottolog_name": form["glottolog_name"],
-                "segments": form["segments"],
-                "alignment": form["alignment"],
-            })
+            cognate_set["forms"].append(
+                {
+                    "language_id": form["language_id"],
+                    "glottolog_name": form["glottolog_name"],
+                    "segments": form["segments"],
+                    "alignment": form["alignment"],
+                }
+            )
 
         data["cognate_sets"].append(cognate_set)
 
@@ -169,7 +177,7 @@ def main():
     save_as_yaml(
         regression_set,
         output_dir / "regression_test_set.yml",
-        "Gold standard alignments for regression testing (100 diverse cognate sets)"
+        "Gold standard alignments for regression testing (100 diverse cognate sets)",
     )
 
     print("\nExtracting matrix learning training set (200 cognate sets)...")
@@ -177,7 +185,7 @@ def main():
     save_as_yaml(
         training_set,
         output_dir / "learning_training_set.yml",
-        "Cognate sets for training matrix learning algorithms (200 sets)"
+        "Cognate sets for training matrix learning algorithms (200 sets)",
     )
 
     print("\nExtracting matrix learning evaluation set (100 cognate sets)...")
@@ -185,7 +193,7 @@ def main():
     save_as_yaml(
         eval_set,
         output_dir / "learning_eval_set.yml",
-        "Cognate sets for evaluating learned matrices (100 different sets)"
+        "Cognate sets for evaluating learned matrices (100 different sets)",
     )
 
     print("\nExtracting integration test examples (20 cognate sets)...")
@@ -193,17 +201,17 @@ def main():
     save_as_yaml(
         integration_examples,
         output_dir / "integration_examples.yml",
-        "Diverse examples for integration tests (20 sets of varying sizes)"
+        "Diverse examples for integration tests (20 sets of varying sizes)",
     )
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("EXTRACTION COMPLETE")
-    print("="*80)
+    print("=" * 80)
     print(f"\nFiles created in {output_dir}:")
-    print(f"  - regression_test_set.yml (100 cognate sets)")
-    print(f"  - learning_training_set.yml (200 cognate sets)")
-    print(f"  - learning_eval_set.yml (100 cognate sets)")
-    print(f"  - integration_examples.yml (20 cognate sets)")
+    print("  - regression_test_set.yml (100 cognate sets)")
+    print("  - learning_training_set.yml (200 cognate sets)")
+    print("  - learning_eval_set.yml (100 cognate sets)")
+    print("  - integration_examples.yml (20 cognate sets)")
 
 
 if __name__ == "__main__":

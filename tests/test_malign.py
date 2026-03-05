@@ -1,8 +1,4 @@
-"""test_malign
-===========
-
-Tests for the `malign` package.
-"""
+"""Tests for the malign package."""
 
 # Import the library itself
 import pytest
@@ -60,10 +56,11 @@ def test_compute_graph():
     dna_seq2 = "TAGACC"
     graph = malign.yenksp.compute_graph(dna_seq1, dna_seq2, malign.utils.DNA_MATRIX)
 
-    assert len(graph.nodes) == 56
-    assert len(graph.edges) == 139
-    assert graph.edges[(0, 0), (1, 1)]["weight"] == 2
-    assert graph.edges[(6, 5), (7, 6)]["weight"] == 1
+    assert len(graph) == 56
+    total_edges = sum(len(neighbors) for neighbors in graph.values())
+    assert total_edges == 139
+    assert graph[(0, 0)][(1, 1)] == 2
+    assert graph[(6, 5)][(7, 6)] == 1
 
 
 def test_score_alignment():
@@ -123,7 +120,7 @@ def test_score_alignment():
 
 
 def test_tabulation():
-    """Test alignment tabulation output"""
+    """Test alignment tabulation output."""
 
     # TODO: assertMultiLineEqual() is failing, only keeping here for coverage
 

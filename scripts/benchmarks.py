@@ -17,7 +17,7 @@ Usage:
 
 import argparse
 import time
-from typing import Callable
+from collections.abc import Callable
 
 import malign
 
@@ -246,19 +246,23 @@ def generate_recommendations(
         anw_2 = seq_count_results["anw"][2][0]
         anw_max = seq_count_results["anw"][max(seq_count_results["anw"].keys())][0]
         ratio = anw_max / anw_2
-        lines.append(f"- **ANW**: Scales ~{ratio:.1f}x from 2 to {max(seq_count_results['anw'].keys())} sequences")
+        lines.append(
+            f"- **ANW**: Scales ~{ratio:.1f}x from 2 to {max(seq_count_results['anw'].keys())} sequences"
+        )
         if ratio < 10:
             lines.append(f"  - Good for up to {max(seq_count_results['anw'].keys())}+ sequences")
         else:
-            lines.append(f"  - Recommended limit: ~6 sequences for interactive use")
+            lines.append("  - Recommended limit: ~6 sequences for interactive use")
 
     if "yenksp" in seq_count_results:
         yenksp_2 = seq_count_results["yenksp"][2][0]
         yenksp_max = seq_count_results["yenksp"][max(seq_count_results["yenksp"].keys())][0]
         ratio = yenksp_max / yenksp_2
-        lines.append(f"- **YenKSP**: Scales ~{ratio:.1f}x from 2 to {max(seq_count_results['yenksp'].keys())} sequences")
-        lines.append(f"  - More computationally intensive than ANW")
-        lines.append(f"  - Recommended limit: 4-5 sequences")
+        lines.append(
+            f"- **YenKSP**: Scales ~{ratio:.1f}x from 2 to {max(seq_count_results['yenksp'].keys())} sequences"
+        )
+        lines.append("  - More computationally intensive than ANW")
+        lines.append("  - Recommended limit: 4-5 sequences")
 
     # Analyze sequence length scaling
     lines.append("\n### Sequence Length")
@@ -266,8 +270,10 @@ def generate_recommendations(
         anw_min = seq_length_results["anw"][min(seq_length_results["anw"].keys())][0]
         anw_max = seq_length_results["anw"][max(seq_length_results["anw"].keys())][0]
         ratio = anw_max / anw_min
-        lines.append(f"- Scales ~{ratio:.1f}x from {min(seq_length_results['anw'].keys())} to {max(seq_length_results['anw'].keys())} symbols")
-        lines.append(f"- Practical limit: 40-50 symbols for real-time use")
+        lines.append(
+            f"- Scales ~{ratio:.1f}x from {min(seq_length_results['anw'].keys())} to {max(seq_length_results['anw'].keys())} symbols"
+        )
+        lines.append("- Practical limit: 40-50 symbols for real-time use")
 
     # Analyze k value scaling
     lines.append("\n### k Value (Top Alignments)")
@@ -276,12 +282,14 @@ def generate_recommendations(
         k_max = k_value_results["anw"][max(k_value_results["anw"].keys())][0]
         ratio = k_max / k1
         lines.append(f"- Scales ~{ratio:.1f}x from k=1 to k={max(k_value_results['anw'].keys())}")
-        lines.append(f"- k=1-10: Fast, suitable for most applications")
-        lines.append(f"- k=20-50: Slower, use when diversity is critical")
+        lines.append("- k=1-10: Fast, suitable for most applications")
+        lines.append("- k=20-50: Slower, use when diversity is critical")
 
     lines.append("\n### Algorithm Selection")
     lines.append("- **ANW**: Faster, better for larger problems (5+ sequences, k>10)")
-    lines.append("- **YenKSP**: More thorough exploration, better for small problems (2-4 sequences)")
+    lines.append(
+        "- **YenKSP**: More thorough exploration, better for small problems (2-4 sequences)"
+    )
 
     return "\n".join(lines)
 

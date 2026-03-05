@@ -90,9 +90,7 @@ def _get_alignment_pairs(alignment: Alignment) -> set[tuple[int, int, Hashable, 
     return pairs
 
 
-def alignment_precision_recall(
-    predicted: Alignment, gold: Alignment
-) -> tuple[float, float]:
+def alignment_precision_recall(predicted: Alignment, gold: Alignment) -> tuple[float, float]:
     """Calculate precision and recall for an alignment.
 
     Precision: proportion of predicted pairwise alignments that are correct.

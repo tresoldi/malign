@@ -171,7 +171,9 @@ def test_anw_vs_yenksp_consistency():
     # Top alignment should be very similar (within tolerance for floating point)
     # Best alignment from both should have similar scores
     score_diff = abs(alms_anw[0].score - alms_yenksp[0].score)
-    assert score_diff < 0.5, f"Top scores differ too much: ANW={alms_anw[0].score}, YenKSP={alms_yenksp[0].score}"
+    assert score_diff < 0.5, (
+        f"Top scores differ too much: ANW={alms_anw[0].score}, YenKSP={alms_yenksp[0].score}"
+    )
 
     # All alignments should preserve original sequences
     for alms, method_name in [(alms_anw, "ANW"), (alms_yenksp, "YenKSP")]:

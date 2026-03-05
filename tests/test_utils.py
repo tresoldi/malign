@@ -18,10 +18,3 @@ def test_identity_matrix():
     seqs = [["A", "C", "G", "T"], ["A", "C", "G", "T"]]
     matrix = identity_matrix(seqs)
     assert matrix is not None
-
-
-# TODO: Phase 2/3 - Add tests for new utility functions
-# - sum_of_pairs()
-# - alignment_entropy()
-# - alignment_consensus()
-# - alignment_accuracy()

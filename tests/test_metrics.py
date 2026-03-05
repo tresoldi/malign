@@ -146,7 +146,9 @@ def test_f1_is_harmonic_mean():
     f1 = malign.alignment_f1(predicted, gold)
 
     # Verify F1 = 2 * (P * R) / (P + R)
-    expected_f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
+    expected_f1 = (
+        2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
+    )
     assert abs(f1 - expected_f1) < 1e-10
 
 

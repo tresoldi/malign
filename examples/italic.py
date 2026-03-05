@@ -1,7 +1,7 @@
-import os
 import csv
-from pathlib import Path
+import os
 from collections import defaultdict
+from pathlib import Path
 
 import catcoocc
 
