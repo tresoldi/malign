@@ -19,8 +19,6 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering",
@@ -28,14 +26,13 @@ classifiers = [
     "Topic :: Text Processing :: Linguistic",
     "Typing :: Typed",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
-    "networkx>=2.5",
     "numpy>=1.20.0",
-    "scipy>=1.7.0",  # For matrix learning optimization (Phase 2)
-    "scikit-learn>=0.24.0",  # sklearn package
+    "scipy>=1.7.0",
+    "scikit-learn>=0.24.0",
     "tabulate>=0.8.0",
-    "PyYAML>=5.4.0",  # For YAML matrix serialization (Phase 2)
+    "PyYAML>=5.4.0",
 ]
 
 [project.optional-dependencies]
@@ -59,15 +56,14 @@ dev = [
     "nhandu>=0.1.0",
 ]
 
-# Integration with external libraries (Phase 2)
-integrations = [
-    "freqprob>=0.1.0",
-    "asymcat>=0.1.0",
+# Phonological feature distances
+features = [
+    "distfeat>=0.5.0",
 ]
 
 # All optional dependencies
 all = [
-    "malign[dev,integrations]",
+    "malign[dev,features]",
 ]
 
 [project.urls]
@@ -90,7 +86,7 @@ malign = ["py.typed"]
 # Ruff configuration
 [tool.ruff]
 line-length = 100
-target-version = "py310"
+target-version = "py312"
 extend-exclude = [
     "__pycache__", ".git", ".mypy_cache", ".pytest_cache",
     ".ruff_cache", ".venv", "venv", "build", "dist",
@@ -135,15 +131,34 @@ ignore = [
 "tests/**/*.py" = [
     "ARG001", "ARG002",  # Unused arguments in tests
     "S101",              # Use of assert detected
-    "D100", "D103",      # Missing docstrings in tests
+    "D100", "D103", "D104",  # Missing docstrings in tests
+    "T201",              # Allow print statements
+    "B905",              # zip() without strict= (test data)
+    "PT007", "PT017",    # Parametrize style, assertion on exception
+    "SIM222",            # or True patterns
+    "F841",              # Unused variables (test scaffolding)
+]
+"malign/learning.py" = [
+    "T201",              # Allow print statements (verbose output)
 ]
 "scripts/*.py" = [
+    "D100", "D103",      # Missing docstrings
     "T201",              # Allow print statements
+    "B007",              # Unused loop variables
+    "SIM108",            # Ternary suggestions
+    "C401",              # Generator vs comprehension
 ]
 "docs/tutorial_*.py" = [
-    "D100",   # Missing module docstring (self-documenting)
-    "E402",   # Module import not at top (pedagogical)
-    "T201",   # Allow print statements
+    "D100", "D103",      # Missing docstrings (self-documenting)
+    "E402",              # Module import not at top (pedagogical)
+    "T201",              # Allow print statements
+    "RUF001",            # Ambiguous unicode (intentional for demos)
+]
+"examples/*.py" = [
+    "D100", "D103",      # Missing docstrings
+    "T201",              # Allow print statements
+    "C416",              # List comprehension style
+    "B007",              # Unused loop variables
 ]
 
 [tool.ruff.lint.pydocstyle]
@@ -151,7 +166,7 @@ convention = "google"
 
 # MyPy configuration (relaxed initially, per Q6 answer)
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.12"
 warn_return_any = false  # Relaxed
 warn_unused_configs = true
 disallow_untyped_defs = false  # Relaxed - will tighten in Phase 1.7
@@ -167,7 +182,7 @@ strict_equality = true
 show_error_codes = true
 
 [[tool.mypy.overrides]]
-module = ["networkx.*", "numpy.*", "sklearn.*", "tabulate.*", "pytest.*", "hypothesis.*", "yaml.*"]
+module = ["numpy.*", "scipy.*", "sklearn.*", "tabulate.*", "pytest.*", "hypothesis.*", "yaml.*", "distfeat.*"]
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
