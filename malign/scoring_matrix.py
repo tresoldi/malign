@@ -1,6 +1,8 @@
 """Module for scoring matrices."""
 
 import itertools
+import math
+from collections import Counter
 from collections.abc import Hashable
 from dataclasses import dataclass
 
@@ -314,6 +316,82 @@ class ScoringMatrix:
                 # distfeat.distance returns values in [0, 1]
                 dist = _distfeat_distance(combo[0], combo[1], system=system)
                 scores[combo] = 1.0 - dist
+
+        return cls(scores=scores, domains=domains, gap=gap, impute_method=impute_method)
+
+    @classmethod
+    def from_substitution_counts(
+        cls,
+        counts: dict[tuple[Hashable, ...], int],
+        gap: Hashable = "-",
+        gap_score: float = -1.0,
+        impute_method: str | None = "mean",
+    ) -> "ScoringMatrix":
+        """Create an asymmetric matrix from observed substitution frequencies.
+
+        Converts raw substitution counts to log-odds scores:
+        ``score = log(observed_freq / expected_freq)`` where expected
+        frequency is the product of marginal frequencies (independence model).
+
+        This is the standard approach used by BLOSUM/PAM matrices and is
+        directly applicable to historical sound change rates in linguistics.
+
+        Args:
+            counts: Mapping from symbol tuples to observed counts.
+                E.g. ``{("p", "b"): 15, ("b", "p"): 3}``.
+            gap: Gap symbol (default: "-").
+            gap_score: Score for gap alignments (default: -1.0).
+            impute_method: Method for filling missing scores (default: "mean").
+
+        Returns:
+            A new ScoringMatrix with asymmetric log-odds scores.
+
+        Raises:
+            ValueError: If counts is empty or has inconsistent key lengths.
+        """
+        if not counts:
+            raise ValueError("counts must be non-empty.")
+
+        # Determine arity from keys
+        arity = len(next(iter(counts)))
+
+        # Collect all symbols per position
+        symbols_per_pos: list[set[Hashable]] = [set() for _ in range(arity)]
+        for key in counts:
+            for d, sym in enumerate(key):
+                symbols_per_pos[d].add(sym)
+
+        domains = [sorted({gap, *syms}) for syms in symbols_per_pos]
+
+        # Compute total and marginal frequencies
+        total = sum(counts.values())
+        marginals: list[Counter] = [Counter() for _ in range(arity)]
+        for key, count in counts.items():
+            for d, sym in enumerate(key):
+                marginals[d][sym] += count
+
+        # Convert to log-odds scores
+        scores: dict[tuple[Hashable, ...], float] = {}
+        for combo in itertools.product(*domains):
+            if all(s == gap for s in combo):
+                scores[combo] = 0.0
+                continue
+            if gap in combo:
+                scores[combo] = gap_score
+                continue
+
+            observed = counts.get(combo, 0)
+            if observed == 0:
+                # No observation: leave for imputation
+                continue
+
+            observed_freq = observed / total
+            expected_freq = math.prod(marginals[d][sym] / total for d, sym in enumerate(combo))
+
+            if expected_freq > 0:
+                scores[combo] = math.log(observed_freq / expected_freq)
+            else:
+                continue  # Leave for imputation
 
         return cls(scores=scores, domains=domains, gap=gap, impute_method=impute_method)
 

@@ -14,7 +14,8 @@ and is suitable for general-purpose sequence alignment tasks.
 
 ## Key Features
 
-- **Asymmetric scoring**: Direction-dependent alignment costs
+- **Asymmetric scoring**: Direction-dependent alignment costs, with `from_substitution_counts()` factory for log-odds matrices from observed sound change frequencies
+- **True multi-alignment**: N-dimensional alignment for up to 4 sequences (via YenKSP on N-dim graphs), with automatic progressive fallback for larger sets
 - **Multiple algorithms**: Needleman-Wunsch (`anw`) and Yen's k-shortest paths (`yenksp`)
 - **k-best alignments**: Return the top-k optimal alignments, not just the best one
 - **Matrix learning**: Learn scoring matrices from cognate sets via EM or gradient descent

@@ -7,6 +7,8 @@ from collections.abc import Callable, Hashable
 from .alignment import Alignment
 from .anw import nw_align
 from .dumb import dumb_malign
+from .ndim_common import should_use_ndim
+from .ndim_yenksp import ndim_yenksp_align
 from .scoring_matrix import ScoringMatrix
 from .utils import identity_matrix, score_alignment, sort_alignments
 from .yenksp import yenksp_align
@@ -146,7 +148,17 @@ def align(
 
     if method == "dumb":
         alms = [dumb_malign(seqs, matrix=matrix)]
+    elif len(seqs) == 2:
+        # Direct pairwise: skip _collect_alignments overhead
+        if method == "yenksp":
+            alms = yenksp_align(seqs[0], seqs[1], k=k, matrix=matrix)
+        else:
+            alms = nw_align(seqs[0], seqs[1], k=k, matrix=matrix)
+    elif should_use_ndim(len(seqs), [len(s) for s in seqs], method):
+        # True N-dimensional alignment via YenKSP (safe k-bounded enumeration)
+        alms = ndim_yenksp_align(seqs, k=k, matrix=matrix)
     else:
+        # Progressive fallback for large N
         if method == "yenksp":
             pairwise_func = yenksp_align
             pw_k = k**2

@@ -158,35 +158,38 @@ alignments = malign.align(seqs, matrix=matrix, k=1)
 
 ### True Multi-Alignment
 
-MAlign performs **true multiple sequence alignment**, not progressive pairwise alignment.
+For small N (up to 4 sequences), MAlign performs **true N-dimensional alignment** -- all sequences are scored jointly at every column, finding the globally optimal alignment. For larger N, it falls back to a progressive pairwise approach automatically.
+
+**How It Works:**
+
+- **N=2**: Direct pairwise alignment (Needleman-Wunsch or YenKSP).
+- **N=3-4** (within grid-size limits): True N-dimensional alignment via YenKSP on an N-dimensional graph. Dijkstra-based search naturally produces exactly k best paths.
+- **N=5+** or large grids: Silent fallback to progressive pairwise alignment, which decomposes into all pairwise combinations and reassembles candidates.
 
 **Comparison with Progressive Methods:**
 
-| Feature | MAlign | Progressive (UPGMA, ClustalW) |
-|---------|--------|-------------------------------|
-| **Method** | Simultaneous multi-way alignment | Series of pairwise alignments |
-| **Scoring** | Global probability across all sequences | Sum of pairwise scores |
-| **Optimality** | Globally optimal (with ANW/YenKSP) | Dependent on guide tree |
-| **Asymmetry** | Full support | Not supported |
-| **Use Case** | Linguistic cognates, directional changes | Biological sequences |
-
-**Why It Matters:**
-
-Progressive alignment can introduce artifacts where early decisions constrain later alignments. MAlign evaluates all sequences together, finding alignments that maximize the overall probability/score.
+| Feature | MAlign (N-dim) | MAlign (progressive fallback) | ClustalW |
+|---------|---------------|-------------------------------|----------|
+| **Method** | Simultaneous N-way alignment | All-pairs + Cartesian product | Guide tree |
+| **Scoring** | Global across all sequences | Assembled from pairwise | Sum of pairwise |
+| **Optimality** | Globally optimal | May miss global optimum | Dependent on tree |
+| **Asymmetry** | Full support | Partial (pairwise only) | Not supported |
+| **Sequences** | Up to 4 | Any number | Any number |
 
 ```python
 import malign
 
-# Three related sequences
+# Three related sequences -- uses true N-dimensional alignment
 sequences = [
     ["k", "a", "t"],
     ["c", "a", "t"],
     ["k", "a", "t", "z"]
 ]
-
-# MAlign finds best global alignment
-# (not "align seq1-seq2, then add seq3")
 alignments = malign.align(sequences, k=1, method="anw")
+
+# Six sequences -- automatically falls back to progressive
+sequences_large = [["s1"], ["s2"], ["s3"], ["s4"], ["s5"], ["s6"]]
+alignments_large = malign.align(sequences_large, k=1, method="anw")
 ```
 
 ### K-Best Results

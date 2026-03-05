@@ -326,6 +326,53 @@ matrix = malign.ScoringMatrix.from_sequences(
 )
 ```
 
+##### ScoringMatrix.from_substitution_counts()
+
+```python
+@classmethod
+def from_substitution_counts(
+    cls,
+    counts: dict[tuple[Hashable, ...], int],
+    gap: Hashable = "-",
+    gap_score: float = -1.0,
+    impute_method: str | None = "mean",
+) -> ScoringMatrix
+```
+
+Create an asymmetric scoring matrix from observed substitution frequencies.
+
+Converts raw counts to log-odds scores: `score = log(observed_freq / expected_freq)` where expected frequency is the product of marginal frequencies (independence model). This is the standard approach used by BLOSUM/PAM matrices and is directly applicable to historical sound change rates.
+
+**Parameters:**
+
+- `counts`: Dictionary mapping symbol tuples to observed counts. E.g. `{("p", "b"): 15, ("b", "p"): 3}`
+- `gap`: Gap symbol (default: "-")
+- `gap_score`: Score for gap alignments (default: -1.0)
+- `impute_method`: Method for filling unobserved pairs (default: "mean")
+
+**Example:**
+
+```python
+import malign
+
+# From a corpus of cognate pairs with known directionality
+counts = {
+    ("p", "b"): 15,   # p → b observed 15 times
+    ("b", "p"): 3,    # b → p observed only 3 times (asymmetric!)
+    ("p", "p"): 20,
+    ("b", "b"): 18,
+    ("t", "d"): 10,
+    ("d", "t"): 2,
+    ("t", "t"): 25,
+    ("d", "d"): 20,
+}
+matrix = malign.ScoringMatrix.from_substitution_counts(counts)
+
+# Matrix is asymmetric: score(p,b) != score(b,p)
+print(matrix[("p", "b")])  # Higher (common change)
+print(matrix[("b", "p")])  # Lower (rare change)
+```
+
 ##### ScoringMatrix.from_yaml()
 
 ```python
