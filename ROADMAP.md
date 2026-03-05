@@ -16,8 +16,9 @@ Status of key selling points and planned work to close gaps.
 - N-dimensional alignment natively handles asymmetric matrices.
 
 **Remaining work:**
-- [ ] Add `from_distfeat()` support for directed distances (if distfeat
-  provides them), or document the symmetry limitation.
+- [x] Document `from_distfeat()` symmetry limitation (distfeat provides
+  symmetric feature distances; for asymmetric scoring, use
+  `from_substitution_counts()` with directional substitution data).
 
 ### 2. Different Domains -- DELIVERED
 
@@ -30,8 +31,8 @@ Each domain is independent. Well-tested and documented.
 - For N <= 4 sequences (within grid-size limits), true N-dimensional alignment
   is performed via YenKSP on an N-dimensional graph. All sequences are scored
   jointly at every column, finding the globally optimal alignment.
-- For N > 4 or very long sequences, the system silently falls back to the
-  progressive pairwise approach for practical feasibility.
+- For N > 4 or very long sequences, the system uses UPGMA-guided progressive
+  alignment with beam search for k-best results.
 - Pairwise alignment (N=2) is dispatched directly without overhead.
 
 **Architecture:**
@@ -39,27 +40,26 @@ Each domain is independent. Well-tested and documented.
 - `ndim_yenksp.py`: N-dimensional graph construction and YenKSP alignment.
 - `ndim_nw.py`: N-dimensional Needleman-Wunsch (available but not used in
   dispatch due to exponential co-optimal path explosion with identity matrices).
+- `progressive.py`: UPGMA-guided progressive alignment with beam search.
 
 **Remaining work:**
-- [ ] Consider UPGMA-guided progressive alignment for large N (better than
-  current all-pairs progressive approach).
+- [x] UPGMA-guided progressive alignment for large N (replaces all-pairs
+  progressive approach).
 - [ ] Investigate capping NW backtrace to enable N-dim NW for cases where
   scoring matrices have few ties.
 
-### 4. Automatic Matrix Inference -- PARTIAL
+### 4. Automatic Matrix Inference -- DELIVERED
 
 **What works:**
 - `learn_matrix()` learns from pre-clustered cognate sets (EM or gradient
-  descent).
-- `from_distfeat()` infers scores from phonological feature knowledge.
-- `from_substitution_counts()` converts observed counts to log-odds scores.
+  descent). This is supervised and requires pre-grouped cognates.
+- `bootstrap_matrix()` learns from arbitrary sequence pairs without clustering
+  (unsupervised). Uses iterative log-odds re-estimation with Laplace smoothing.
+- `from_distfeat()` infers scores from phonological feature knowledge
+  (symmetric only).
+- `from_substitution_counts()` converts observed counts to log-odds scores
+  (supports asymmetric).
 - Matrix imputation fills sparse matrices from partial data.
 
-**What's missing:**
-- No unsupervised mode: users must provide cognate groupings.
-- No automatic clustering or cognate discovery.
-
-**Planned:**
-- [ ] Consider adding an unsupervised bootstrap that treats each sequence pair
-  as its own cognate set, iteratively aligns and re-estimates.
-- [ ] Document the supervised requirement clearly.
+**Remaining work:**
+- [ ] Automatic clustering or cognate discovery (beyond current scope).

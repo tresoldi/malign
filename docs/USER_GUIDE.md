@@ -416,6 +416,9 @@ matrix.scores[("C", "C")] = 1.0
 
 Learn scoring matrices from cognate data.
 
+> **Note:** `learn_matrix()` is supervised: it requires pre-clustered cognate sets.
+> For unsupervised learning from arbitrary sequence pairs, use `bootstrap_matrix()`.
+
 #### Expectation-Maximization (EM)
 
 Fast iterative learning, good for initial matrices:
@@ -474,6 +477,32 @@ matrix = malign.learn_matrix(
 - **EM**: 13.85% accuracy with limited data (needs 100+ training sets), 481× faster
 
 **Recommendation**: Use gradient descent for better accuracy when training data is limited (<100 sets). Use EM for large datasets (100+ sets) where speed matters.
+
+#### Unsupervised Bootstrap Learning
+
+For learning from arbitrary sequence pairs without pre-clustered cognate sets:
+
+```python
+import malign
+
+# No clustering needed - just provide pairs
+pairs = [
+    (["p", "a", "t", "a"], ["b", "a", "d", "a"]),
+    (["t", "a", "p", "a"], ["d", "a", "b", "a"]),
+    (["k", "a", "t", "a"], ["g", "a", "d", "a"]),
+]
+
+matrix = malign.bootstrap_matrix(pairs, max_iter=20, verbose=True)
+
+# Use learned matrix
+alms = malign.align(
+    [["p", "a", "t"], ["b", "a", "d"]],
+    k=1,
+    matrix=matrix,
+)
+```
+
+`bootstrap_matrix()` uses log-odds scoring with Laplace smoothing and iteratively re-estimates the matrix from alignment co-occurrences. It always produces 2-domain matrices and can preserve asymmetric substitution patterns.
 
 ---
 

@@ -5,7 +5,7 @@ __author__ = "Tiago Tresoldi"
 __email__ = "tiago.tresoldi@lingfil.uu.se"
 
 from malign.alignment import Alignment
-from malign.learning import learn_matrix
+from malign.learning import bootstrap_matrix, learn_matrix
 from malign.malign import align
 from malign.metrics import alignment_accuracy, alignment_f1, alignment_precision_recall
 from malign.scoring_matrix import ScoringMatrix
@@ -18,6 +18,7 @@ __all__ = [
     "alignment_accuracy",
     "alignment_f1",
     "alignment_precision_recall",
+    "bootstrap_matrix",
     "learn_matrix",
     "tabulate_alms",
 ]

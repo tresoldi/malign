@@ -209,9 +209,87 @@ matrix_gd.save("learned_matrix.yml")
 - OR logic: stops when either criterion is met
 - Early stopping with patience mechanism
 
+> **Note:** `learn_matrix()` is supervised: it requires pre-clustered cognate sets.
+> For unsupervised learning from arbitrary sequence pairs, use `bootstrap_matrix()`.
+
 **See Also:**
 
 - [USER_GUIDE.md Section 3](USER_GUIDE.md#matrix-learning) for detailed learning examples
+
+---
+
+### malign.bootstrap_matrix()
+
+```python
+def bootstrap_matrix(
+    pairs: list[tuple[Sequence[Hashable], Sequence[Hashable]]],
+    max_iter: int = 20,
+    initial_matrix: ScoringMatrix | None = None,
+    gap: Hashable = "-",
+    alignment_method: str = "anw",
+    convergence_threshold: float = 0.001,
+    matrix_threshold: float = 0.01,
+    patience: int = 5,
+    gap_score: float = -1.0,
+    verbose: bool = False,
+) -> ScoringMatrix
+```
+
+Learn a scoring matrix from sequence pairs without pre-clustered cognate sets.
+
+Iteratively aligns pairs with the current matrix, counts column co-occurrences, and re-estimates scores using log-odds with Laplace smoothing. Unlike `learn_matrix()` (which requires pre-clustered cognate sets), this function works with arbitrary sequence pairs.
+
+**Parameters:**
+
+- **`pairs`** (`list[tuple[Sequence, Sequence]]`): List of (sequence_a, sequence_b) tuples.
+- **`max_iter`** (`int`, default: `20`): Maximum number of bootstrap iterations.
+- **`initial_matrix`** (`ScoringMatrix | None`, default: `None`): Starting matrix. If `None`, creates an identity matrix from observed symbols.
+- **`gap`** (`Hashable`, default: `"-"`): Gap symbol.
+- **`alignment_method`** (`str`, default: `"anw"`): Alignment method used in each iteration.
+- **`convergence_threshold`** (`float`, default: `0.001`): Relative score change threshold.
+- **`matrix_threshold`** (`float`, default: `0.01`): Frobenius norm threshold for convergence.
+- **`patience`** (`int`, default: `5`): Early stopping patience.
+- **`gap_score`** (`float`, default: `-1.0`): Gap score for initial matrix.
+- **`verbose`** (`bool`, default: `False`): Print convergence information.
+
+**Returns:**
+
+- `ScoringMatrix`: Learned scoring matrix.
+
+**Raises:**
+
+- `ValueError`: If `pairs` is empty.
+
+**Examples:**
+
+```python
+import malign
+
+# Pairs of related sequences (no clustering needed)
+pairs = [
+    (["p", "a", "t", "a"], ["b", "a", "d", "a"]),
+    (["t", "a", "p", "a"], ["d", "a", "b", "a"]),
+    (["k", "a", "t", "a"], ["g", "a", "d", "a"]),
+]
+
+matrix = malign.bootstrap_matrix(pairs, max_iter=20, verbose=True)
+
+# Use learned matrix for alignment
+alms = malign.align(
+    [["p", "a", "t"], ["b", "a", "d"]],
+    k=1,
+    matrix=matrix,
+)
+```
+
+**Key differences from `learn_matrix()`:**
+
+| | `learn_matrix()` | `bootstrap_matrix()` |
+|---|---|---|
+| Input | Pre-clustered cognate sets | Flat list of pairs |
+| M-step | `log(freq + epsilon)` | `log(observed/expected)` (log-odds) |
+| Smoothing | None | Pseudocounts (+1 Laplace) |
+| Domains | N-domain (matches cognate set size) | Always 2-domain |
 
 ---
 
@@ -325,6 +403,50 @@ matrix = malign.ScoringMatrix.from_sequences(
     gap_score=-1.0
 )
 ```
+
+##### ScoringMatrix.from_distfeat()
+
+```python
+@classmethod
+def from_distfeat(
+    cls,
+    sequences: list[list[str]],
+    gap: Hashable = "-",
+    gap_score: float = -1.0,
+    impute_method: str | None = "mean",
+) -> ScoringMatrix
+```
+
+Create a scoring matrix using phonological feature distances from the `distfeat` library.
+
+Scores are computed as `1 - normalized_distance` between segments, so identical segments score 1.0 and maximally different segments score close to 0.
+
+> **Note:** `distfeat` provides symmetric feature distances, so `from_distfeat()` always produces a symmetric matrix. For asymmetric scoring, use `from_substitution_counts()` with directional substitution data.
+
+**Parameters:**
+
+- `sequences`: List of sequences containing IPA segments
+- `gap`: Gap symbol (default: "-")
+- `gap_score`: Score for gap alignments (default: -1.0)
+- `impute_method`: Method for filling unobserved pairs (default: "mean")
+
+**Example:**
+
+```python
+import malign
+
+matrix = malign.ScoringMatrix.from_distfeat(
+    sequences=[["p", "t", "k"], ["b", "d", "g"]],
+)
+
+# p-b differ only in voicing: high similarity
+print(matrix["p", "b"])  # > 0.0
+
+# Symmetric: score(p,b) == score(b,p)
+assert matrix["p", "b"] == matrix["b", "p"]
+```
+
+**Requires:** `distfeat` package (`pip install distfeat`).
 
 ##### ScoringMatrix.from_substitution_counts()
 

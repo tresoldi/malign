@@ -9,6 +9,7 @@ from .anw import nw_align
 from .dumb import dumb_malign
 from .ndim_common import should_use_ndim
 from .ndim_yenksp import ndim_yenksp_align
+from .progressive import upgma_progressive_align
 from .scoring_matrix import ScoringMatrix
 from .utils import identity_matrix, score_alignment, sort_alignments
 from .yenksp import yenksp_align
@@ -158,14 +159,8 @@ def align(
         # True N-dimensional alignment via YenKSP (safe k-bounded enumeration)
         alms = ndim_yenksp_align(seqs, k=k, matrix=matrix)
     else:
-        # Progressive fallback for large N
-        if method == "yenksp":
-            pairwise_func = yenksp_align
-            pw_k = k**2
-        else:  # anw
-            pairwise_func = nw_align
-            pw_k = k
-
-        alms = _collect_alignments(seqs, matrix, pw_func=pairwise_func, k=pw_k)[:k]
+        # UPGMA-guided progressive alignment for large N
+        pairwise_func = yenksp_align if method == "yenksp" else nw_align
+        alms = upgma_progressive_align(seqs, matrix, pw_func=pairwise_func, k=k)
 
     return alms

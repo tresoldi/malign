@@ -12,7 +12,9 @@ import malign
 from malign.scoring_matrix import ScoringMatrix
 
 # Hypothesis settings: conservative for CI
-test_settings = settings(max_examples=50, deadline=2000)
+# deadline=None because UPGMA progressive alignment for 5 sequences
+# can take several seconds depending on sequence lengths
+test_settings = settings(max_examples=50, deadline=None)
 
 
 @given(

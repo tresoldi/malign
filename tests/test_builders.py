@@ -119,8 +119,8 @@ def test_from_distfeat_basic():
     assert matrix["p", "-"] == -1.0
 
 
-def test_from_distfeat_asymmetric():
-    """Test that from_distfeat() produces asymmetric scores."""
+def test_from_distfeat_symmetric():
+    """Test that from_distfeat() produces symmetric scores (same feature system)."""
     matrix = malign.ScoringMatrix.from_distfeat(
         sequences=[["p", "t"], ["p", "t"]],
     )

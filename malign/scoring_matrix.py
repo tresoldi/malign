@@ -115,7 +115,8 @@ def _fill_matrix(
         estimator = ExtraTreesRegressor(n_estimators=10, random_state=0)
         imputer = IterativeImputer(missing_values=np.nan, random_state=0, estimator=estimator)
     elif impute_method == "k_neighbors":
-        estimator = KNeighborsRegressor(n_neighbors=15)
+        n_neighbors = min(5, len(train_matrix) - 1) if len(train_matrix) > 1 else 1
+        estimator = KNeighborsRegressor(n_neighbors=n_neighbors)
         imputer = IterativeImputer(missing_values=np.nan, random_state=0, estimator=estimator)
     elif impute_method == "bayesian_ridge":
         estimator = BayesianRidge()
