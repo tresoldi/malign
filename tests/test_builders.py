@@ -1,7 +1,9 @@
-"""Tests for ScoringMatrix builder methods (Phase 2.2)."""
+"""Tests for ScoringMatrix builder methods."""
 
-import tempfile
 import os
+import tempfile
+
+import pytest
 
 import malign
 
@@ -89,3 +91,72 @@ def test_from_sequences_identity():
     # Different symbols = mismatch
     assert matrix["A", "C"] == -0.5
     assert matrix["C", "A"] == -0.5
+
+
+# distfeat builder tests
+
+distfeat = pytest.importorskip("distfeat")
+
+
+def test_from_distfeat_basic():
+    """Test from_distfeat() with IPA segments."""
+    matrix = malign.ScoringMatrix.from_distfeat(
+        sequences=[["p", "t", "k"], ["b", "d", "g"]],
+    )
+
+    assert matrix.num_domains == 2
+    assert matrix.gap == "-"
+    assert len(matrix.domains) == 2
+
+    # p-b differ only in voicing, should be high similarity (> 0)
+    assert matrix["p", "b"] > 0.0
+
+    # p-g differ more, should be lower similarity
+    assert matrix["p", "b"] > matrix["p", "g"]
+
+    # Gap alignment
+    assert matrix["-", "-"] == 0.0
+    assert matrix["p", "-"] == -1.0
+
+
+def test_from_distfeat_asymmetric():
+    """Test that from_distfeat() produces asymmetric scores."""
+    matrix = malign.ScoringMatrix.from_distfeat(
+        sequences=[["p", "t"], ["p", "t"]],
+    )
+
+    # Same alphabet in both domains - should have matching scores
+    assert matrix["p", "p"] == pytest.approx(1.0)
+    assert matrix["t", "t"] == pytest.approx(1.0)
+
+    # p-t distance should be symmetric for same feature system
+    assert matrix["p", "t"] == pytest.approx(matrix["t", "p"])
+
+
+def test_from_distfeat_custom_gap():
+    """Test from_distfeat() with custom gap symbol."""
+    matrix = malign.ScoringMatrix.from_distfeat(
+        sequences=[["p", "t"], ["b", "d"]],
+        gap=".",
+        gap_score=-2.0,
+    )
+
+    assert matrix.gap == "."
+    assert matrix[".", "."] == 0.0
+    assert matrix["p", "."] == -2.0
+
+
+def test_from_distfeat_alignment():
+    """Test that from_distfeat matrices work for alignment."""
+    matrix = malign.ScoringMatrix.from_distfeat(
+        sequences=[["p", "a", "t", "a"], ["b", "a", "d", "a"]],
+    )
+
+    alms = malign.align(
+        [["p", "a", "t", "a"], ["b", "a", "d", "a"]],
+        k=1,
+        matrix=matrix,
+    )
+
+    assert len(alms) >= 1
+    assert alms[0].score is not None
