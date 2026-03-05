@@ -1,8 +1,4 @@
-"""test_matrix
-===========
-
-Tests for the scoring matrices of the `malign` package.
-"""
+"""Tests for the scoring matrices of the malign package."""
 
 # TODO: add test for identity matrix
 # TODO: add test for initialization only from sparse subdomain
@@ -158,7 +154,7 @@ def test_pairwise_from_full_vectors_with_domains():
     )
 
     # Build matrix with "insufficient" domains
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="not in domains"):
         malign.ScoringMatrix(PAIRWISE_TEST_VECTORS, domains=[["-", "a", "b"], ["-", "Y", "Z"]])
 
     # Assertions
@@ -184,7 +180,7 @@ def test_multiwise_from_full_vectors():
 
 # TODO: add test with "default" (currently "mean")
 @pytest.mark.parametrize(
-    "method,num_domains,gap,size,tests",
+    ("method", "num_domains", "gap", "size", "tests"),
     [
         [
             "mean",
@@ -286,7 +282,7 @@ def test_multiwise_from_sparse_vectors(method, num_domains, gap, size, tests):
     assert matrix.num_domains == num_domains
     assert matrix.gap == gap
     assert len(matrix.scores) == size
-    assert ["-", "i", "j"] in matrix.domains
+    assert ("-", "i", "j") in matrix.domains
 
     assert matrix["-", "-", "-"] == 0.0
     for key, expected, rel in tests:
@@ -334,10 +330,10 @@ def test_subdomain_query():
 
 def test_load_save():
     """Test loading and saving matrices in YAML format."""
-    import tempfile
     import os
+    import tempfile
 
-    # Build matrix with various filling methods
+    # Build matrix
     matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
 
     # Use tempfile with proper cleanup
@@ -348,52 +344,29 @@ def test_load_save():
         # Save matrix to YAML
         matrix.save(temp_path)
 
-        # Load matrix from YAML
-        matrix2 = malign.ScoringMatrix()
-        matrix2.load(temp_path)
+        # Load matrix from YAML using from_yaml
+        matrix2 = malign.ScoringMatrix.from_yaml(temp_path)
 
         # Assertions
         assert matrix.scores == matrix2.scores
         assert matrix.domains == matrix2.domains
         assert matrix.gap == matrix2.gap
-        assert matrix._domain_range == matrix2._domain_range
     finally:
         # Clean up temp file
         if os.path.exists(temp_path):
             os.unlink(temp_path)
 
 
-def test_copy():
-    """Test method for matrix copy."""
+def test_frozen_matrix():
+    """Test that ScoringMatrix is immutable (frozen dataclass)."""
 
-    # Build reference matrix
-    ref_matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
-
-    # Get copy
-    cpy_matrix = ref_matrix.copy()
-
-    # Perform manual comparison
-    assert ref_matrix.scores == cpy_matrix.scores
-    assert ref_matrix.domains == cpy_matrix.domains
-
-    # Assert they are different
-    assert id(ref_matrix) != id(cpy_matrix)
-
-
-def test_set_item():
-    """Test matrix __setitem__."""
-
-    # Build reference matrix
     matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
 
-    # Various sets and tests
-    matrix["a", "X", "i"] = -111
-    matrix[None, "X", "i"] = -222
-    with pytest.raises(ValueError):
-        matrix["<", "X", "i"] = -333
-
-    assert matrix["a", "X", "i"] == -111
-    assert matrix[None, "X", "i"] == -222
+    # Should not be able to set attributes
+    with pytest.raises(AttributeError):
+        matrix.gap = "X"
+    with pytest.raises(AttributeError):
+        matrix.num_domains = 5
 
 
 def test_tabulate():
