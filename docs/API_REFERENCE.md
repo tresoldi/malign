@@ -232,6 +232,8 @@ def bootstrap_matrix(
     patience: int = 5,
     gap_score: float = -1.0,
     verbose: bool = False,
+    prior_matrix: ScoringMatrix | None = None,
+    prior_weight: float = 0.5,
 ) -> ScoringMatrix
 ```
 
@@ -239,11 +241,13 @@ Learn a scoring matrix from sequence pairs without pre-clustered cognate sets.
 
 Iteratively aligns pairs with the current matrix, counts column co-occurrences, and re-estimates scores using log-odds with Laplace smoothing. Unlike `learn_matrix()` (which requires pre-clustered cognate sets), this function works with arbitrary sequence pairs.
 
+When `prior_matrix` is provided, each M-step blends the data-driven log-odds scores with the prior using additive regularization. The blending weight decays linearly from `prior_weight` to 0 over `max_iter` iterations, so the prior dominates early (when data signal is weak) and fades as alignments stabilize.
+
 **Parameters:**
 
 - **`pairs`** (`list[tuple[Sequence, Sequence]]`): List of (sequence_a, sequence_b) tuples.
 - **`max_iter`** (`int`, default: `20`): Maximum number of bootstrap iterations.
-- **`initial_matrix`** (`ScoringMatrix | None`, default: `None`): Starting matrix. If `None`, creates an identity matrix from observed symbols.
+- **`initial_matrix`** (`ScoringMatrix | None`, default: `None`): Starting matrix. If `None`, uses `prior_matrix` if available, otherwise creates an identity matrix from observed symbols.
 - **`gap`** (`Hashable`, default: `"-"`): Gap symbol.
 - **`alignment_method`** (`str`, default: `"anw"`): Alignment method used in each iteration.
 - **`convergence_threshold`** (`float`, default: `0.001`): Relative score change threshold.
@@ -251,6 +255,8 @@ Iteratively aligns pairs with the current matrix, counts column co-occurrences, 
 - **`patience`** (`int`, default: `5`): Early stopping patience.
 - **`gap_score`** (`float`, default: `-1.0`): Gap score for initial matrix.
 - **`verbose`** (`bool`, default: `False`): Print convergence information.
+- **`prior_matrix`** (`ScoringMatrix | None`, default: `None`): Optional phonological/feature prior (e.g. from `ScoringMatrix.from_distfeat()`). Symbols in the prior but absent from the pairs are included in the output matrix.
+- **`prior_weight`** (`float`, default: `0.5`): Initial regularization strength for the prior. Decays linearly to 0 over `max_iter` iterations.
 
 **Returns:**
 
@@ -282,6 +288,34 @@ alms = malign.align(
 )
 ```
 
+**Prior-guided pipeline (distfeat → bootstrap):**
+
+```python
+import malign
+
+# 1. Build a phonological prior from universal feature knowledge
+prior = malign.ScoringMatrix.from_distfeat(
+    sequences=[["p", "t", "k", "b", "d", "g"], ["p", "t", "k", "b", "d", "g"]],
+)
+
+# 2. Refine with language-specific cognate pairs
+pairs = [
+    (["p", "a", "t", "a"], ["b", "a", "d", "a"]),
+    (["t", "a", "p", "a"], ["d", "a", "b", "a"]),
+    (["k", "a", "t", "a"], ["g", "a", "d", "a"]),
+]
+matrix = malign.bootstrap_matrix(
+    pairs,
+    max_iter=20,
+    prior_matrix=prior,
+    prior_weight=0.5,
+)
+
+# 3. Result: asymmetric scores that retain phonological structure
+#    where data is sparse, data-driven where evidence is strong
+alms = malign.align([["p", "a", "t"], ["b", "a", "d"]], k=1, matrix=matrix)
+```
+
 **Key differences from `learn_matrix()`:**
 
 | | `learn_matrix()` | `bootstrap_matrix()` |
@@ -290,6 +324,7 @@ alms = malign.align(
 | M-step | `log(freq + epsilon)` | `log(observed/expected)` (log-odds) |
 | Smoothing | None | Pseudocounts (+1 Laplace) |
 | Domains | N-domain (matches cognate set size) | Always 2-domain |
+| Prior | Not supported | Optional `prior_matrix` with annealing |
 
 ---
 

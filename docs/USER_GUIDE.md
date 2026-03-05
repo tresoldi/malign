@@ -504,6 +504,55 @@ alms = malign.align(
 
 `bootstrap_matrix()` uses log-odds scoring with Laplace smoothing and iteratively re-estimates the matrix from alignment co-occurrences. It always produces 2-domain matrices and can preserve asymmetric substitution patterns.
 
+#### Prior-guided Learning
+
+When you have universal phonological knowledge (e.g. from `distfeat`) but want
+to refine it with language-specific data, use the `prior_matrix` parameter.
+The prior is blended into each M-step with a weight that decays linearly
+to zero, so the phonological structure dominates early (when data signal is
+weak) and fades as the data-driven scores stabilize.
+
+```python
+import malign
+
+# Step 1: Build a phonological prior
+prior = malign.ScoringMatrix.from_distfeat(
+    sequences=[["p", "t", "k", "b", "d", "g"], ["p", "t", "k", "b", "d", "g"]],
+)
+
+# Step 2: Refine with cognate pairs
+pairs = [
+    (["p", "a", "t", "a"], ["b", "a", "d", "a"]),
+    (["t", "a", "p", "a"], ["d", "a", "b", "a"]),
+    (["k", "a", "t", "a"], ["g", "a", "d", "a"]),
+]
+matrix = malign.bootstrap_matrix(
+    pairs,
+    max_iter=20,
+    prior_matrix=prior,   # phonological feature prior
+    prior_weight=0.5,     # initial blending strength (decays to 0)
+    verbose=True,
+)
+
+# Step 3: Use the refined matrix — asymmetric and phonologically informed
+alms = malign.align([["p", "a", "t"], ["b", "a", "d"]], k=1, matrix=matrix)
+```
+
+**When to use prior-guided learning:**
+
+- You have few cognate pairs but good phonological coverage.
+- You want the output matrix to score rare/unseen symbol pairs sensibly
+  (the prior fills in where the data is silent).
+- You want asymmetric scores that start from a symmetric phonological base
+  and drift toward the directionality observed in the data.
+
+**Tuning `prior_weight`:**
+
+- `0.3–0.5`: Moderate regularization (recommended default).
+- `0.7–1.0`: Strong regularization — useful with very few pairs.
+- The weight decays linearly: at iteration `i` the effective weight is
+  `prior_weight × (1 − i / max_iter)`.
+
 ---
 
 ## 4. Algorithms

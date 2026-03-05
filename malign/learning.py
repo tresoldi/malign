@@ -353,6 +353,8 @@ def bootstrap_matrix(
     patience: int = 5,
     gap_score: float = -1.0,
     verbose: bool = False,
+    prior_matrix: ScoringMatrix | None = None,
+    prior_weight: float = 0.5,
 ) -> ScoringMatrix:
     """Learn a scoring matrix from sequence pairs without pre-clustered cognate sets.
 
@@ -360,6 +362,12 @@ def bootstrap_matrix(
     co-occurrences, and re-estimates scores using log-odds. Unlike
     ``learn_matrix()`` (which requires pre-clustered cognate sets), this
     function works with arbitrary sequence pairs.
+
+    When ``prior_matrix`` is provided, each M-step blends the data-driven
+    log-odds scores with the prior using additive regularization.  The
+    blending weight (``prior_weight``) decays linearly to zero over
+    ``max_iter`` iterations, so the prior dominates early (when data signal
+    is weak) and fades as alignments stabilize.
 
     Args:
         pairs: List of (sequence_a, sequence_b) tuples.
@@ -372,6 +380,11 @@ def bootstrap_matrix(
         patience: Early stopping patience (default: 5).
         gap_score: Score for gap alignment in initial matrix (default: -1.0).
         verbose: Print convergence information (default: False).
+        prior_matrix: Optional phonological/feature prior (e.g. from
+            ``ScoringMatrix.from_distfeat()``). Symbols in the prior but
+            absent from the pairs are included in the output matrix.
+        prior_weight: Initial regularization strength for the prior
+            (default: 0.5). Decays linearly to 0 over ``max_iter``.
 
     Returns:
         Learned ScoringMatrix.
@@ -389,9 +402,20 @@ def bootstrap_matrix(
         left_symbols.update(seq_a)
         right_symbols.update(seq_b)
 
+    # Expand symbol sets with prior matrix domains
+    if prior_matrix is not None:
+        if len(prior_matrix.domains) >= 1:
+            left_symbols |= set(prior_matrix.domains[0])
+        if len(prior_matrix.domains) >= 2:
+            right_symbols |= set(prior_matrix.domains[1])
+        left_symbols.discard(gap)
+        right_symbols.discard(gap)
+
     # Initialize matrix
     if initial_matrix is not None:
         matrix = initial_matrix
+    elif prior_matrix is not None:
+        matrix = prior_matrix
     else:
         matrix = ScoringMatrix.from_sequences(
             sequences=[sorted([gap, *left_symbols]), sorted([gap, *right_symbols])],
@@ -463,9 +487,17 @@ def bootstrap_matrix(
             # All-gap vector always scores 0
             new_scores[(gap, gap)] = 0.0
 
+            # Prior regularization with linear decay
+            alpha = prior_weight * (1.0 - iteration / max_iter)
+            if prior_matrix is not None and alpha > 0:
+                for pair_key in new_scores:
+                    prior_score = prior_matrix.scores.get(pair_key)
+                    if prior_score is not None:
+                        new_scores[pair_key] += alpha * prior_score
+
             matrix = ScoringMatrix(
                 scores=new_scores,
-                domains=matrix.domains,
+                domains=[all_symbols_0, all_symbols_1],
                 gap=gap,
                 impute_method=None,
             )

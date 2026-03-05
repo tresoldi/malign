@@ -61,5 +61,12 @@ Each domain is independent. Well-tested and documented.
   (supports asymmetric).
 - Matrix imputation fills sparse matrices from partial data.
 
+- `bootstrap_matrix(prior_matrix=...)` blends a phonological feature prior
+  (e.g. from `from_distfeat()`) with data-driven log-odds throughout
+  learning. The prior weight decays linearly so phonological structure
+  dominates early and fades as the data signal strengthens. This enables
+  the key workflow: **distfeat → bootstrap → asymmetric**, starting from
+  universal phonological knowledge and refining with language-specific pairs.
+
 **Remaining work:**
 - [ ] Automatic clustering or cognate discovery (beyond current scope).
