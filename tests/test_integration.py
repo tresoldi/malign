@@ -188,6 +188,34 @@ def test_anw_vs_yenksp_consistency():
 
 
 @pytest.mark.integration
+def test_anw_vs_yenksp_pairwise_asymmetric_consistency():
+    """Integration: pairwise ANW/YenKSP remain consistent on asymmetric matrices."""
+    matrix = ScoringMatrix(
+        {
+            ("A", "A"): 2.0,
+            ("A", "B"): -1.0,
+            ("B", "A"): -1.0,
+            ("B", "B"): 2.0,
+            ("A", "-"): -5.0,
+            ("B", "-"): -3.0,
+            ("-", "A"): -2.0,
+            ("-", "B"): -4.0,
+        },
+        impute_method=None,
+    )
+
+    anw = malign.align(["A", ""], k=1, method="anw", matrix=matrix)[0]
+    yenksp = malign.align(["A", ""], k=1, method="yenksp", matrix=matrix)[0]
+    assert anw.seqs == yenksp.seqs
+    assert anw.score == yenksp.score == -5.0
+
+    anw = malign.align(["", "A"], k=1, method="anw", matrix=matrix)[0]
+    yenksp = malign.align(["", "A"], k=1, method="yenksp", matrix=matrix)[0]
+    assert anw.seqs == yenksp.seqs
+    assert anw.score == yenksp.score == -2.0
+
+
+@pytest.mark.integration
 def test_metrics_validation_chain():
     """Integration 4: align → compute all metrics → verify mathematical relationships.
 

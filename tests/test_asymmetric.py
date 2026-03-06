@@ -4,6 +4,7 @@ import math
 
 import pytest
 
+import malign
 from malign.ndim_yenksp import ndim_yenksp_align
 from malign.scoring_matrix import ScoringMatrix
 from malign.utils import identity_matrix
@@ -51,6 +52,29 @@ def test_asymmetric_align_different_scores():
     # due to asymmetry in gap placement
     assert alms_fwd[0].score is not None
     assert alms_rev[0].score is not None
+
+
+def test_pairwise_anw_yenksp_consistency_with_asymmetric_gaps():
+    """Pairwise ANW and YenKSP should agree under asymmetric gap penalties."""
+    matrix = ScoringMatrix(
+        {
+            ("A", "A"): 2.0,
+            ("A", "B"): -1.0,
+            ("B", "A"): -1.0,
+            ("B", "B"): 2.0,
+            ("A", "-"): -3.0,
+            ("B", "-"): -3.0,
+            ("-", "A"): -2.0,
+            ("-", "B"): -3.0,
+        },
+        impute_method=None,
+    )
+
+    anw = malign.align(["BA", "AB"], method="anw", k=1, matrix=matrix)[0]
+    yenksp = malign.align(["BA", "AB"], method="yenksp", k=1, matrix=matrix)[0]
+
+    assert anw.seqs == yenksp.seqs
+    assert anw.score == yenksp.score
 
 
 def test_from_substitution_counts_basic():
