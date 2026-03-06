@@ -211,15 +211,17 @@ def compute_graph(
             elif i == 0:
                 dig_score = None
                 hor_score = None
-                ver_score = matrix[symbol_a, matrix.gap]
+                # (i, j-1) -> (i, j): consume seq_b symbol, gap in seq_a
+                ver_score = matrix[matrix.gap, symbol_b]
             elif j == 0:
                 dig_score = None
-                hor_score = matrix[matrix.gap, symbol_b]
+                # (i-1, j) -> (i, j): consume seq_a symbol, gap in seq_b
+                hor_score = matrix[symbol_a, matrix.gap]
                 ver_score = None
             else:
                 dig_score = matrix[symbol_a, symbol_b]
-                hor_score = matrix[matrix.gap, symbol_b]
-                ver_score = matrix[symbol_a, matrix.gap]
+                hor_score = matrix[symbol_a, matrix.gap]
+                ver_score = matrix[matrix.gap, symbol_b]
 
             if dig_score is not None:
                 _add_edge(graph, (i - 1, j - 1), (i, j), max_score - dig_score)
