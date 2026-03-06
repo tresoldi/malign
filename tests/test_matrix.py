@@ -139,6 +139,21 @@ def test_pairwise_from_full_vectors():
     assert tuple(matrix.domains[1]) == ("-", "X", "Y")
 
 
+def test_scoring_matrix_supports_mixed_hashable_symbols():
+    """Mixed symbol types should not fail during domain construction."""
+    matrix = malign.ScoringMatrix(
+        scores={
+            ("a", ("b", "c")): 1.0,
+            ("a", "-"): -1.0,
+            ("-", ("b", "c")): -1.0,
+        },
+        impute_method=None,
+    )
+
+    assert ("b", "c") in matrix.domains[1]
+    assert matrix["a", ("b", "c")] == 1.0
+
+
 def test_pairwise_from_full_vectors_with_domains():
     """Test pairwise matrices built from complete vectors with domains."""
 

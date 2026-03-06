@@ -3,8 +3,9 @@
 import itertools
 import math
 from collections import Counter
-from collections.abc import Hashable
+from collections.abc import Hashable, Iterable, Sequence
 from dataclasses import dataclass
+from typing import cast
 
 import numpy as np
 import yaml
@@ -15,6 +16,11 @@ from sklearn.linear_model import BayesianRidge
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.tree import DecisionTreeRegressor
 from tabulate import tabulate
+
+
+def _symbol_sort_key(symbol: Hashable) -> tuple[str, str]:
+    """Deterministic sort key that supports heterogeneous hashable symbols."""
+    return (type(symbol).__name__, repr(symbol))
 
 
 def _build_domains(
@@ -32,15 +38,17 @@ def _build_domains(
     Returns:
         Tuple of tuples of domain symbols.
     """
+    raw: Sequence[Iterable[Hashable]]
     if domains is not None:
         raw = domains
     else:
-        raw = [
+        inferred: list[set[Hashable]] = [
             {symbol for symbol in domain if symbol is not None} | {gap}
             for domain in zip(*scores.keys(), strict=False)
         ]
+        raw = inferred
 
-    return tuple(tuple(sorted(set(d))) for d in raw)
+    return tuple(tuple(sorted(set(d), key=_symbol_sort_key)) for d in raw)
 
 
 def _validate_scores(
@@ -132,8 +140,8 @@ def _fill_matrix(
     new_scores = dict(scores)
     for row in trans_matrix:
         mh_vector, value = row[:-1], row[-1]
-        cat_vector = [encoder[idx][1] for idx, value in enumerate(mh_vector) if value]
-        new_scores[tuple(cat_vector)] = value
+        cat_vector = tuple(encoder[idx][1] for idx, flag in enumerate(mh_vector) if flag)
+        new_scores[cat_vector] = float(value)
 
     return new_scores
 
@@ -253,7 +261,7 @@ class ScoringMatrix:
         Returns:
             A new ScoringMatrix with basic match/mismatch scoring.
         """
-        domains = [sorted({gap, *seq}) for seq in sequences]
+        domains = [sorted({gap, *seq}, key=_symbol_sort_key) for seq in sequences]
 
         scores = {}
         for combo in itertools.product(*domains):
@@ -304,7 +312,7 @@ class ScoringMatrix:
                 "Install it with: pip install malign[features]"
             ) from None
 
-        domains = [sorted({gap, *seq}) for seq in sequences]
+        domains = [sorted({gap, *seq}, key=_symbol_sort_key) for seq in sequences]
 
         scores: dict[tuple[Hashable, ...], float] = {}
         for combo in itertools.product(*domains):
@@ -318,7 +326,8 @@ class ScoringMatrix:
                 dist = _distfeat_distance(combo[0], combo[1], system=system)
                 scores[combo] = 1.0 - dist
 
-        return cls(scores=scores, domains=domains, gap=gap, impute_method=impute_method)
+        hashable_domains = cast("list[list[Hashable]]", domains)
+        return cls(scores=scores, domains=hashable_domains, gap=gap, impute_method=impute_method)
 
     @classmethod
     def from_substitution_counts(
@@ -362,7 +371,7 @@ class ScoringMatrix:
             for d, sym in enumerate(key):
                 symbols_per_pos[d].add(sym)
 
-        domains = [sorted({gap, *syms}) for syms in symbols_per_pos]
+        domains = [sorted({gap, *syms}, key=_symbol_sort_key) for syms in symbols_per_pos]
 
         # Compute total and marginal frequencies
         total = sum(counts.values())
@@ -409,7 +418,7 @@ class ScoringMatrix:
             return tuple("0000000000" if k is None else k for k in obj)
 
         _scores = {
-            " / ".join("NULL" if k is None else k for k in key): float(self.scores[key])
+            " / ".join("NULL" if k is None else str(k) for k in key): float(self.scores[key])
             for key in sorted(self.scores, key=_allow_none_key)
         }
 
@@ -459,7 +468,7 @@ class ScoringMatrix:
             for symbol_a in self.domains[0]:
                 row = [symbol_a] + [self.scores[symbol_a, symbol_b] for symbol_b in self.domains[1]]
                 rows.append(row)
-            headers = ["", *list(self.domains[1])]
+            headers = ["", *(str(symbol) for symbol in self.domains[1])]
 
         elif self.num_domains == 3:
             for symbol_a in self.domains[0]:
@@ -469,7 +478,7 @@ class ScoringMatrix:
                 ]
                 rows.append(row)
             headers = [""] + [
-                "/" + "/".join(sub_key)
+                "/" + "/".join(str(symbol) for symbol in sub_key)
                 for sub_key in itertools.product(self.domains[1], self.domains[2])
             ]
         else:
