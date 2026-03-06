@@ -15,10 +15,12 @@ and is suitable for general-purpose sequence alignment tasks.
 ## Key Features
 
 - **Asymmetric scoring**: Direction-dependent alignment costs, with `from_substitution_counts()` factory for log-odds matrices from observed sound change frequencies
-- **True multi-alignment**: N-dimensional alignment for up to 4 sequences (via YenKSP on N-dim graphs), with automatic progressive fallback for larger sets
+- **True multi-alignment**: N-dimensional alignment for up to 4 sequences (via YenKSP on N-dim graphs), with automatic UPGMA progressive fallback for larger sets
 - **Multiple algorithms**: Needleman-Wunsch (`anw`) and Yen's k-shortest paths (`yenksp`)
 - **k-best alignments**: Return the top-k optimal alignments, not just the best one
-- **Matrix learning**: Learn scoring matrices from cognate sets via EM or gradient descent
+- **Matrix learning**: Supervised (EM, gradient descent) and unsupervised (`bootstrap_matrix`) from sequence pairs
+- **Prior-guided learning**: Blend phonological feature priors with data-driven scores via linearly-decaying regularization
+- **Block detection**: Detect and merge complementary-gap patterns (diphthongization, metathesis) into compound symbols
 - **Feature-based scoring**: Build matrices from phonological feature distances (via [distfeat](https://github.com/tresoldi/distfeat))
 - **Matrix imputation**: Fill sparse matrices using sklearn-based methods
 - **Evaluation metrics**: Accuracy, precision, recall, and F1 for alignment quality
@@ -94,6 +96,32 @@ cognate_sets = [
     [["f", "a", "t", "o"], ["h", "a", "d", "o"]],
 ]
 matrix = malign.learn_matrix(cognate_sets, method="em", max_iter=10)
+```
+
+### Unsupervised Bootstrap Learning
+
+```python
+# No clustering needed -- just pairs of related sequences
+pairs = [
+    (["p", "a", "t", "a"], ["b", "a", "d", "a"]),
+    (["t", "a", "p", "a"], ["d", "a", "b", "a"]),
+    (["k", "a", "t", "a"], ["g", "a", "d", "a"]),
+]
+matrix = malign.bootstrap_matrix(pairs, max_iter=20)
+
+# Optionally blend with a phonological prior
+prior = malign.ScoringMatrix.from_distfeat(
+    sequences=[["p", "t", "k", "b", "d", "g"], ["p", "t", "k", "b", "d", "g"]],
+)
+matrix = malign.bootstrap_matrix(pairs, max_iter=20, prior_matrix=prior)
+```
+
+### Block Detection (Diphthongization / Metathesis)
+
+```python
+# Merge complementary-gap columns into compound symbols
+alms = malign.align([["a"], ["j", "e"]], k=1, merge_blocks=True)
+# Sequence 2 gets compound symbol ("j", "e") instead of separate columns
 ```
 
 ## Algorithms

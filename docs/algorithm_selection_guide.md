@@ -1,8 +1,51 @@
 # Algorithm Selection Guide
 
-This guide helps you choose between **ANW** (A* + Needleman-Wunsch) and **YenKSP** (Yen's k-Shortest Paths) alignment methods.
+This guide helps you choose between alignment methods and understand how MAlign dispatches alignment strategies automatically.
 
-## Decision Flowchart
+## Automatic Multi-Sequence Dispatch
+
+MAlign automatically selects the best alignment strategy based on input size:
+
+```
+┌─────────────────────────────────────┐
+│  How many sequences?                │
+└──────────────┬──────────────────────┘
+               │
+      ┌────────┴────────┐
+      │                 │
+    N = 2             N >= 3
+      │                 │
+      v                 v
+┌───────────┐    ┌──────────────────┐
+│  Direct   │    │ Grid small       │
+│  pairwise │    │ enough for       │
+│  (NW or   │    │ N-dim? (N<=4,    │
+│  YenKSP)  │    │ cells<=200K)     │
+└───────────┘    └────────┬─────────┘
+                    ┌─────┴─────┐
+                   Yes         No
+                    │           │
+                    v           v
+              ┌──────────┐ ┌──────────────┐
+              │ True     │ │ UPGMA        │
+              │ N-dim    │ │ progressive  │
+              │ YenKSP   │ │ alignment    │
+              │ (optimal)│ │ (beam search │
+              └──────────┘ │ for k-best)  │
+                           └──────────────┘
+```
+
+This dispatch is transparent -- just call `malign.align()` and the right strategy is selected.
+
+**N-dimensional alignment** (N=3-4, small grids) finds the globally optimal alignment across all sequences simultaneously, not a pairwise approximation.
+
+**UPGMA progressive alignment** (N=5+ or large grids) builds a guide tree from pairwise distances, then merges sequences along the tree with beam search for k-best results.
+
+## ANW vs YenKSP
+
+Within each dispatch tier, you choose between two alignment algorithms:
+
+### Decision Flowchart
 
 ```
 ┌─────────────────────────────────────┐
@@ -11,7 +54,7 @@ This guide helps you choose between **ANW** (A* + Needleman-Wunsch) and **YenKSP
                │
       ┌────────┴────────┐
       │                 │
-    ≤ 4               > 4
+    <= 4               > 4
       │                 │
       v                 v
 ┌─────────────┐    ┌──────────┐
@@ -34,7 +77,7 @@ This guide helps you choose between **ANW** (A* + Needleman-Wunsch) and **YenKSP
 ```
 
 **Quick Decision Rules:**
-- **2-4 sequences, k ≤ 10**: Use **YenKSP** (more thorough)
+- **2-4 sequences, k <= 10**: Use **YenKSP** (more thorough)
 - **2-4 sequences, k > 10**: Use **ANW** (faster for large k)
 - **5+ sequences**: Use **ANW** (YenKSP too slow)
 - **Real-time/interactive**: Use **ANW** (generally faster)
@@ -47,7 +90,7 @@ This guide helps you choose between **ANW** (A* + Needleman-Wunsch) and **YenKSP
 | **Speed** | Faster (especially for k > 10) | Slower |
 | **Quality** | High quality, near-optimal | Highest quality, exhaustive search |
 | **Sequence Count** | Good for 5-8+ sequences | Best for 2-4 sequences |
-| **k Value Scaling** | Near-linear (~2x for k=1→20) | More expensive for large k |
+| **k Value Scaling** | Near-linear (~2x for k=1->20) | More expensive for large k |
 | **Use Cases** | Large problems, interactive use, k > 10 | Small problems, maximum quality |
 | **Algorithm** | A* search + NW alignment | Yen's k-shortest paths |
 
@@ -56,16 +99,15 @@ This guide helps you choose between **ANW** (A* + Needleman-Wunsch) and **YenKSP
 ### ANW (A* + Needleman-Wunsch)
 
 **Pros:**
-- ✅ **Faster**: Especially for k > 10 and many sequences
-- ✅ **Scales better**: Can handle 5-8 sequences reasonably
-- ✅ **Near-linear k scaling**: 2x slower for k=20 vs k=1
-- ✅ **Interactive**: Fast enough for real-time use
-- ✅ **Heuristic guidance**: A* search efficiently explores space
+- Faster, especially for k > 10 and many sequences
+- Scales better: can handle 5-8 sequences reasonably
+- Near-linear k scaling: 2x slower for k=20 vs k=1
+- Fast enough for real-time/interactive use
+- Heuristic guidance: A* search efficiently explores space
 
 **Cons:**
-- ❌ **Heuristic-based**: May miss some optimal solutions
-- ❌ **Less exhaustive**: Doesn't guarantee finding all k-best
-- ❌ **Quality**: Slightly lower than YenKSP for small problems
+- Heuristic-based: may miss some optimal solutions
+- Slightly lower quality than YenKSP for small problems
 
 **Best For:**
 - Problems with 5+ sequences
@@ -76,23 +118,39 @@ This guide helps you choose between **ANW** (A* + Needleman-Wunsch) and **YenKSP
 ### YenKSP (Yen's k-Shortest Paths)
 
 **Pros:**
-- ✅ **Exhaustive**: Guarantees finding true k-shortest paths
-- ✅ **Highest quality**: Maximum alignment quality
-- ✅ **Deterministic**: Always finds optimal k-best alignments
-- ✅ **Theory**: Strong theoretical guarantees
+- Exhaustive: guarantees finding true k-shortest paths
+- Highest alignment quality
+- Deterministic: always finds optimal k-best alignments
+- Strong theoretical guarantees
 
 **Cons:**
-- ❌ **Slower**: Especially for large k and many sequences
-- ❌ **Poor scaling**: 362x slower for 5 vs 2 sequences
-- ❌ **Limited sequences**: Impractical for 5+ sequences
-- ❌ **Large k**: Becomes very slow for k > 20
+- Slower, especially for large k and many sequences
+- 362x slower for 5 vs 2 sequences
+- Impractical for 5+ sequences
+- Becomes very slow for k > 20
 
 **Best For:**
 - Problems with 2-4 sequences
-- Small to moderate k (k ≤ 10)
+- Small to moderate k (k <= 10)
 - When maximum quality is critical
 - Batch processing (not interactive)
 - Research/benchmarking
+
+## Post-Processing: Block Merging
+
+After alignment (with either method), you can apply block detection
+to merge complementary-gap columns (diphthongization, metathesis):
+
+```python
+# Automatic: merge during alignment
+alms = malign.align(sequences, k=1, merge_blocks=True, max_block_size=2)
+
+# Manual: merge an existing alignment
+merged = malign.merge_alignment_blocks(alignment, max_block_size=2)
+```
+
+Block merging is post-processing only -- it does not affect the alignment
+scoring or algorithm choice.
 
 ## Performance Benchmarks
 
@@ -108,7 +166,7 @@ Based on `scripts/benchmarks.py` results:
 | 5 | 0.397s | Usable |
 | 6-8 | 1-10s (est) | Batch only |
 
-**Scaling**: ~362x from 2→5 sequences (exponential)
+**Scaling**: ~362x from 2->5 sequences (exponential)
 
 ### k Value Impact (3 sequences)
 
@@ -119,7 +177,7 @@ Based on `scripts/benchmarks.py` results:
 | 10 | 0.006s | Top 10 |
 | 20 | 0.008s | Diversity |
 
-**Scaling**: ~2x from k=1→20 (nearly linear)
+**Scaling**: ~2x from k=1->20 (nearly linear)
 
 ### Sequence Length Impact (3 sequences, k=1)
 
@@ -130,15 +188,15 @@ Based on `scripts/benchmarks.py` results:
 | 15 | 0.005s | Long |
 | 20 | 0.010s | Very long |
 
-**Scaling**: ~2.7x from 5→20 symbols (sub-quadratic)
+**Scaling**: ~2.7x from 5->20 symbols (sub-quadratic)
 
 ## Practical Recommendations
 
 ### Interactive Applications
 Use **ANW** with conservative parameters:
-- k ≤ 10 for instant results
-- ≤ 5 sequences for real-time
-- ≤ 20 symbols per sequence
+- k <= 10 for instant results
+- <= 5 sequences for real-time
+- <= 20 symbols per sequence
 
 ### Batch Processing
 Either method works:
@@ -149,7 +207,7 @@ Either method works:
 Use **YenKSP** for ground truth:
 - Guarantees true k-best alignments
 - Use as gold standard for evaluating other methods
-- Limited to small problems (≤4 sequences)
+- Limited to small problems (<=4 sequences)
 
 ### Production Systems
 Use **ANW** for reliability:
@@ -170,7 +228,7 @@ alms = malign.align(sequences, k=10, method="yenksp")
 
 ### Example 2: Aligning 6 language forms
 ```python
-# Larger problem, need top 5 alignments
+# Larger problem -- automatically uses progressive alignment
 sequences = [[...], [...], [...], [...], [...], [...]]  # 6 sequences
 
 # Use ANW (YenKSP would be too slow)
@@ -186,13 +244,24 @@ sequences = [["A", "B", "C"], ["A", "B", "D"]]
 alms = malign.align(sequences, k=50, method="anw")
 ```
 
+### Example 4: Block-aware alignment
+```python
+# Diphthongization pattern
+alms = malign.align(
+    [["a"], ["j", "e"]],
+    k=1,
+    merge_blocks=True,
+)
+# Sequence 2 gets compound symbol ("j", "e")
+```
+
 ## Summary
 
 **Default Choice**: Use **ANW** unless you have a specific reason to use YenKSP.
 
 **Use YenKSP** when:
-- You have ≤ 4 sequences
-- You need k ≤ 10 alignments
+- You have <= 4 sequences
+- You need k <= 10 alignments
 - Maximum quality is critical
 - You're doing research/benchmarking
 

@@ -8,9 +8,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.5.0] - 2025
 
 ### Added
-- **Feature-based scoring**: `ScoringMatrix.from_distfeat()` builds matrices from
-  phonological feature distances (requires `pip install malign[features]`)
-- **Full pipeline**: distfeat features -> scoring matrix -> alignment -> evaluation
+
+#### True N-Dimensional Multi-Alignment
+- **N-dimensional YenKSP**: For up to 4 sequences (within grid-size limits),
+  performs true N-dimensional alignment on an N-dimensional graph, finding the
+  globally optimal alignment across all sequences simultaneously.
+- **Automatic dispatch**: `align()` transparently selects the best strategy
+  (direct pairwise, N-dim YenKSP, or progressive) based on sequence count
+  and grid size.
+
+#### UPGMA Progressive Alignment
+- **`upgma_progressive_align()`**: Guide-tree-based progressive alignment for
+  5+ sequences, using UPGMA clustering on pairwise alignment distances.
+- **Beam search**: Maintains top-k candidates during profile merging for
+  k-best progressive alignments.
+
+#### Unsupervised Bootstrap Matrix Learning
+- **`bootstrap_matrix()`**: Learn scoring matrices from arbitrary sequence
+  pairs without pre-clustered cognate sets. Uses iterative log-odds
+  re-estimation with Laplace smoothing.
+- **Prior-guided learning**: `prior_matrix` parameter blends phonological
+  feature priors (e.g. from `from_distfeat()`) with data-driven scores.
+  Prior weight decays linearly to zero over iterations.
+- **Block-aware learning**: `block_merge=True` detects complementary-gap
+  patterns and reduces gap inflation in pair counts during the M-step.
+
+#### Block Detection and Column Merging
+- **`detect_blocks()`**: Identifies complementary-gap patterns
+  (diphthongization, metathesis) in alignments. Configurable `max_block_size`.
+- **`merge_alignment_blocks()`**: Merges block columns into compound symbols
+  (tuples). Exported in public API.
+- **`align(merge_blocks=True)`**: Post-processing integration for automatic
+  block merging after alignment.
+
+#### Feature-Based Scoring
+- **`ScoringMatrix.from_distfeat()`**: Builds scoring matrices from
+  phonological feature distances using the `distfeat` library.
+  Requires `pip install malign[features]`.
+- **`ScoringMatrix.from_substitution_counts()`**: Creates asymmetric scoring
+  matrices from observed substitution frequencies using log-odds scoring
+  (same approach as BLOSUM/PAM matrices).
 
 ### Changed
 - **Breaking**: Python >= 3.12 required (was 3.10+)
@@ -40,7 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Matrix Learning (Phase 2)
 - **EM Algorithm**: Expectation-Maximization for learning scoring matrices from cognate sets
 - **Gradient Descent**: L-BFGS-B optimization via `scipy.optimize.minimize`
-- **Convergence Detection** (Phase 3.7):
+- **Convergence Detection**:
   - Score-based convergence (relative change < 0.001)
   - Matrix-based convergence (Frobenius norm < 0.01)
   - OR logic: stops when either criterion is met
@@ -63,23 +100,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Testing Infrastructure (Phase 3)
 - **Coverage Tests**: Expanded from 74% to 77% on core malign.py
 - **Property-Based Tests**: 6 core properties using Hypothesis
-  - Alignment length consistency
-  - Symbol preservation
-  - Gap validity
-  - Score monotonicity
 - **Integration Tests**: 5 end-to-end pipeline scenarios
 - **Regression Tests**: Validation against Arca Verborum gold standard (451,935 forms)
-  - Baseline: 63% accuracy with identity matrix
-  - Establishes performance benchmarks for future improvements
 - **Benchmark Suite**: Performance analysis across sequence count, length, and k values
-  - Documents 362x scaling for sequence count
-  - Documents 2.7x scaling for sequence length
-  - Documents 2x scaling for k value
 - **Test Data**: 420 curated cognate sets from Arca Verborum
-  - 100 regression test sets
-  - 200 learning training sets
-  - 100 learning evaluation sets
-  - 20 integration test sets
 
 #### Documentation
 - **Algorithm Selection Guide**: Decision flowchart and performance comparison (ANW vs YenKSP)
@@ -89,18 +113,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 #### Breaking Changes
-- **Function Renamed**: `multi_align()` → `align()`
-  - **Migration**: Replace all calls to `malign.multi_align()` with `malign.align()`
-  - Signature and behavior unchanged
-  - Return type always `List[Alignment]` (never single item)
-
+- **Function Renamed**: `multi_align()` -> `align()`
 - **Python Version**: Now requires Python 3.10+ (was 3.7+)
-  - Uses modern type hints (`|` for Union, built-in generics)
-  - Required for type annotation features
-
 - **Docstring Style**: Migrated from Epytext to Google-style docstrings
-  - More readable and widely adopted
-  - Better tool support (Sphinx, IDEs)
 
 #### Improvements
 - **Code Quality**: Comprehensive ruff linting and formatting applied
@@ -116,28 +131,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 - JSON matrix format (still supported for backward compatibility, but YAML is preferred)
 
-### Performance Benchmarks
-
-**Sequence Count Scaling** (ANW method):
-- 2 sequences: 0.02s baseline
-- 5 sequences: 7.22s (362x slower)
-- Exponential scaling - use with caution for >5 sequences
-
-**Sequence Length Scaling**:
-- 5 symbols: 0.07s baseline
-- 20 symbols: 0.19s (2.7x slower)
-- Sub-quadratic scaling - practical up to ~50 symbols
-
-**K Value Scaling**:
-- k=1: 0.06s baseline
-- k=20: 0.12s (2x slower)
-- Nearly linear - k=50 is practical
-
-**Learning Method Comparison** (Phase 3.8):
-- **Gradient Descent**: 62.30% accuracy, slower (30s for 5 sets)
-- **EM**: 13.85% accuracy with limited data, 481x faster (0.06s)
-- **Recommendation**: Use gradient descent for better accuracy; EM needs more training data
-
 ### Migration Guide from 0.3.x
 
 ```python
@@ -145,27 +138,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 from malign import multi_align
 alms = multi_align(sequences, k=3, method="anw")
 
-# New (0.4.0)
+# New (0.4.0+)
 from malign import align
 alms = align(sequences, k=3, method="anw")
-
-# Matrix learning (NEW in 0.4.0)
-from malign import learn_matrix
-cognate_sets = [[["ACGT"], ["AGCT"]], [["TGCA"], ["TGGA"]]]
-matrix = learn_matrix(cognate_sets, method="em", max_iter=10)
-
-# Use learned matrix
-alms = align(sequences, k=3, matrix=matrix, method="anw")
-
-# Save/load matrices (NEW in 0.4.0)
-matrix.save("my_matrix.yml")
-loaded = malign.ScoringMatrix.from_yaml("my_matrix.yml")
 ```
-
-### Known Issues
-- MyPy reports 105 type errors (documentation prioritized for beta release)
-- Learning module coverage at 4.85% (tested via integration tests)
-- Metrics module coverage at 8.00% (will improve in 0.4.0 final)
 
 ---
 
@@ -202,7 +178,3 @@ loaded = malign.ScoringMatrix.from_yaml("my_matrix.yml")
 - Initial release for internal testing
 - Basic multiple sequence alignment
 - Community outreach version
-
----
-
-**Note**: Version 0.4.0 represents a significant evolution of MAlign with production-ready matrix learning, comprehensive testing, and modern Python practices. The beta release focuses on gathering community feedback before final 0.4.0 release.
