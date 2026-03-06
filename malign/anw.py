@@ -45,10 +45,10 @@ def nw_grids(
     s_grid[0][0] = scorer[scorer.gap, scorer.gap]
     d_grid[0][0] = (False, False, False)
     for i in range(1, len_a):
-        s_grid[0][i] = -i
+        s_grid[0][i] = s_grid[0][i - 1] + scorer[seq_a[i], scorer.gap]
         d_grid[0][i] = (False, True, False)
     for j in range(1, len_b):
-        s_grid[j][0] = -j
+        s_grid[j][0] = s_grid[j - 1][0] + scorer[scorer.gap, seq_b[j]]
         d_grid[j][0] = (False, False, True)
 
     for i, j in itertools.product(range(1, len_a), range(1, len_b)):
@@ -69,7 +69,7 @@ def _nw_product(
     prev_alms: list[dict[str, list[Hashable]]],
     char_a: Hashable,
     char_b: Hashable,
-    paths: list[dict[Hashable, list[Hashable]]],
+    paths: list[dict[str, list[Hashable]]],
 ) -> list[dict[str, list[Hashable]]]:
     """Build a product of paths for NW alignments with multiple directions."""
     ret_alms = []
@@ -89,7 +89,7 @@ def nw_backtrace(
     gap: Hashable,
     i: int | None = None,
     j: int | None = None,
-) -> list[dict[Hashable, list[Hashable]]]:
+) -> list[dict[str, list[Hashable]]]:
     """Run the Needleman-Wunsch backtrace operation.
 
     Alignments are returned in reverse order (bottom-right to top-left);
@@ -106,9 +106,9 @@ def nw_backtrace(
     Returns:
         List of alignment dictionaries with 'a' and 'b' keys.
     """
-    alms = [{"a": [], "b": []}]
+    alms: list[dict[str, list[Hashable]]] = [{"a": [], "b": []}]
 
-    if not i and not j:
+    if i is None or j is None:
         i = len(seq_a) - 1
         j = len(seq_b) - 1
 
