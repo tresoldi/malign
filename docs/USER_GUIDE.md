@@ -643,6 +643,91 @@ alms = malign.align(sequences, k=3, method="anw")
 
 ## 5. Advanced Topics
 
+### Block Detection and Column Merging
+
+In phonological alignment, certain sound changes produce 1-to-many
+correspondences that the column-by-column model represents as
+complementary gaps:
+
+```
+Diphthongization (a → je):     Metathesis (tr → rt):
+  a  -                           t  r  -
+  j  e                           -  r  t
+```
+
+MAlign can detect these **block patterns** and merge them into compound
+symbols (tuples), giving a cleaner representation for downstream analysis.
+
+#### Post-alignment merging
+
+Use `merge_blocks=True` in `align()` to automatically merge block columns:
+
+```python
+import malign
+
+# Diphthongization example
+alms = malign.align(
+    [["a"], ["j", "e"]],
+    k=1,
+    merge_blocks=True,
+)
+# Result: sequence 1 has "a", sequence 2 has ("j", "e")
+```
+
+You can also apply merging manually to any alignment:
+
+```python
+import malign
+
+aln = malign.Alignment(seqs=[("a", "-"), ("j", "e")], score=1.0)
+merged = malign.merge_alignment_blocks(aln)
+# merged.seqs[1][0] == ("j", "e")
+```
+
+#### Block-aware bootstrap learning
+
+When learning scoring matrices with `bootstrap_matrix()`, complementary-gap
+columns inflate gap-symbol counts. Use `block_merge=True` to reduce this
+effect:
+
+```python
+import malign
+
+pairs = [
+    (["a", "t", "a"], ["j", "e", "d", "a"]),
+    (["p", "a", "t", "a"], ["b", "a", "d", "a"]),
+]
+
+matrix = malign.bootstrap_matrix(
+    pairs,
+    max_iter=20,
+    block_merge=True,      # reduce gap inflation from blocks
+    max_block_size=2,       # max columns per block (default)
+)
+```
+
+#### How block detection works
+
+1. Each alignment column is classified as **FULL** (no gaps), **PARTIAL**
+   (some gaps), or **ALL_GAP** (all gaps, ignored).
+2. Maximal runs of consecutive PARTIAL columns are found.
+3. Each run is extended to adjacent FULL columns (one per side) if the
+   result fits within `max_block_size`.
+4. Within a block, non-gap symbols are collected per sequence:
+   - 0 symbols → gap
+   - 1 symbol → that symbol (unwrapped)
+   - 2+ symbols → tuple, e.g. `("j", "e")`
+
+#### Configuring max_block_size
+
+The default `max_block_size=2` handles the most common patterns
+(diphthongization, simple metathesis). Increase to 3 for longer blocks:
+
+```python
+# Longer block detection
+alms = malign.align(sequences, k=1, merge_blocks=True, max_block_size=3)
+```
+
 ### Batch Processing
 
 **TODO**: Document align_batch() in Phase 4.

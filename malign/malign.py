@@ -6,6 +6,7 @@ from collections.abc import Callable, Hashable
 
 from .alignment import Alignment
 from .anw import nw_align
+from .blocks import merge_alignment_blocks
 from .dumb import dumb_malign
 from .ndim_common import should_use_ndim
 from .ndim_yenksp import ndim_yenksp_align
@@ -121,6 +122,8 @@ def align(
     method: str = "anw",
     matrix: ScoringMatrix | None = None,
     k: int = 1,
+    merge_blocks: bool = False,
+    max_block_size: int = 2,
 ) -> list[Alignment]:
     """Compute multiple alignments for a list of sequences.
 
@@ -129,6 +132,10 @@ def align(
         method: Alignment method - "dumb", "anw", or "yenksp" (default: "anw").
         matrix: Scoring matrix. If not provided, an identity matrix is created.
         k: Maximum number of alignments to return (default: 1).
+        merge_blocks: If True, merge complementary-gap block columns into
+            compound symbols (tuples) before returning (default: False).
+        max_block_size: Maximum number of columns in a detected block
+            (default: 2). Only used when merge_blocks is True.
 
     Returns:
         Sorted list of the k-best multiple alignments.
@@ -162,5 +169,9 @@ def align(
         # UPGMA-guided progressive alignment for large N
         pairwise_func = yenksp_align if method == "yenksp" else nw_align
         alms = upgma_progressive_align(seqs, matrix, pw_func=pairwise_func, k=k)
+
+    if merge_blocks:
+        gap = matrix.gap if matrix else "-"
+        alms = [merge_alignment_blocks(a, gap=gap, max_block_size=max_block_size) for a in alms]
 
     return alms

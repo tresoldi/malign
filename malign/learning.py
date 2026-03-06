@@ -14,6 +14,7 @@ from collections.abc import Hashable, Sequence
 import numpy as np
 from scipy.optimize import minimize
 
+from .blocks import _adjust_pair_counts_for_blocks
 from .malign import align
 from .scoring_matrix import ScoringMatrix
 
@@ -355,6 +356,8 @@ def bootstrap_matrix(
     verbose: bool = False,
     prior_matrix: ScoringMatrix | None = None,
     prior_weight: float = 0.5,
+    block_merge: bool = False,
+    max_block_size: int = 2,
 ) -> ScoringMatrix:
     """Learn a scoring matrix from sequence pairs without pre-clustered cognate sets.
 
@@ -368,6 +371,11 @@ def bootstrap_matrix(
     blending weight (``prior_weight``) decays linearly to zero over
     ``max_iter`` iterations, so the prior dominates early (when data signal
     is weak) and fades as alignments stabilize.
+
+    When ``block_merge`` is True, complementary-gap block columns are
+    detected in each alignment and the gap-containing columns within
+    blocks are decremented from pair counts, reducing gap inflation
+    caused by diphthongization and metathesis patterns.
 
     Args:
         pairs: List of (sequence_a, sequence_b) tuples.
@@ -385,6 +393,10 @@ def bootstrap_matrix(
             absent from the pairs are included in the output matrix.
         prior_weight: Initial regularization strength for the prior
             (default: 0.5). Decays linearly to 0 over ``max_iter``.
+        block_merge: If True, adjust pair counts by detecting
+            complementary-gap blocks and reducing gap inflation (default: False).
+        max_block_size: Maximum block size for block detection (default: 2).
+            Only used when block_merge is True.
 
     Returns:
         Learned ScoringMatrix.
@@ -436,6 +448,7 @@ def bootstrap_matrix(
         # E-step: Align all pairs with current matrix
         pair_counts: Counter[tuple[Hashable, ...]] = Counter()
         total_score = 0.0
+        iteration_alignments: list = []
 
         for seq_a, seq_b in pairs:
             alms = align(
@@ -447,10 +460,16 @@ def bootstrap_matrix(
 
             if alms and alms[0].score is not None:
                 total_score += alms[0].score
+                iteration_alignments.append(alms[0])
                 aln_len = len(alms[0].seqs[0])
                 for col_idx in range(aln_len):
                     column = tuple(seq[col_idx] for seq in alms[0].seqs)
                     pair_counts[column] += 1
+
+        # Block adjustment: reduce gap inflation from complementary-gap patterns
+        if block_merge:
+            for aln in iteration_alignments:
+                _adjust_pair_counts_for_blocks(pair_counts, aln, gap, max_block_size)
 
         # M-step: Build log-odds scores with Laplace smoothing
         total_count = sum(pair_counts.values())

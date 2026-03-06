@@ -218,6 +218,35 @@ def test_bootstrap_prior_as_initial():
     assert len(matrix.scores) >= len(prior.scores) * 0.5
 
 
+def test_bootstrap_block_merge_basic():
+    """bootstrap_matrix with block_merge=True returns a valid matrix."""
+    pairs = [
+        (["p", "a", "t", "a"], ["b", "a", "d", "a"]),
+        (["p", "a", "k", "a"], ["b", "a", "g", "a"]),
+    ]
+    matrix = malign.bootstrap_matrix(pairs, max_iter=3, block_merge=True)
+
+    assert isinstance(matrix, malign.ScoringMatrix)
+    assert matrix.num_domains == 2
+    assert len(matrix.scores) > 0
+
+
+def test_bootstrap_block_merge_vs_no_merge():
+    """block_merge=True may produce different scores than without."""
+    pairs = [
+        (["a"], ["j", "e"]),
+        (["a"], ["j", "e"]),
+        (["a"], ["j", "e"]),
+        (["b"], ["b"]),
+    ]
+    matrix_no = malign.bootstrap_matrix(pairs, max_iter=5, block_merge=False)
+    matrix_yes = malign.bootstrap_matrix(pairs, max_iter=5, block_merge=True)
+
+    # Both should be valid
+    assert isinstance(matrix_no, malign.ScoringMatrix)
+    assert isinstance(matrix_yes, malign.ScoringMatrix)
+
+
 def test_bootstrap_distfeat_pipeline():
     """End-to-end: from_distfeat() -> bootstrap_matrix(prior_matrix=...) -> asymmetric."""
     pytest.importorskip("distfeat")

@@ -70,3 +70,15 @@ Each domain is independent. Well-tested and documented.
 
 **Remaining work:**
 - [ ] Automatic clustering or cognate discovery (beyond current scope).
+
+### 5. Block Detection and Column Merging -- DELIVERED
+
+**What works:**
+- `detect_blocks()` identifies complementary-gap patterns (diphthongization,
+  metathesis) in alignments. Configurable `max_block_size` (default 2).
+- `merge_alignment_blocks()` merges block columns into compound symbols
+  (tuples). Available as post-processing via `align(merge_blocks=True)`.
+- `bootstrap_matrix(block_merge=True)` adjusts pair counts to reduce gap
+  inflation caused by block patterns during matrix learning.
+- Broadened block definition: single PARTIAL columns extend to adjacent
+  FULL columns to capture pairwise diphthongization patterns.

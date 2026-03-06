@@ -5,6 +5,7 @@ __author__ = "Tiago Tresoldi"
 __email__ = "tiago.tresoldi@lingfil.uu.se"
 
 from malign.alignment import Alignment
+from malign.blocks import merge_alignment_blocks
 from malign.learning import bootstrap_matrix, learn_matrix
 from malign.malign import align
 from malign.metrics import alignment_accuracy, alignment_f1, alignment_precision_recall
@@ -20,5 +21,6 @@ __all__ = [
     "alignment_precision_recall",
     "bootstrap_matrix",
     "learn_matrix",
+    "merge_alignment_blocks",
     "tabulate_alms",
 ]

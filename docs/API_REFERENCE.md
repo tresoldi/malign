@@ -33,6 +33,8 @@ def align(
     method: str = "anw",
     matrix: ScoringMatrix | None = None,
     k: int = 1,
+    merge_blocks: bool = False,
+    max_block_size: int = 2,
 ) -> list[Alignment]
 ```
 
@@ -55,6 +57,10 @@ Returns a sorted list of the `k` best alignments. This is the primary function f
 - **`matrix`** (`ScoringMatrix | None`, default: `None`): Scoring matrix for alignment. If `None`, an identity matrix is created automatically (matches score +1, mismatches -0.5, gaps -1).
 
 - **`k`** (`int`, default: `1`): Maximum number of alignments to return. The actual number may be less if fewer distinct alignments exist.
+
+- **`merge_blocks`** (`bool`, default: `False`): If True, detect complementary-gap block columns (e.g. diphthongization `a/-` → `j/e`) and merge them into compound symbols (tuples) before returning. See [Block Detection](#malignmerge_alignment_blocks).
+
+- **`max_block_size`** (`int`, default: `2`): Maximum number of columns in a detected block. Only used when `merge_blocks` is True.
 
 **Returns:**
 
@@ -234,6 +240,8 @@ def bootstrap_matrix(
     verbose: bool = False,
     prior_matrix: ScoringMatrix | None = None,
     prior_weight: float = 0.5,
+    block_merge: bool = False,
+    max_block_size: int = 2,
 ) -> ScoringMatrix
 ```
 
@@ -257,6 +265,8 @@ When `prior_matrix` is provided, each M-step blends the data-driven log-odds sco
 - **`verbose`** (`bool`, default: `False`): Print convergence information.
 - **`prior_matrix`** (`ScoringMatrix | None`, default: `None`): Optional phonological/feature prior (e.g. from `ScoringMatrix.from_distfeat()`). Symbols in the prior but absent from the pairs are included in the output matrix.
 - **`prior_weight`** (`float`, default: `0.5`): Initial regularization strength for the prior. Decays linearly to 0 over `max_iter` iterations.
+- **`block_merge`** (`bool`, default: `False`): If True, detect complementary-gap blocks in each alignment and reduce gap-containing column counts, mitigating gap inflation from diphthongization and metathesis patterns.
+- **`max_block_size`** (`int`, default: `2`): Maximum block size for detection. Only used when `block_merge` is True.
 
 **Returns:**
 
@@ -325,6 +335,44 @@ alms = malign.align([["p", "a", "t"], ["b", "a", "d"]], k=1, matrix=matrix)
 | Smoothing | None | Pseudocounts (+1 Laplace) |
 | Domains | N-domain (matches cognate set size) | Always 2-domain |
 | Prior | Not supported | Optional `prior_matrix` with annealing |
+| Block merge | Not supported | Optional `block_merge` for gap reduction |
+
+---
+
+### malign.merge_alignment_blocks()
+
+```python
+def merge_alignment_blocks(
+    alignment: Alignment,
+    gap: Hashable = "-",
+    max_block_size: int = 2,
+) -> Alignment
+```
+
+Detect complementary-gap block columns in an alignment and merge them into compound symbols.
+
+In phonological alignment, diphthongization (`a` → `je`) and metathesis (`tr` → `rt`) produce columns with complementary gaps. This function detects such patterns and merges block columns so that multiple symbols become tuples.
+
+**Parameters:**
+
+- **`alignment`** (`Alignment`): The alignment to process.
+- **`gap`** (`Hashable`, default: `"-"`): Gap symbol.
+- **`max_block_size`** (`int`, default: `2`): Maximum number of columns in a detected block.
+
+**Returns:**
+
+- `Alignment`: New alignment with block columns merged. Score is preserved.
+
+**Examples:**
+
+```python
+import malign
+
+# Alignment with diphthongization pattern: a/- and j/e
+aln = malign.Alignment(seqs=[("a", "-"), ("j", "e")], score=1.0)
+merged = malign.merge_alignment_blocks(aln)
+# Result: seqs=[("a",), (("j","e"),)]  — compound tuple for sequence 2
+```
 
 ---
 
