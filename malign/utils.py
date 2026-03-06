@@ -65,18 +65,23 @@ def score_alignment(seqs: Sequence[Sequence[Hashable]], scorer, **kwargs) -> flo
         The computed alignment score.
     """
     gap = kwargs.get("gap", "-")
-    gap_ext = kwargs.get("gap_ext", -1)
-    gap_open = kwargs.get("gap_open", -1)
+    gap_ext = kwargs.get("gap_ext", 0.0)
+    gap_open = kwargs.get("gap_open", 0.0)
+    normalize = kwargs.get("normalize", False)
 
     site_score = sum(scorer[corr] for corr in zip(*seqs, strict=False))
 
-    gap_seqs = [[list(g) for k, g in itertools.groupby(seq)] for seq in seqs]
-    gap_seqs = [[len(g) for g in gap_seq if g[0] == gap] for gap_seq in gap_seqs]
-    gap_seqs = [gap_seq for gap_seq in gap_seqs if gap_seq]
+    grouped: list[list[list[Hashable]]] = [[list(g) for _, g in itertools.groupby(seq)] for seq in seqs]
+    gap_runs: list[list[int]] = [[len(g) for g in groups if g[0] == gap] for groups in grouped]
+    gap_runs = [runs for runs in gap_runs if runs]
 
-    seq_penalty = sum(sum(gap_seq) * gap_ext for gap_seq in gap_seqs) + (len(gap_seqs) * gap_open)
+    seq_penalty = sum(sum(runs) * gap_ext for runs in gap_runs) + (len(gap_runs) * gap_open)
+    total_score = site_score + seq_penalty
 
-    return (site_score + seq_penalty) / len(seqs[0])
+    if normalize and seqs and seqs[0]:
+        return total_score / len(seqs[0])
+
+    return total_score
 
 
 def tabulate_alms(alms) -> str:
