@@ -1,0 +1,10 @@
+Dataset	Method	Avg_Accuracy	Avg_Precision	Avg_Recall	Avg_F1	Num_Pairs	Num_Skipped	Num_Errors	Runtime_Seconds
+BDPA Romance	LingPy SCA	0.9908	0.9908	0.9908	0.9908	293	547	0	0.1045
+BDPA Romance	malign (identity)	0.8002	0.8002	0.8002	0.8002	264	576	0	0.1457
+BDPA Romance	malign (bootstrap)	0.6061	0.6061	0.6061	0.6061	276	564	0	0.0631
+NorthEuralex Italic	LingPy SCA	0.9709	0.9709	0.9709	0.9709	266	234	0	0.0847
+NorthEuralex Italic	malign (identity)	0.8986	0.8986	0.8986	0.8986	242	258	0	0.1523
+NorthEuralex Italic	malign (bootstrap)	0.4309	0.4309	0.4309	0.4309	75	425	0	0.1918
+Lexibank Turkish-Azeri	LingPy SCA	1.0000	1.0000	1.0000	1.0000	69	135	0	0.0244
+Lexibank Turkish-Azeri	malign (identity)	0.9797	0.9797	0.9797	0.9797	69	135	0	0.0330
+Lexibank Turkish-Azeri	malign (learned)	1.0000	1.0000	1.0000	1.0000	68	136	0	0.0110
