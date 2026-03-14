@@ -68,7 +68,7 @@ try:
     )
 
     # p-b differ only in voicing: high similarity
-    print(f"\nFeature-based scores:")
+    print("\nFeature-based scores:")
     print(f"  p-b (voicing only): {matrix[('p', 'b')]:.3f}")
     print(f"  p-d (voicing+place): {matrix[('p', 'd')]:.3f}")
     print(f"  p-g (voicing+place): {matrix[('p', 'g')]:.3f}")
@@ -86,12 +86,12 @@ except ImportError:
 #' log-odds matrix:
 
 counts = {
-    ("p", "b"): 15,   # p -> b observed 15 times (voicing, common)
-    ("b", "p"): 3,    # b -> p observed 3 times (devoicing, rare)
-    ("p", "p"): 20,   # p -> p (identity)
-    ("b", "b"): 18,   # b -> b (identity)
-    ("t", "d"): 10,   # t -> d (voicing)
-    ("d", "t"): 2,    # d -> t (devoicing, rare)
+    ("p", "b"): 15,  # p -> b observed 15 times (voicing, common)
+    ("b", "p"): 3,  # b -> p observed 3 times (devoicing, rare)
+    ("p", "p"): 20,  # p -> p (identity)
+    ("b", "b"): 18,  # b -> b (identity)
+    ("t", "d"): 10,  # t -> d (voicing)
+    ("d", "t"): 2,  # d -> t (devoicing, rare)
     ("t", "t"): 25,
     ("d", "d"): 20,
 }
@@ -109,7 +109,9 @@ print(f"  Asymmetric: {matrix[('p', 'b')] != matrix[('b', 'p')]}")
 # Save a matrix
 matrix = malign.ScoringMatrix.from_sequences(
     sequences=[["A", "C", "G"], ["A", "C", "G"]],
-    match=1.0, mismatch=-0.5, gap_score=-1.0,
+    match=1.0,
+    mismatch=-0.5,
+    gap_score=-1.0,
 )
 # matrix.save("my_matrix.yml")
 
@@ -124,7 +126,7 @@ scores = {
     ("A", "A"): 2.0,
     ("A", "C"): -1.0,
     ("A", "-"): -2.0,
-    ("C", "A"): -0.5,   # Asymmetric: C->A differs from A->C
+    ("C", "A"): -0.5,  # Asymmetric: C->A differs from A->C
     ("C", "C"): 2.0,
     ("C", "-"): -2.0,
     ("-", "A"): -2.0,
@@ -155,7 +157,7 @@ matrix = malign.ScoringMatrix(
 )
 
 # Missing scores are imputed on access
-print(f"\nImputed matrix:")
+print("\nImputed matrix:")
 print(f"  A-A (known): {matrix[('A', 'A')]:.3f}")
 print(f"  A-C (imputed): {matrix[('A', 'C')]:.3f}")
 
@@ -165,7 +167,9 @@ print(f"  A-C (imputed): {matrix[('A', 'C')]:.3f}")
 
 matrix = malign.ScoringMatrix.from_sequences(
     sequences=[["A", "C", "G"], ["A", "C", "G"]],
-    match=1.0, mismatch=-0.5, gap_score=-1.0,
+    match=1.0,
+    mismatch=-0.5,
+    gap_score=-1.0,
 )
 
 print("\nMatrix table:")

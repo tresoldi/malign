@@ -7,7 +7,6 @@ import pytest
 import malign
 from malign.ndim_yenksp import ndim_yenksp_align
 from malign.scoring_matrix import ScoringMatrix
-from malign.scoring_matrix import ScoringMatrix
 
 
 def test_asymmetric_matrix_scores_differ():

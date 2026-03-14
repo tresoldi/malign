@@ -6,7 +6,6 @@ import pytest
 
 import malign
 
-
 # --- Cognate data fixtures ---
 
 

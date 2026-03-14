@@ -4,7 +4,6 @@ from collections.abc import Hashable, Sequence
 
 from .alignment import Alignment
 from .scoring_matrix import ScoringMatrix
-from .scoring_matrix import ScoringMatrix
 from .utils import score_alignment
 
 

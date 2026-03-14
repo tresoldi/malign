@@ -3,7 +3,6 @@
 import malign
 from malign.ndim_yenksp import build_align_nd, compute_graph_nd, ndim_yenksp_align
 from malign.scoring_matrix import ScoringMatrix
-from malign.scoring_matrix import ScoringMatrix
 
 
 def test_2seq_regression():

@@ -13,9 +13,7 @@ from pathlib import Path
 import pytest
 
 import malign
-from malign.metrics import alignment_accuracy
 from tests.gold_data_utils import (
-    cognate_set_to_gold_alignment,
     cognate_set_to_sequences,
     evaluate_matrix_accuracy,
     filter_valid_cognate_sets,

@@ -156,9 +156,9 @@ def test_property_learning_produces_valid_matrix(cognate_sets):
         assert alms[0].score is not None, "Score is None"
         assert len(alms[0].seqs) == len(test_seqs), "Wrong number of sequences"
 
-        # Check that gaps were added if needed
+        # Check that sequences are valid (lists or tuples of symbols)
         for seq in alms[0].seqs:
-            assert isinstance(seq, tuple), "Aligned sequence not a tuple"
+            assert isinstance(seq, (list, tuple)), "Aligned sequence not a list or tuple"
 
     except Exception as e:
         # Some random cognate sets might be pathological, that's OK

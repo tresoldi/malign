@@ -10,6 +10,7 @@ from malign.scoring_matrix import ScoringMatrix
 
 from .alignment import Alignment
 
+
 def pad_sequence(seq, gap):
     """Prepend a gap symbol to a sequence."""
     return [gap, *list(seq)]
@@ -82,7 +83,9 @@ def score_alignment(
 
     site_score = sum(scorer[corr] for corr in zip(*seqs, strict=False))
 
-    grouped: list[list[list[Hashable]]] = [[list(g) for _, g in itertools.groupby(seq)] for seq in seqs]
+    grouped: list[list[list[Hashable]]] = [
+        [list(g) for _, g in itertools.groupby(seq)] for seq in seqs
+    ]
     gap_runs: list[list[int]] = [[len(g) for g in groups if g[0] == gap] for groups in grouped]
     gap_runs = [runs for runs in gap_runs if runs]
 
@@ -123,5 +126,3 @@ def tabulate_alms(alms) -> str:
     table = table[:-1]
 
     return tabulate(table, headers=headers, colalign=colalign, tablefmt="github")
-
-

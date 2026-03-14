@@ -43,7 +43,7 @@ aln = malign.Alignment(
 )
 
 merged = malign.merge_alignment_blocks(aln)
-print(f"\nManual merge:")
+print("\nManual merge:")
 print(f"  Before: {[list(s) for s in aln.seqs]}")
 print(f"  After:  {[list(s) for s in merged.seqs]}")
 print(f"  Score preserved: {merged.score == aln.score}")
@@ -96,7 +96,7 @@ accuracy = malign.alignment_accuracy(predicted, gold)
 precision, recall = malign.alignment_precision_recall(predicted, gold)
 f1 = malign.alignment_f1(predicted, gold)
 
-print(f"\nEvaluation metrics:")
+print("\nEvaluation metrics:")
 print(f"  Accuracy:  {accuracy:.2%}")
 print(f"  Precision: {precision:.2%}")
 print(f"  Recall:    {recall:.2%}")
@@ -165,7 +165,7 @@ alms = malign.align(
     merge_blocks=True,
 )
 
-print(f"\nFull pipeline:")
+print("\nFull pipeline:")
 print(f"  Learned matrix with {len(matrix.scores)} scores")
 print(f"  Got {len(alms)} alignments")
 print(malign.tabulate_alms(alms[:2]))

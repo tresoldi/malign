@@ -41,7 +41,7 @@ def compute_graph_nd(
 
     grid_size = prod(shape)
     if grid_size > MAX_GRAPH_NODES:
-        dims_str = " × ".join(str(s) for s in shape)
+        dims_str = " x ".join(str(s) for s in shape)
         raise MemoryError(
             f"N-dimensional alignment grid too large: {dims_str} = {grid_size:,} nodes "
             f"(limit is {MAX_GRAPH_NODES:,}). Reduce the number or length of sequences."

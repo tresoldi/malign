@@ -142,14 +142,22 @@ MAlign can align sequences from different domains (e.g., IPA transcriptions vs. 
 ```python
 import malign
 
-# Define asymmetric matrix
-matrix = malign.ScoringMatrix()
-matrix.scores = {
-    ("th", "θ"): 2.0,   # English orthography → IPA
-    ("θ", "th"): 0.5,   # IPA → orthography (less natural)
-    ("t", "t"): 1.0,    # Identity match
-    # ... more mappings
-}
+# Define asymmetric matrix via constructor
+matrix = malign.ScoringMatrix(
+    scores={
+        ("th", "θ"): 2.0,   # English orthography → IPA
+        ("θ", "th"): 0.5,   # IPA → orthography (less natural)
+        ("t", "t"): 1.0,    # Identity match
+        ("th", "-"): -1.0,
+        ("θ", "-"): -1.0,
+        ("-", "th"): -1.0,
+        ("-", "θ"): -1.0,
+        ("t", "-"): -1.0,
+        ("-", "t"): -1.0,
+        # ... more mappings
+    },
+    impute_method=None,
+)
 
 # Align orthographic and phonetic forms
 seqs = [["th", "i", "n", "k"], ["θ", "ɪ", "ŋ", "k"]]
@@ -267,25 +275,26 @@ alignments = malign.align(sequences, matrix=matrix, k=1)
 
 #### 2. Manual Construction
 
-For complete control over all alignment scores:
+For complete control over all alignment scores, pass all scores to the constructor:
 
 ```python
 import malign
 
-# Define domains (symbol alphabets for each sequence)
-domains = [
-    ["-", "A", "C", "G", "T"],  # Sequence 1 symbols
-    ["-", "A", "C", "G", "T"]   # Sequence 2 symbols
-]
+# Build a complete scores dictionary
+scores = {
+    ("A", "A"): 2.0,   # Match
+    ("A", "C"): -1.0,   # Mismatch
+    ("A", "G"): -1.0,
+    ("A", "T"): -1.0,
+    ("C", "C"): 2.0,
+    # ... all other symbol pairs ...
+    ("A", "-"): -2.0,   # Gap penalties
+    ("-", "A"): -2.0,
+    # ... all gap pairs ...
+}
 
-# Create empty matrix
-matrix = malign.ScoringMatrix(domains=domains, gap="-")
-
-# Manually set scores
-matrix.scores[("A", "A")] = 2.0   # Match
-matrix.scores[("A", "C")] = -1.0  # Mismatch
-matrix.scores[("A", "-")] = -2.0  # Gap penalty
-# ... set all other scores
+# ScoringMatrix is immutable — pass everything at construction
+matrix = malign.ScoringMatrix(scores=scores, gap="-", impute_method=None)
 ```
 
 #### 3. From Pre-computed Probabilities
@@ -303,12 +312,14 @@ prob_matrix = {
     # ...
 }
 
-# Convert to log-odds scores
-matrix = malign.ScoringMatrix(domains=domains, gap="-")
-for (sym1, sym2), prob in prob_matrix.items():
-    # Log-odds: log(P(align) / P(random))
-    background_prob = 0.1  # Adjust based on your data
-    matrix.scores[(sym1, sym2)] = np.log(prob / background_prob)
+# Convert to log-odds scores before constructing
+background_prob = 0.1  # Adjust based on your data
+scores = {
+    key: float(np.log(prob / background_prob))
+    for key, prob in prob_matrix.items()
+}
+
+matrix = malign.ScoringMatrix(scores=scores, gap="-")
 ```
 
 #### 4. From Cognate Sets (Learning)

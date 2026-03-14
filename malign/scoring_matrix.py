@@ -5,6 +5,7 @@ import math
 from collections import Counter
 from collections.abc import Hashable, Iterable, Sequence
 from dataclasses import dataclass
+from dataclasses import field as dataclass_field
 from typing import cast
 
 import numpy as np
@@ -162,7 +163,7 @@ class ScoringMatrix:
     scores: dict[tuple[Hashable, ...], float]
     domains: tuple[tuple[Hashable, ...], ...]
     gap: Hashable = "-"
-    _default_score: float = 0.0
+    _default_score: float = dataclass_field(default=0.0, repr=False, compare=False)
 
     def __init__(
         self,

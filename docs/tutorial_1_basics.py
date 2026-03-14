@@ -47,7 +47,7 @@ print(malign.tabulate_alms(alignments))
 
 # Align phonological segments
 sequences = [
-    ["k", "a", "t"],      # English "cat"
+    ["k", "a", "t"],  # English "cat"
     ["g", "a", "t", "o"],  # Spanish "gato"
 ]
 
@@ -88,7 +88,9 @@ for i, aln in enumerate(alms):
 scores = [aln.score for aln in alms]
 if len(scores) > 1:
     score_range = max(scores) - min(scores)
-    print(f"  Score range: {score_range:.3f} {'(uncertain)' if score_range < 0.5 else '(confident)'}")
+    print(
+        f"  Score range: {score_range:.3f} {'(uncertain)' if score_range < 0.5 else '(confident)'}"
+    )
 
 #' ## Multi-Sequence Alignment
 #'

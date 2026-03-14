@@ -30,6 +30,8 @@ def learn_matrix(
     patience: int = 5,
     bounds: tuple[float, float] = (-10.0, 10.0),
     verbose: bool = False,
+    prior_matrix: ScoringMatrix | None = None,
+    prior_weight: float = 0.5,
 ) -> ScoringMatrix:
     """Learn a scoring matrix from cognate sets.
 
@@ -40,13 +42,19 @@ def learn_matrix(
         cognate_sets: List of cognate sets, where each set is a list of sequences.
         method: Learning method - "em" or "gradient_descent" (default: "em").
         max_iter: Maximum iterations for learning (default: 10).
-        initial_matrix: Starting matrix (if None, creates identity matrix).
+        initial_matrix: Starting matrix (if None, creates identity matrix;
+            if prior_matrix is given, uses it as initial).
         gap: Gap symbol (default: "-").
         convergence_threshold: Relative score change threshold (default: 0.001).
         matrix_threshold: Frobenius norm threshold for matrix convergence (default: 0.01).
         patience: Early stopping patience (default: 5).
         bounds: Parameter bounds for gradient descent (default: (-10.0, 10.0)).
         verbose: Print convergence information (default: False).
+        prior_matrix: Optional prior matrix (e.g. from ``ScoringMatrix.from_distfeat()``).
+            Blended with data-driven scores during EM learning. Symbols in the prior
+            but absent from the cognate sets are included in the output.
+        prior_weight: Initial regularization strength for the prior (default: 0.5).
+            Decays linearly to 0 over ``max_iter`` iterations (EM only).
 
     Returns:
         Learned ScoringMatrix optimized for the provided cognates.
@@ -61,6 +69,8 @@ def learn_matrix(
             matrix_threshold=matrix_threshold,
             patience=patience,
             verbose=verbose,
+            prior_matrix=prior_matrix,
+            prior_weight=prior_weight,
         )
     if method == "gradient_descent":
         return _gradient_descent_learning(
@@ -123,6 +133,8 @@ def _em_learning(
     matrix_threshold: float = 0.01,
     patience: int = 5,
     verbose: bool = False,
+    prior_matrix: ScoringMatrix | None = None,
+    prior_weight: float = 0.5,
 ) -> ScoringMatrix:
     """Learn matrix using Expectation-Maximization.
 
@@ -137,11 +149,18 @@ def _em_learning(
         matrix_threshold: Frobenius norm threshold (default: 0.01).
         patience: Early stopping patience (default: 5).
         verbose: Print convergence information (default: False).
+        prior_matrix: Optional prior matrix for regularization.
+        prior_weight: Initial prior blending weight (decays linearly).
 
     Returns:
         Learned ScoringMatrix.
     """
-    matrix = _initialize_matrix(cognate_sets, gap) if initial_matrix is None else initial_matrix
+    if initial_matrix is not None:
+        matrix = initial_matrix
+    elif prior_matrix is not None:
+        matrix = prior_matrix
+    else:
+        matrix = _initialize_matrix(cognate_sets, gap)
 
     # Track convergence
     prev_total_score = None
@@ -181,6 +200,14 @@ def _em_learning(
                 freq = count / total_count
                 score = np.log(freq + 1e-10)
                 new_scores[pair] = float(score)
+
+            # Prior regularization with linear decay
+            alpha = prior_weight * (1.0 - iteration / max_iter)
+            if prior_matrix is not None and alpha > 0:
+                for pair_key in new_scores:
+                    prior_score = prior_matrix.scores.get(pair_key)
+                    if prior_score is not None:
+                        new_scores[pair_key] += alpha * prior_score
 
             matrix = ScoringMatrix(
                 scores=new_scores,

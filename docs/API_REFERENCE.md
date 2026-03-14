@@ -121,7 +121,8 @@ def learn_matrix(
     patience: int = 5,
     bounds: tuple[float, float] = (-10.0, 10.0),
     verbose: bool = False,
-    **kwargs,
+    prior_matrix: ScoringMatrix | None = None,
+    prior_weight: float = 0.5,
 ) -> ScoringMatrix
 ```
 
@@ -140,7 +141,7 @@ Given collections of related sequences (cognates), learns a scoring matrix that 
 
 - **`max_iter`** (`int`, default: `10`): Maximum iterations for learning algorithm.
 
-- **`initial_matrix`** (`ScoringMatrix | None`, default: `None`): Starting matrix. If `None`, creates identity-based matrix.
+- **`initial_matrix`** (`ScoringMatrix | None`, default: `None`): Starting matrix. If `None`, creates identity-based matrix (or uses prior_matrix if provided).
 
 - **`gap`** (`Hashable`, default: `"-"`): Gap symbol.
 
@@ -154,7 +155,9 @@ Given collections of related sequences (cognates), learns a scoring matrix that 
 
 - **`verbose`** (`bool`, default: `False`): Print convergence information during learning.
 
-- **`**kwargs`**: Additional method-specific parameters passed to `scipy.optimize.minimize` (for gradient descent).
+- **`prior_matrix`** (`ScoringMatrix | None`, default: `None`): Optional prior matrix (e.g. from `ScoringMatrix.from_distfeat()`). Blended with data-driven scores during EM learning. If no `initial_matrix` is provided, the prior is also used as the starting point.
+
+- **`prior_weight`** (`float`, default: `0.5`): Initial regularization strength for the prior. Decays linearly to 0 over `max_iter` iterations (EM only; ignored for gradient descent).
 
 **Returns:**
 

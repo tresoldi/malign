@@ -143,18 +143,15 @@ try:
     matrix_with_prior = malign.bootstrap_matrix(
         pairs,
         max_iter=10,
-        prior_matrix=prior,   # phonological feature prior
-        prior_weight=0.5,     # initial blending strength (decays to 0)
+        prior_matrix=prior,  # phonological feature prior
+        prior_weight=0.5,  # initial blending strength (decays to 0)
     )
 
     # Step 3: Compare with vs without prior
     matrix_no_prior = malign.bootstrap_matrix(pairs, max_iter=10)
 
     common_keys = set(matrix_no_prior.scores) & set(matrix_with_prior.scores)
-    diffs = [
-        abs(matrix_no_prior.scores[k] - matrix_with_prior.scores[k])
-        for k in common_keys
-    ]
+    diffs = [abs(matrix_no_prior.scores[k] - matrix_with_prior.scores[k]) for k in common_keys]
     print(f"\nPrior effect: max score diff = {max(diffs):.3f}")
 
 except ImportError:
