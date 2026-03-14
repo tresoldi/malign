@@ -10,8 +10,8 @@ Runnable scripts showcasing the `malign` API on real linguistic and biological d
 | 02 | `02_bdpa_evaluation.py` | Gold-standard evaluation of predicted alignments | `align()`, `Alignment()`, `alignment_accuracy()`, `alignment_precision_recall()`, `alignment_f1()` | `data/bdpa/romance.tsv` | -- |
 | 03 | `03_northeuralex_pipeline.py` | distfeat -> bootstrap -> learn pipeline | `ScoringMatrix.from_distfeat()`, `bootstrap_matrix()`, `learn_matrix()` | `data/northeuralex/italic_by_cogid.tsv` | `pip install malign[features]` |
 | 04 | `04_cmudict_cross_domain.py` | Cross-domain alignment (letters <-> phonemes) | `align()`, `ScoringMatrix.from_substitution_counts()` | `data/cmudict/cmudict.tsv` | -- |
-| 05 | `05_wiktionary_multilingual.py` | Multilingual alignment (3+ seqs), mixed scripts | `align()`, `ScoringMatrix.from_sequences()`, `tabulate_alms()` | `data/wiktionary/wiktionary.tsv` | -- |
-| 06 | `06_neurodecipher_scripts.py` | Cross-script alignment (Greek -> Linear B) | `align()`, `bootstrap_matrix()` | `data/neurodecipher/greek_linearb.tsv` | -- |
+| 05 | `05_wiktionary_multilingual.py` | Romance cognate alignment (2-way and 3-way) | `align()`, `bootstrap_matrix()` | `data/wiktionary/wiktionary.tsv` | -- |
+| 06 | `06_neurodecipher_scripts.py` | Disjoint-domain bootstrap (Greek alphabet vs Linear B syllabary) | `align()`, `bootstrap_matrix()` | `data/neurodecipher/greek_linearb.tsv` | -- |
 | 07 | `07_lexibank_learning.py` | Large-scale matrix learning, gold evaluation | `learn_matrix()`, `align()`, `alignment_accuracy()` | `data/lexibank/forms.tsv` | -- |
 
 ## Running
@@ -24,7 +24,7 @@ python examples/01_dna_alignment.py
 for f in examples/0*.py; do python "$f"; done
 ```
 
-Output files are written to `examples/output/` (gitignored).
+Output files are written to `examples/output/`.
 
 ## Data
 

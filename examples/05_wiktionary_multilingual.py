@@ -1,95 +1,99 @@
-"""Multilingual alignment with mixed scripts (3+ sequences).
+"""Multilingual alignment of Romance cognates from Wiktionary.
 
-Demonstrates: align(), ScoringMatrix.from_sequences(), tabulate_alms().
-Shows alignment of words across Latin, Bengali, Georgian, Hebrew, and
-other scripts.
+Demonstrates: align(), bootstrap_matrix(), comparison of identity vs
+learned matrix, and 3-way alignment.
 
-Data: data/wiktionary/wiktionary.tsv (filtered to rows with >= 3 languages).
+Italian and Portuguese are closely related Romance languages, so most
+translation equivalents share common Latin etyma and produce meaningful
+alignments. English is added as a third language for 3-way demos
+(shared cognates via Latin/French borrowings).
+
+Data: data/wiktionary/wiktionary.tsv.
 """
 
 import csv
 import random
 from pathlib import Path
 
-from malign import align
+from malign import align, bootstrap_matrix
 
 DATA_DIR = Path(__file__).parent / "data"
 OUTPUT_DIR = Path(__file__).parent / "output"
 OUTPUT_DIR.mkdir(exist_ok=True)
 
 # --- load data ---
-LANGUAGES = [
-    "English",
-    "Bengali",
-    "Georgian",
-    "Hebrew",
-    "Italian",
-    "Portuguese",
-    "Russian",
-    "Finnish",
-    "Czech",
-    "Swahili",
-    "Afrikaans",
-    "Danish",
-    "Esperanto",
-]
-
-rows_with_multi: list[tuple[list[str], list[list[str]]]] = []
+pairs_it_pt: list[tuple[list[str], list[str]]] = []
+triples: list[tuple[list[str], list[str], list[str]]] = []
 
 with open(DATA_DIR / "wiktionary" / "wiktionary.tsv", encoding="utf-8") as fh:
     reader = csv.DictReader(fh, delimiter="\t")
     for row in reader:
-        present = []
-        for lang in LANGUAGES:
-            val = row.get(lang, "").strip()
-            if val:
-                present.append((lang, val.split()))
-        # Keep rows with >=3 languages and short sequences (max 12 symbols each)
-        if len(present) >= 3 and all(len(p[1]) <= 12 for p in present):
-            langs_here = [p[0] for p in present]
-            seqs_here = [p[1] for p in present]
-            rows_with_multi.append((langs_here, seqs_here))
+        it = row.get("Italian", "").strip()
+        pt = row.get("Portuguese", "").strip()
+        if not it or not pt:
+            continue
+        it_chars = it.split()
+        pt_chars = pt.split()
+        # Keep short single-word entries (likely cognates, not compounds)
+        if len(it_chars) > 12 or len(pt_chars) > 12:
+            continue
+        pairs_it_pt.append((it_chars, pt_chars))
 
-print(f"Found {len(rows_with_multi)} rows with >= 3 languages")
+        # Also collect triples with English
+        en = row.get("English", "").strip()
+        if en:
+            en_chars = en.split()
+            if len(en_chars) <= 12:
+                triples.append((it_chars, pt_chars, en_chars))
 
-# Sample 50 rows, preferring mixed-script combinations
+print(f"Loaded {len(pairs_it_pt)} Italian-Portuguese pairs, {len(triples)} triples with English")
+
+# Reproducible sample
 random.seed(42)
+pair_sample = random.sample(pairs_it_pt, min(200, len(pairs_it_pt)))
+triple_sample = random.sample(triples, min(20, len(triples)))
 
-# Prefer rows that include non-Latin scripts
-non_latin_langs = {"Bengali", "Georgian", "Hebrew", "Russian"}
-mixed_script = [
-    (langs, seqs)
-    for langs, seqs in rows_with_multi
-    if any(lang in non_latin_langs for lang in langs)
+# --- Step 1: Bootstrap matrix from Italian-Portuguese pairs ---
+boot_subset = pair_sample[:150]
+print(f"Bootstrapping matrix from {len(boot_subset)} Italian-Portuguese pairs...")
+learned = bootstrap_matrix(
+    boot_subset,
+    max_iter=10,
+    verbose=True,
+)
+
+# --- Step 2: Compare identity vs learned on pairwise alignments ---
+lines: list[str] = [
+    "=== Italian-Portuguese alignment (identity vs bootstrapped) ===",
+    "",
 ]
 
-if len(mixed_script) >= 20:
-    sample = random.sample(mixed_script, 20)
-else:
-    sample = mixed_script + random.sample(
-        [r for r in rows_with_multi if r not in mixed_script],
-        min(20 - len(mixed_script), len(rows_with_multi) - len(mixed_script)),
-    )
+for it_chars, pt_chars in pair_sample[:20]:
+    it_word = "".join(it_chars)
+    pt_word = "".join(pt_chars)
+    lines.append(f"--- {it_word} / {pt_word} ---")
 
-print(f"Selected {len(sample)} entries (preferring mixed-script rows)")
+    for label, matrix in [("identity", None), ("learned", learned)]:
+        alms = align([it_chars, pt_chars], k=1, matrix=matrix)
+        if alms:
+            a = alms[0]
+            lines.append(f"  {label:>10}: {' '.join(str(s) for s in a.seqs[0])}")
+            lines.append(f"  {'':>10}  {' '.join(str(s) for s in a.seqs[1])}")
+            lines.append(f"  {'':>10}  score: {a.score:.2f}")
+    lines.append("")
 
-# --- align ---
-lines: list[str] = ["=== Multilingual alignment (3+ sequences, mixed scripts) ===", ""]
+# --- Step 3: 3-way alignment (Italian / Portuguese / English) ---
+lines.append("=== 3-way alignment (Italian / Portuguese / English) ===")
+lines.append("")
 
-for i, (langs, seqs) in enumerate(sample):
-    # Limit to 3 sequences max for tractability
-    if len(seqs) > 3:
-        seqs = seqs[:3]
-        langs = langs[:3]
-
-    alms = align(seqs, k=1)
+for it_chars, pt_chars, en_chars in triple_sample:
+    alms = align([it_chars, pt_chars, en_chars], k=1, matrix=learned)
     if not alms:
         continue
-
     a = alms[0]
-    lines.append(f"--- Entry {i + 1} ({', '.join(langs)}) ---")
-    for lang, seq in zip(langs, a.seqs, strict=False):
-        lines.append(f"  {lang:>12}: {' '.join(str(s) for s in seq)}")
+    lines.append(f"  {'Italian':>12}: {' '.join(str(s) for s in a.seqs[0])}")
+    lines.append(f"  {'Portuguese':>12}: {' '.join(str(s) for s in a.seqs[1])}")
+    lines.append(f"  {'English':>12}: {' '.join(str(s) for s in a.seqs[2])}")
     lines.append(f"  {'score':>12}: {a.score:.2f}")
     lines.append("")
 

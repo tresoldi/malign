@@ -1,79 +1,226 @@
-  d o l - e r e
-  d o l e - ɾ -
-  score: -21.47
+=== ITALIAN-SPANISH alignment comparison ===
 
-  d i n u o - v o
-  d e n - w e β o
-  score: -33.93
+Each cognate pair is aligned with:
+  (a) identity/distfeat prior
+  (b) bootstrapped matrix
+  (c) EM-learned matrix
 
-  t u tː o
-  t o ð o
-  score: -18.72
+--- dolere / doleɾ ---
+       prior: d o l e r e
+              d o l e ɾ -
+              score: 3.68
+   bootstrap: d o l e - r e
+              d o l - e ɾ -
+              score: 23.82
+     learned: d o l - e - r e
+              - - d o l e ɾ -
+              score: -18.31
 
-  d a s o l o
-  - a s o l o
-  score: -19.43
+--- dinuovo / denweβo ---
+       prior: d i n u o v o
+              d e n w e β o
+              score: 4.97
+   bootstrap: d i - n u o - - v o
+              d - e n - - w e β o
+              score: 28.84
+     learned: d - - i - n u o v o
+              d e n w e β - o - -
+              score: -33.00
 
-  s e - m p r e -
-  s j e m p ɾ - e
-  score: -26.42
+--- tutːo / toðo ---
+       prior: t u tː o
+              t o ð o
+              score: 2.88
+   bootstrap: t u tː o - -
+              t - - o ð o
+              score: 13.21
+     learned: t u tː o
+              t o ð o
+              score: -18.62
 
-  k - w a n t i t a -
-  k a n - - t i ð a ð
-  score: -32.48
+--- dasolo / asolo ---
+       prior: d a s o l o
+              - a s o l o
+              score: 4.00
+   bootstrap: d a s o l o
+              - a s o l o
+              score: 20.22
+     learned: d a s o l o
+              - a s o l o
+              score: -18.96
 
-  a n i m a l e
-  a n i m a l -
-  score: -20.02
+--- sempre / sjempɾe ---
+       prior: s - e m p r e
+              s j e m p ɾ e
+              score: 4.68
+   bootstrap: s e - - m p r e -
+              s - j e m p ɾ - e
+              score: 29.62
+     learned: s e - m p r e -
+              s j e m p ɾ - e
+              score: -25.57
 
-  f o r m i k a
-  - o ɾ m i ɣ a
-  score: -24.17
+--- kwantita / kantiðað ---
+       prior: k w a n t i t a
+              k a n t i ð a ð
+              score: 4.20
+   bootstrap: k w a n t i t a -
+              k - a n t i ð a ð
+              score: 30.09
+     learned: k - w a n t i t a -
+              k a n - - t i ð a ð
+              score: -30.55
 
-  a p r i l e
-  a β ɾ i l -
-  score: -19.01
+--- animale / animal ---
+       prior: a n i m a l e
+              a n i m a l -
+              score: 5.00
+   bootstrap: a n i m a l e
+              a n i m a l -
+              score: 26.08
+     learned: a n i m a l e
+              a n i m a l -
+              score: -19.36
 
-  b r a t tʃ o
-  b ɾ a - θ o
-  score: -20.78
+--- formika / oɾmiɣa ---
+       prior: f o r m i k a
+              - o ɾ m i ɣ a
+              score: 3.86
+   bootstrap: f o r m i k - a
+              - o ɾ m i - ɣ a
+              score: 22.13
+     learned: f o r m i k a
+              - o ɾ m i ɣ a
+              score: -24.72
 
-  - - p r e g a r e
-  ɾ o ɣ - - - a ɾ -
-  score: -25.05
+--- aprile / aβɾil ---
+       prior: a p r i l e
+              a β ɾ i l -
+              score: 2.86
+   bootstrap: a p r i l e
+              a β ɾ i l -
+              score: 20.22
+     learned: a p r i l e
+              a β ɾ i l -
+              score: -18.41
 
-  r i n u n i r z i
-  ɾ e - u n i ɾ s e
-  score: -34.31
+--- brattʃo / bɾaθo ---
+       prior: b r a t tʃ o
+              b ɾ a θ - o
+              score: 3.22
+   bootstrap: b r a t tʃ o
+              b ɾ a - θ o
+              score: 19.76
+     learned: b r a t tʃ o
+              b ɾ a - θ o
+              score: -20.00
 
-  d a pː r i m - - a
-  p - - ɾ i m e ɾ o
-  score: -37.73
+--- pregare / ɾoɣaɾ ---
+       prior: p r e g a r e
+              ɾ o - ɣ a ɾ -
+              score: 1.12
+   bootstrap: p r e - g a r e
+              - ɾ - o ɣ a ɾ -
+              score: 19.96
+     learned: p r e g a r e
+              ɾ o - ɣ a ɾ -
+              score: -25.23
 
-  a g o s t o
-  a ɣ o s t o
-  score: -19.72
+--- rinunirzi / ɾeuniɾse ---
+       prior: r i n u n i r z i
+              ɾ e - u n i ɾ s e
+              score: 5.33
+   bootstrap: r i n - u n i r z i -
+              ɾ - - e u n i ɾ s - e
+              score: 30.49
+     learned: r i n u n i r z i
+              ɾ e - u n i ɾ s e
+              score: -34.41
 
-  ts i a
-  t i a
-  score: -11.66
+--- dapːrima / pɾimeɾo ---
+       prior: d a pː r i m a
+              p ɾ i m e ɾ o
+              score: 3.32
+   bootstrap: d a pː r i m a - - -
+              - - p ɾ i m - e ɾ o
+              score: 21.47
+     learned: - - d a pː r i m a
+              p ɾ i m e ɾ - o -
+              score: -33.03
 
-  a u t u nː o
-  o - t o ɲ o
-  score: -23.55
+--- agosto / aɣosto ---
+       prior: a g o s t o
+              a ɣ o s t o
+              score: 5.73
+   bootstrap: a g o s t o
+              a ɣ o s t o
+              score: 23.12
+     learned: a g o s t o
+              a ɣ o s t o
+              score: -19.91
 
-  u n p o k o
-  u n p o k o
-  score: -19.39
+--- tsia / tia ---
+       prior: ts i a
+              t i a
+              score: 2.65
+   bootstrap: ts i a
+              t i a
+              score: 10.64
+     learned: ts i a
+              t i a
+              score: -11.46
 
-  b o r z a
-  b o l s o
-  score: -23.48
+--- autunːo / otoɲo ---
+       prior: a u t u nː o
+              - o t o ɲ o
+              score: 3.17
+   bootstrap: a u - t - u nː o
+              - - o t o - ɲ o
+              score: 19.85
+     learned: a u t u nː o
+              o - t o ɲ o
+              score: -19.13
 
-  - - k - u ɔ tʃ e r e a l f o r n o
-  k o θ e ɾ a l - - - o ɾ n o - - -
-  score: -46.24
+--- unpoko / unpoko ---
+       prior: u n p o k o
+              u n p o k o
+              score: 6.00
+   bootstrap: u n p o k o
+              u n p o k o
+              score: 24.20
+     learned: u n p o k o
+              u n p o k o
+              score: -18.84
 
-  l a t r a r e
-  l a ð ɾ a ɾ -
-  score: -19.60
+--- borza / bolso ---
+       prior: b o r z a
+              b o l s o
+              score: 3.35
+   bootstrap: b o r z a -
+              b o l s - o
+              score: 14.43
+     learned: b o r z a
+              b o l s o
+              score: -22.68
+
+--- kuɔtʃerealforno / koθeɾaloɾno ---
+       prior: k u ɔ tʃ e r e a l f o r n o
+              k - o θ e ɾ - a l - o ɾ n o
+              score: 6.64
+   bootstrap: k u - ɔ tʃ e - r e a l f o r n o
+              k - o - θ - e ɾ - a l - o ɾ n o
+              score: 47.93
+     learned: - - k - u ɔ tʃ e r e a l f o r n o
+              k o θ e ɾ a l - o - - ɾ n - - - o
+              score: -39.96
+
+--- latrare / laðɾaɾ ---
+       prior: l a t r a r e
+              l a ð ɾ a ɾ -
+              score: 3.36
+   bootstrap: l a t r a r e
+              l a ð ɾ a ɾ -
+              score: 23.22
+     learned: l a t r a r e
+              l a ð ɾ a ɾ -
+              score: -18.46

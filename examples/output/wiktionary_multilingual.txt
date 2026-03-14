@@ -1,121 +1,263 @@
-=== Multilingual alignment (3+ sequences, mixed scripts) ===
+=== Italian-Portuguese alignment (identity vs bootstrapped) ===
 
---- Entry 1 (English, Portuguese, Russian) ---
-       English: g o r s e
-    Portuguese: - t o j o
-       Russian: у л е к с
-         score: -5.00
+--- vertice / cimeira ---
+    identity: v e r t i c e
+              c i m e i r a
+              score: -5.00
+     learned: v e - - - - - r t i c e -
+              - - c i m e i r - - - - a
+              score: 16.34
 
---- Entry 2 (English, Georgian, Italian) ---
-       English: - - - - - d e b t
-      Georgian: მ ო ვ ა ლ ე ო ბ ა
-       Italian: - - i m p e g n o
-         score: -9.00
+--- Ninive / Nínive ---
+    identity: N i n i v e
+              N í n i v e
+              score: 4.00
+     learned: N i - n i v e -
+              N - í n i v - e
+              score: 24.28
 
---- Entry 3 (English, Russian, Finnish) ---
-       English: - - - - C a m b r i a n
-       Russian: - - - - в а л л и ́ е ц
-       Finnish: w a l e s i l a i n e n
-         score: -12.00
+--- gusto / gosto ---
+    identity: g u s t o
+              g o s t o
+              score: 3.00
+     learned: g u - s t o
+              g - o s t o
+              score: 16.00
 
---- Entry 4 (English, Italian, Portuguese) ---
-       English: - s p e c t r u m
-       Italian: - s p e t t r - o
-    Portuguese: e s p e - t r - o
-         score: 1.00
+--- adottabile / adotável ---
+    identity: a d o t t a b i l e
+              a d o t á v e - l -
+              score: 0.00
+     learned: a d o t t a b i - l e
+              a d o t - á v - e l -
+              score: 27.57
 
---- Entry 5 (English, Georgian, Hebrew) ---
-       English: - - g l o o m
-      Georgian: უ კ უ ნ ე თ ი
-        Hebrew: - - - - ח ש ך
-         score: -7.00
+--- venusiana / venusiano ---
+    identity: v e n u s i a n a
+              v e n u s i a n o
+              score: 7.00
+     learned: v e - n u s i a n a -
+              v - e n u s i a n - o
+              score: 28.53
 
---- Entry 6 (English, Georgian, Italian) ---
-       English: l i v e s t o c k
-      Georgian: - ს ა ქ ო ნ ე ლ ი
-       Italian: - b e s t i a m e
-         score: -9.00
+--- fondere / fundir ---
+    identity: f o n d e r e
+              f u n d i r -
+              score: 1.00
+     learned: f o - n d e - r e
+              f - u n d - i r -
+              score: 20.76
 
---- Entry 7 (English, Italian, Russian) ---
-       English: s w a r d
-       Italian: z o l l a
-       Russian: - д ё р н
-         score: -5.00
+--- canuto / grisalho ---
+    identity: c - - - a n u t o
+              g r i s a l h - o
+              score: -5.00
+     learned: c - - - a n u t - - o
+              g r i s a - - - l h o
+              score: 15.51
 
---- Entry 8 (English, Italian, Portuguese) ---
-       English: g a u z e
-       Italian: g a r z a
-    Portuguese: g a - z e
-         score: 1.00
+--- Talmud / Talmude ---
+    identity: T a l m u d -
+              T a l m u d e
+              score: 5.00
+     learned: T a l m u d -
+              T a l m u d e
+              score: 26.05
 
---- Entry 9 (English, Portuguese, Russian) ---
-       English: - M a g e l l a n
-    Portuguese: M a g a l h ã e s
-       Russian: М а г е л л а ́ н
-         score: -9.00
+--- gradiente / gradiente ---
+    identity: g r a d i e n t e
+              g r a d i e n t e
+              score: 9.00
+     learned: g r a d i e - n t e -
+              g r a d i - e n t - e
+              score: 30.33
 
---- Entry 10 (English, Portuguese, Russian) ---
-       English: - - - s p o o f
-    Portuguese: b e s t e i r a
-       Russian: - н о н с е н с
-         score: -8.00
+--- feudo / feudo ---
+    identity: f e u d o
+              f e u d o
+              score: 5.00
+     learned: f e - u d o
+              f - e u d o
+              score: 19.09
 
---- Entry 11 (English, Russian, Finnish) ---
-       English: - - - c r e d i t
-       Russian: - - - - - с р о к
-       Finnish: m a k s u a i k a
-         score: -9.00
+--- albero / árvore ---
+    identity: a l b e r o
+              á r v o r e
+              score: -4.00
+     learned: a l b e r - o - -
+              - - á - r v o r e
+              score: 16.77
 
---- Entry 12 (English, Russian, Finnish) ---
-       English: - - s l o u g h
-       Russian: к о р о ́ с т а
-       Finnish: - - - - r u p i
-         score: -8.00
+--- astensione / abstenção ---
+    identity: a - s t e n s i o n e
+              a b s t e n ç ã o - -
+              score: 1.00
+     learned: a - s t e - n s i - o n e
+              a b s t - e n ç - ã o - -
+              score: 27.86
 
---- Entry 13 (English, Georgian, Italian) ---
-       English: a n c h o v y
-      Georgian: - ქ ა ფ შ ი ა
-       Italian: a c c i u g a
-         score: -7.00
+--- ordine / ordem ---
+    identity: o r d i n e -
+              o r d - - e m
+              score: 1.00
+     learned: o r d i n e - -
+              o r d - - - e m
+              score: 16.31
 
---- Entry 14 (English, Georgian, Portuguese) ---
-       English: - - d e a l w i t h
-      Georgian: გ ა მ კ ლ ა ვ ე ბ ა
-    Portuguese: - - - - - l i d a r
-         score: -10.00
+--- rivaleggiare / competir ---
+    identity: r i v a l e g g i a r e
+              c o m p - e t - i - r -
+              score: -6.00
+     learned: r - i - v a l e g g - - i a r e
+              c o - m p - - - - - e t i - r -
+              score: 22.02
 
---- Entry 15 (English, Bengali, Georgian) ---
-       English: h i s t o r y
-       Bengali: - ই ত ি হ া স
-      Georgian: ი ს ტ ო რ ი ა
-         score: -7.00
+--- testo / texto ---
+    identity: t e s t o
+              t e x t o
+              score: 3.00
+     learned: t e - s t o
+              t - e x t o
+              score: 17.19
 
---- Entry 16 (English, Bengali, Georgian) ---
-       English: t e n
-       Bengali: - দ শ
-      Georgian: ა თ ი
-         score: -3.00
+--- miopia / miopia ---
+    identity: m i o p i a
+              m i o p i a
+              score: 6.00
+     learned: m i o p i a
+              m i o p i a
+              score: 18.97
 
---- Entry 17 (English, Portuguese, Russian) ---
-       English: - - - - l e s s
-    Portuguese: - - - m e n o r
-       Russian: м е ́ н ь ш и й
-         score: -8.00
+--- trillo / trinado ---
+    identity: t r i l l - o
+              t r i n a d o
+              score: 1.00
+     learned: t r i l l - - - o
+              t r i - - n a d o
+              score: 16.89
 
---- Entry 18 (English, Hebrew, Portuguese) ---
-       English: d i o d e
-        Hebrew: ד י ו ד ה
-    Portuguese: d i o d o
-         score: -5.00
+--- sergente / sargento ---
+    identity: s e r g e n t e
+              s a r g e n t o
+              score: 4.00
+     learned: s - e r g e - n t e -
+              s a - r g - e n t - o
+              score: 26.20
 
---- Entry 19 (English, Italian, Portuguese) ---
-       English: n a m e - - - - - - l y
-       Italian: o v v e - - - r o s i a
-    Portuguese: n o m e a d a m e n t e
-         score: -10.00
+--- dama / damas ---
+    identity: d a m a -
+              d a m a s
+              score: 3.00
+     learned: d a m a -
+              d a m a s
+              score: 13.33
 
---- Entry 20 (English, Italian, Portuguese) ---
-       English: - - - - b u r s t
-       Italian: e s p l o d e r e
-    Portuguese: - e s t o u r a r
-         score: -9.00
+--- spaccare / rasgar ---
+    identity: s p a c c a r e
+              r - a s g a r -
+              score: -2.00
+     learned: - - s p a c c a r e
+              r a s - - - g a r -
+              score: 17.34
+
+=== 3-way alignment (Italian / Portuguese / English) ===
+
+       Italian: a l t i t u d i n e
+    Portuguese: - - a l t i t u d e
+       English: - - a l t i t u d e
+         score: -19.82
+
+       Italian: i n s a l u b r e
+    Portuguese: i n s a l u b r e
+       English: u n h e a l t h y
+         score: -17.84
+
+       Italian: m e n a r o l a
+    Portuguese: - - - - - p u a
+       English: b i t s t o c k
+         score: -15.85
+
+       Italian: g e s t u a l i t à
+    Portuguese: - d e d i l h a d o
+       English: - f i n g e r i n g
+         score: -19.82
+
+       Italian: - - d u o
+    Portuguese: d u e t o
+       English: - d u e t
+         score: -9.91
+
+       Italian: c a s s i e r e
+    Portuguese: - - - c a i x a
+       English: - - t e l l e r
+         score: -15.85
+
+       Italian: t e r a p è u t i c o
+    Portuguese: t e r a p ê u t i c a
+       English: t h e r a p e u t i c
+         score: -21.80
+
+       Italian: g i u s t a m e n t e
+    Portuguese: - j u s t a m e n t e
+       English: - - - - - j u s t l y
+         score: -21.80
+
+       Italian: t r u c c o
+    Portuguese: f r a u d e
+       English: d e c e i t
+         score: -11.89
+
+       Italian: - - r e c i d i v i t à
+    Portuguese: r e i n c i d ê n c i a
+       English: - - r e c i d i v i s m
+         score: -23.78
+
+       Italian: - e t r u s c o
+    Portuguese: - e t r u s c o
+       English: E t r u s c a n
+         score: -15.85
+
+       Italian: - - - o m o g e n e o
+    Portuguese: - - h o m o g é n e o
+       English: h o m o g e n e o u s
+         score: -21.80
+
+       Italian: s a n g u i n a r e
+    Portuguese: - - - s a n g r a r
+       English: - - - - - b l e e d
+         score: -19.82
+
+       Italian: - - - s e r p e
+    Portuguese: s e r p e n t e
+       English: - s e r p e n t
+         score: -15.85
+
+       Italian: e s p l o r a t o r e
+    Portuguese: - - - - b a t e d o r
+       English: - - - - - - s c o u t
+         score: -21.80
+
+       Italian: d i f f i d e n t e
+    Portuguese: - d e p é a t r á s
+       English: - - - - - - w a r y
+         score: -19.82
+
+       Italian: c a l e n d a r i o
+    Portuguese: c a l e n d á r i o
+       English: - - c a l e n d a r
+         score: -19.82
+
+       Italian: - f a g o c i t a
+    Portuguese: - f a g ó c i t o
+       English: p h a g o c y t e
+         score: -17.84
+
+       Italian: p r o c e d i m e n t o
+    Portuguese: p r o c e d i m e n t o
+       English: - - - p r o c e d u r e
+         score: -23.78
+
+       Italian: d e m a r c a r e
+    Portuguese: d e l i m i t a r
+       English: d e m a r c a t e
+         score: -17.84

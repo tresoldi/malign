@@ -82,36 +82,50 @@ print(f"Prior matrix written to {prior_file}")
 print("\nBootstrapping matrix from cognate pairs...")
 bootstrapped = bootstrap_matrix(
     cognate_pairs,
-    max_iter=5,
+    max_iter=10,
     prior_matrix=prior,
     prior_weight=0.3,
     verbose=True,
 )
 
-# --- Step 3: Learn matrix from cognate sets ---
+bootstrapped_file = OUTPUT_DIR / "northeuralex_learned_matrix.txt"
+bootstrapped_file.write_text(bootstrapped.tabulate(), encoding="utf-8")
+print(f"Bootstrapped matrix written to {bootstrapped_file}")
+
+# --- Step 3: Learn matrix from cognate sets (using bootstrapped as prior) ---
 print("\nLearning matrix from cognate sets...")
 learned = learn_matrix(
     cognate_sets,
     max_iter=5,
     prior_matrix=bootstrapped,
-    prior_weight=0.3,
+    prior_weight=0.5,
     verbose=True,
 )
 
-learned_file = OUTPUT_DIR / "northeuralex_learned_matrix.txt"
-learned_file.write_text(learned.tabulate(), encoding="utf-8")
-print(f"Learned matrix written to {learned_file}")
+# --- Step 4: Align with each matrix stage and compare ---
+lines: list[str] = [
+    f"=== {LANG_A}-{LANG_B} alignment comparison ===",
+    "",
+    "Each cognate pair is aligned with:",
+    "  (a) identity/distfeat prior",
+    "  (b) bootstrapped matrix",
+    "  (c) EM-learned matrix",
+    "",
+]
 
-# --- Step 4: Align sample pairs with learned matrix ---
-lines: list[str] = []
 for sa, sb in cognate_pairs[:20]:
-    alms = align([sa, sb], matrix=learned, k=1)
-    if alms:
-        a = alms[0]
-        lines.append(f"  {' '.join(str(s) for s in a.seqs[0])}")
-        lines.append(f"  {' '.join(str(s) for s in a.seqs[1])}")
-        lines.append(f"  score: {a.score:.2f}")
-        lines.append("")
+    word_a = "".join(sa)
+    word_b = "".join(sb)
+    lines.append(f"--- {word_a} / {word_b} ---")
+
+    for label, matrix in [("prior", prior), ("bootstrap", bootstrapped), ("learned", learned)]:
+        alms = align([sa, sb], matrix=matrix, k=1)
+        if alms:
+            a = alms[0]
+            lines.append(f"  {label:>10}: {' '.join(str(s) for s in a.seqs[0])}")
+            lines.append(f"  {'':>10}  {' '.join(str(s) for s in a.seqs[1])}")
+            lines.append(f"  {'':>10}  score: {a.score:.2f}")
+    lines.append("")
 
 alm_file = OUTPUT_DIR / "northeuralex_alignments.txt"
 alm_file.write_text("\n".join(lines), encoding="utf-8")

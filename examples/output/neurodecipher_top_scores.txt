@@ -1,32 +1,25 @@
-=== Top 30 Greek-Linear B character scores ===
+=== Learned Greek -> Linear B correspondences ===
 
-  ξ -> 𐀮  +6.325
-  β -> 𐀣  +6.143
-  β -> 𐁇  +6.143
-  ψ -> 𐀣  +6.143
-  ψ -> 𐀮  +6.143
-  ψ -> 𐁇  +6.143
-  β -> 𐀦  +5.989
-  ζ -> 𐀼  +5.920
-  ζ -> 𐀽  +5.920
-  ξ -> 𐀣  +5.920
-  ξ -> 𐁇  +5.920
-  ψ -> 𐀰  +5.855
-  β -> 𐀝  +5.738
-  β -> 𐀥  +5.738
-  β -> 𐀽  +5.738
-  β -> 𐀿  +5.738
-  β -> 𐁊  +5.738
-  ψ -> 𐀝  +5.738
-  ψ -> 𐀥  +5.738
-  ψ -> 𐀽  +5.738
-  ψ -> 𐀿  +5.738
-  ψ -> 𐁊  +5.738
-  η -> 𐀣  +5.583
-  ξ -> 𐀝  +5.515
-  ξ -> 𐀥  +5.515
-  ξ -> 𐀽  +5.515
-  ξ -> 𐀿  +5.515
-  ξ -> 𐁊  +5.515
-  β -> 𐀉  +5.450
-  β -> 𐀢  +5.450
+Best Linear B match for each common Greek character.
+LB_value shows the known phonetic reading of the Linear B sign.
+Only correspondences with score > 2.0 are shown (weaker ones are noise).
+
+   Greek   LB sign   LB value     score
+   -----   -------   --------     -----
+       ἁ         𐁀         ha    +6.229
+       ζ         𐀿         zu    +5.828
+       β         𐀦         qo    +5.306
+       φ         𐁆        pu2    +4.583
+       ψ         𐀦         qo    +4.530
+       ξ         𐀥         qi    +4.342
+       δ         𐀉         du    +4.034
+       π         𐀢         pu    +3.946
+       μ         𐀔         ku    +3.889
+       γ         𐀑         ke    +3.761
+       χ         𐀏          ?    +3.633
+       θ         𐀳         te    +3.610
+       κ         𐀓         ko    +3.388
+       λ         𐀩         re    +3.317
+       ε         𐀁          e    +2.566
+       α         𐀀          a    +2.509
+       η         𐁀         ha    +2.252

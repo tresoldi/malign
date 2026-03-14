@@ -1,83 +1,107 @@
-=== Greek -> Linear B cross-script alignment ===
+=== Greek (alphabet) -> Linear B (syllabary) alignment ===
 
---- Identity matrix (first 10 pairs) ---
-  Greek:    φασγιανιοι
-  Linear B: 𐀞𐀑𐀊𐀛𐀊-----
-  score: -10.00
+Linear B is a syllabary: each sign encodes a CV syllable.
+Greek words are longer (more characters) than their Linear B
+equivalents, so gaps are structurally expected.
 
-  Greek:    αχαιϝιανδε
-  Linear B: 𐀀𐀏𐀹𐀊𐀆-----
-  score: -10.00
+--- Short-word alignments (learned matrix) ---
 
-  Greek:    αιϝαια
-  Linear B: 𐁁𐀷𐀊---
-  score: -6.00
+  Greek:    α γ ε ε ν
+  Linear B: 𐀀 𐀐 - - -
+  score: 7.44
 
-  Greek:    θεον
-  Linear B: 𐀳𐀃--
-  score: -4.00
+  Greek:    α γ ε ι
+  Linear B: 𐀀 𐀐 - -
+  score: 7.03
 
-  Greek:    ευθαλεϝοςϝορϝος
-  Linear B: 𐀁𐀄𐀲𐀩𐀺𐀺𐀺--------
-  score: -15.00
+  Greek:    α γ ο ρ - α
+  Linear B: 𐀀 𐀒 - - 𐀨 -
+  score: 8.16
 
-  Greek:    εραθρεϝα
-  Linear B: 𐀁𐀨𐀳𐀩𐀸---
-  score: -8.00
+  Greek:    α γ ρ ο ς -
+  Linear B: 𐀀 𐀒 - - - 𐀫
+  score: 8.98
 
-  Greek:    δεσμος
-  Linear B: 𐀆𐀰𐀗---
-  score: -6.00
+  Greek:    α γ ω
+  Linear B: 𐀀 𐀐 -
+  score: 6.57
 
-  Greek:    ατυγος
-  Linear B: 𐀀𐀶𐀒---
-  score: -6.00
+  Greek:    α ι - α - -
+  Linear B: - - 𐁁 - 𐀷 𐀊
+  score: 6.34
 
-  Greek:    ϝενδανευς
-  Linear B: 𐀸𐀅𐀚𐀄-----
-  score: -9.00
+  Greek:    α ι - γ α
+  Linear B: - - 𐁁 𐀼 -
+  score: 6.14
 
-  Greek:    ποσιδαεϝες
-  Linear B: 𐀡𐀯𐀅𐀁𐀸-----
-  score: -10.00
+  Greek:    α ι - γ α ι
+  Linear B: - - 𐁁 𐀼 - -
+  score: 6.77
 
---- Learned matrix (first 10 pairs) ---
-  Greek:    φα-σ-γιανιοι-
-  Linear B: 𐀞-𐀑-𐀊𐀛------𐀊
-  score: 21.76
+  Greek:    α ι - ζ α
+  Linear B: - - 𐁁 𐀼 -
+  score: 8.84
 
-  Greek:    α--χαιϝιανδε--
-  Linear B: -𐀀𐀏𐀹--------𐀊𐀆
-  score: 20.38
+  Greek:    α ι - ζ α ι
+  Linear B: - - 𐁁 𐀼 - -
+  score: 9.48
 
-  Greek:    αιϝαια--
-  Linear B: --𐁁---𐀷𐀊
-  score: 12.50
+  Greek:    α ι - θ ω ν -
+  Linear B: - - 𐁁 - - - 𐀵
+  score: 5.60
 
-  Greek:    -θεον
-  Linear B: 𐀳𐀃---
-  score: 8.76
+  Greek:    α ι - ξ - μ α
+  Linear B: - - 𐁁 𐀏 𐀭 𐀔 -
+  score: 12.16
 
-  Greek:    ευ----θαλεϝοςϝορϝος--
-  Linear B: --𐀁𐀄𐀲𐀩𐀺------------𐀺𐀺
-  score: 29.51
+  Greek:    α ι - χ - μ η
+  Linear B: - - 𐁁 𐀏 𐀭 𐀔 -
+  score: 12.42
 
-  Greek:    ερα--θρεϝα--
-  Linear B: ---𐀁𐀨𐀳----𐀩𐀸
-  score: 18.87
+  Greek:    α κ τ ω ρ -
+  Linear B: 𐀀 𐀒 - - - 𐀵
+  score: 9.37
 
-  Greek:    δε-σμος
-  Linear B: --𐀆𐀰𐀗--
-  score: 14.31
+  Greek:    α μ π υ ξ
+  Linear B: 𐀀 - 𐀢 - 𐀏
+  score: 10.45
 
-  Greek:    ατυ-γος-
-  Linear B: ---𐀀𐀶--𐀒
-  score: 12.98
+  Greek:    α μ φ ι -
+  Linear B: 𐀀 - - - 𐀠
+  score: 4.11
 
-  Greek:    ϝενδανευς----
-  Linear B: ---------𐀸𐀅𐀚𐀄
-  score: 16.98
+  Greek:    α ν ε ρ - - -
+  Linear B: 𐀀 - - 𐀇 𐀪 𐀊 𐀠
+  score: 8.35
 
-  Greek:    ποσιδαεϝες-----
-  Linear B: ----------𐀡𐀯𐀅𐀁𐀸
-  score: 18.99
+  Greek:    α ν ε τ α - -
+  Linear B: - - - - 𐀀 𐀚 𐀲
+  score: 7.85
+
+  Greek:    α ν ε υ ς - - -
+  Linear B: 𐀀 - - - - 𐀚 𐀄 𐀳
+  score: 9.28
+
+  Greek:    α ν ι α - -
+  Linear B: 𐀀 - - - 𐀛 𐀊
+  score: 7.45
+
+  Greek:    α ρ ε ι α - -
+  Linear B: - - - - 𐀀 𐀩 𐀊
+  score: 7.04
+
+  Greek:    α ρ ι ο - α
+  Linear B: 𐀀 - - - 𐁊 𐀀
+  score: 8.34
+
+  Greek:    α ρ μ ο - ν
+  Linear B: 𐀀 - - - 𐀗 -
+  score: 5.80
+
+  Greek:    α ρ - χ η
+  Linear B: - - 𐀃 𐀏 -
+  score: 6.91
+
+  Greek:    α υ λ ο ι -
+  Linear B: - - 𐁂 - - 𐀫
+  score: 7.15
