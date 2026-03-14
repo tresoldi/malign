@@ -1,25 +1,90 @@
 === Learned Greek -> Linear B correspondences ===
 
-Best Linear B match for each common Greek character.
-LB_value shows the known phonetic reading of the Linear B sign.
-Only correspondences with score > 2.0 are shown (weaker ones are noise).
+For each Greek character: top Linear B signs from the learned matrix,
+filtered to pairs that actually co-occur in the data.
+(Phonetically correct matches are marked with *)
 
-   Greek   LB sign   LB value     score
-   -----   -------   --------     -----
-       ἁ         𐁀         ha    +6.229
-       ζ         𐀿         zu    +5.828
-       β         𐀦         qo    +5.306
-       φ         𐁆        pu2    +4.583
-       ψ         𐀦         qo    +4.530
-       ξ         𐀥         qi    +4.342
-       δ         𐀉         du    +4.034
-       π         𐀢         pu    +3.946
-       μ         𐀔         ku    +3.889
-       γ         𐀑         ke    +3.761
-       χ         𐀏          ?    +3.633
-       θ         𐀳         te    +3.610
-       κ         𐀓         ko    +3.388
-       λ         𐀩         re    +3.317
-       ε         𐀁          e    +2.566
-       α         𐀀          a    +2.509
-       η         𐁀         ha    +2.252
+   Greek  LB sign  reading      score  co-occur
+   -----  ------  -------      -----  --------
+       δ  𐀉       du          +4.034        20 *
+          𐁄       dwo         +4.034         3
+          𐀈       do          +4.016        55 *
+
+       ζ  𐀽       ze          +5.990         8 *
+          𐀿       zu          +5.828        16 *
+          𐀼       za          +5.722        12 *
+
+       θ  𐀘       mo          +4.328         1
+          𐀳       te          +3.610        53 *
+          𐀱       su          +3.029         3
+
+       κ  𐀓       ko          +3.388        42 *
+          𐀒       ki          +3.384       109 *
+          𐀏       ka2         +3.250        86 *
+
+       λ  𐁉       ra3         +3.483         1 *
+          𐀩       re          +3.317        96 *
+          𐁂       au          +3.196         2
+
+       μ  𐀔       ku          +3.889        72
+          𐀕       ma          +3.794        99 *
+          𐀘       mo          +3.483         2 *
+
+       ν  𐁅       nwa         +2.163         2 *
+          𐀘       mo          +2.163         1
+          𐁇       pte         +1.470         1
+
+       π  𐀢       pu          +3.946        19 *
+          𐁇       pte         +3.869         4 *
+          𐀡       po          +3.719        70 *
+
+       ρ  𐁉       ra3         +2.192         1 *
+          𐀘       mo          +2.192         1
+          𐁇       pte         +1.499         4
+
+       σ  𐁅       nwa         +3.535         1
+          𐁈       ra2         +2.554         3
+          𐁇       pte         +2.148         1
+
+       ς  𐁋       ta2         +2.400         1
+          𐁅       nwa         +1.994         1
+          𐀘       mo          +1.994         1
+
+       τ  𐁋       ta2         +2.827         1 *
+          𐁅       nwa         +2.422         2
+          𐁈       ra2         +2.134         5
+
+       φ  𐁆       pu2         +4.583        15 *
+          𐀞       pa          +3.743        38 *
+          𐁉       ra3         +3.545         1
+
+       χ  𐁉       ra3         +3.921         1
+          𐀏       ka2         +3.633        34 *
+          𐀑       ke          +3.390        12 *
+
+  Vowels:
+       α  𐀀       a           +2.509       222 *
+          𐁋       ta2         +1.842         1
+          𐁉       ra3         +1.436         2
+
+       ε  𐀁       e           +2.566       215 *
+          𐁉       ra3         +1.582         2
+          𐁇       pte         +0.889         5
+
+       η  𐁈       ra2         +3.946         2
+          𐁀       a2          +2.252         2
+          𐀥       qi          +2.154         2
+
+       ι  𐁋       ta2         +1.965         1
+          𐁉       ra3         +1.560         2
+          𐁅       nwa         +1.560         2
+
+       ο  𐁉       ra3         +1.524         1
+          𐀘       mo          +1.524         1
+          𐁄       dwo         +1.237         3
+
+       υ  𐁋       ta2         +3.558         1
+          𐁉       ra3         +3.153         1
+          𐀘       mo          +2.459         2
+
+  Top-1 accuracy: 11/20 correct (55%)

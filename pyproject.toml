@@ -160,6 +160,7 @@ ignore = [
     "T201",              # Allow print statements
     "C416",              # List comprehension style
     "B007",              # Unused loop variables
+    "RUF001",            # Ambiguous unicode (intentional for demos)
 ]
 
 [tool.ruff.lint.pydocstyle]
