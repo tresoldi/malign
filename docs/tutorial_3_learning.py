@@ -108,7 +108,7 @@ pairs = [
 
 matrix = malign.bootstrap_matrix(pairs, max_iter=10, verbose=True)
 
-print(f"\nBootstrap matrix: {matrix.num_domains} domains, {len(matrix.scores)} scores")
+print(f"\nBootstrap matrix: {len(matrix.domains)} domains, {len(matrix.scores)} scores")
 
 # Check that voicing correspondences score higher than random
 print(f"  p->b score: {matrix.scores.get(('p', 'b'), 0):.3f}")

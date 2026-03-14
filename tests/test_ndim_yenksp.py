@@ -3,13 +3,13 @@
 import malign
 from malign.ndim_yenksp import build_align_nd, compute_graph_nd, ndim_yenksp_align
 from malign.scoring_matrix import ScoringMatrix
-from malign.utils import identity_matrix
+from malign.scoring_matrix import ScoringMatrix
 
 
 def test_2seq_regression():
     """N-dim YenKSP with 2 sequences should match pairwise yenksp_align."""
     seqs = [["A", "C", "G", "T"], ["A", "G", "G", "T"]]
-    matrix = identity_matrix(seqs, match=+1, gap_score=-1)
+    matrix = ScoringMatrix.from_sequences(seqs, match=+1, gap_score=-1)
 
     pairwise = malign.align(seqs, k=1, method="yenksp", matrix=matrix)
     ndim = ndim_yenksp_align(seqs, k=1, matrix=matrix)
@@ -22,7 +22,7 @@ def test_2seq_regression():
 def test_3seq_small():
     """3-sequence alignment produces valid results."""
     seqs = [["A", "C"], ["A", "G"], ["T", "C"]]
-    matrix = identity_matrix(seqs, match=+1, gap_score=-1)
+    matrix = ScoringMatrix.from_sequences(seqs, match=+1, gap_score=-1)
 
     alms = ndim_yenksp_align(seqs, k=1, matrix=matrix)
     assert len(alms) >= 1
@@ -41,7 +41,7 @@ def test_3seq_small():
 def test_4seq_alignment():
     """4-sequence alignment."""
     seqs = [["A", "C"], ["A", "G"], ["T", "C"], ["T", "G"]]
-    matrix = identity_matrix(seqs, match=+1, gap_score=-1)
+    matrix = ScoringMatrix.from_sequences(seqs, match=+1, gap_score=-1)
 
     alms = ndim_yenksp_align(seqs, k=2, matrix=matrix)
     assert len(alms) >= 1
@@ -55,7 +55,7 @@ def test_4seq_alignment():
 def test_different_lengths():
     """Sequences of very different lengths."""
     seqs = [["A"], ["A", "C", "G"], ["A", "C", "G", "T", "T"]]
-    matrix = identity_matrix(seqs, match=+1, gap_score=-1)
+    matrix = ScoringMatrix.from_sequences(seqs, match=+1, gap_score=-1)
 
     alms = ndim_yenksp_align(seqs, k=1, matrix=matrix)
     assert len(alms) >= 1
@@ -68,7 +68,7 @@ def test_different_lengths():
 def test_single_char_sequences():
     """Single-character sequences."""
     seqs = [["A"], ["B"], ["C"]]
-    matrix = identity_matrix(seqs, match=+1, gap_score=-1)
+    matrix = ScoringMatrix.from_sequences(seqs, match=+1, gap_score=-1)
 
     alms = ndim_yenksp_align(seqs, k=1, matrix=matrix)
     assert len(alms) >= 1
@@ -78,7 +78,7 @@ def test_single_char_sequences():
 def test_identical_sequences():
     """All-identical sequences should align perfectly."""
     seqs = [["A", "C", "G"], ["A", "C", "G"], ["A", "C", "G"]]
-    matrix = identity_matrix(seqs, match=+1, gap_score=-1)
+    matrix = ScoringMatrix.from_sequences(seqs, match=+1, gap_score=-1)
 
     alms = ndim_yenksp_align(seqs, k=1, matrix=matrix)
     assert len(alms) >= 1
@@ -91,7 +91,7 @@ def test_identical_sequences():
 def test_kbest_ordering():
     """k-best alignments should have non-increasing scores."""
     seqs = [["A", "C", "G"], ["A", "G", "G"], ["T", "C", "G"]]
-    matrix = identity_matrix(seqs, match=+1, gap_score=-1)
+    matrix = ScoringMatrix.from_sequences(seqs, match=+1, gap_score=-1)
 
     alms = ndim_yenksp_align(seqs, k=5, matrix=matrix)
     scores = [a.score for a in alms]
@@ -102,7 +102,7 @@ def test_kbest_ordering():
 def test_graph_node_count():
     """Graph should have expected number of nodes."""
     seqs = [["A", "C"], ["A", "G"]]
-    matrix = identity_matrix(seqs, match=+1, gap_score=-1)
+    matrix = ScoringMatrix.from_sequences(seqs, match=+1, gap_score=-1)
     padded = [[matrix.gap, *s] for s in seqs]
 
     graph = compute_graph_nd(padded, matrix)
@@ -113,7 +113,7 @@ def test_graph_node_count():
 def test_graph_3seq():
     """3-seq graph has correct structure."""
     seqs = [["A"], ["B"], ["C"]]
-    matrix = identity_matrix(seqs, match=+1, gap_score=-1)
+    matrix = ScoringMatrix.from_sequences(seqs, match=+1, gap_score=-1)
     padded = [[matrix.gap, *s] for s in seqs]
 
     graph = compute_graph_nd(padded, matrix)

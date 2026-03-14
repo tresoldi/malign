@@ -1,11 +1,5 @@
 """Tests for the scoring matrices of the malign package."""
 
-# TODO: add test for identity matrix
-# TODO: add test for initialization only from sparse subdomain
-# TODO: add test providing domains
-# TODO: add, in general, tests where there is disagreement between scores/subm/domain
-# TODO: replace .num_domains with len(.domains) -- or maybe just __len__?
-
 # Import Python libraries
 import math
 
@@ -130,7 +124,7 @@ def test_pairwise_from_full_vectors():
     matrix = malign.ScoringMatrix(PAIRWISE_TEST_VECTORS)
 
     # Assertions
-    assert matrix.num_domains == 2
+    assert len(matrix.domains) == 2
     assert matrix.gap == "-"
     assert len(matrix.scores) == 12
     assert matrix["-", "-"] == 0.0
@@ -184,7 +178,7 @@ def test_multiwise_from_full_vectors():
     matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS)
 
     # Assertions
-    assert matrix.num_domains == 3
+    assert len(matrix.domains) == 3
     assert matrix.gap == "-"
     assert len(matrix.scores) == 69
     assert len(matrix.domains) == 3
@@ -294,7 +288,7 @@ def test_multiwise_from_sparse_vectors(method, num_domains, gap, size, tests):
 
     matrix = malign.ScoringMatrix(MULTIWISE_TEST_VECTORS_SPARSE, impute_method=method)
 
-    assert matrix.num_domains == num_domains
+    assert len(matrix.domains) == num_domains
     assert matrix.gap == gap
     assert len(matrix.scores) == size
     assert ("-", "i", "j") in matrix.domains
@@ -318,7 +312,7 @@ def test_multiwise_from_subvectors():
     matrix = malign.ScoringMatrix(scores)
 
     # Assertions
-    assert matrix.num_domains == 3
+    assert len(matrix.domains) == 3
     assert matrix.gap == "-"
     assert len(matrix.scores) == 69
     assert len(matrix.domains) == 3
@@ -380,8 +374,6 @@ def test_frozen_matrix():
     # Should not be able to set attributes
     with pytest.raises(AttributeError):
         matrix.gap = "X"
-    with pytest.raises(AttributeError):
-        matrix.num_domains = 5
 
 
 def test_tabulate():
@@ -397,10 +389,11 @@ def test_tabulate():
 
 
 def test_missing_key():
-    """Test pairwise matrices built from complete vectors."""
+    """Test that missing keys return the default (minimum) score."""
 
     # Build matrix
     matrix = malign.ScoringMatrix(PAIRWISE_TEST_VECTORS)
-    assert matrix["a", "1"] == -3.0
-    assert matrix["A", "X"] == -3.0
-    assert matrix["A", "1"] == -9.0
+    min_score = min(matrix.scores.values())
+    assert matrix["a", "1"] == min_score
+    assert matrix["A", "X"] == min_score
+    assert matrix["A", "1"] == min_score

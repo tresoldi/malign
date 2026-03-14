@@ -17,6 +17,8 @@ from malign.metrics import alignment_accuracy
 from tests.gold_data_utils import (
     cognate_set_to_gold_alignment,
     cognate_set_to_sequences,
+    evaluate_matrix_accuracy,
+    filter_valid_cognate_sets,
     load_cognate_sets,
 )
 
@@ -26,30 +28,7 @@ TRAINING_SET = DATA_DIR / "learning_training_set.yml"
 EVAL_SET = DATA_DIR / "learning_eval_set.yml"
 
 
-def _filter_valid_cognate_sets(cognate_sets):
-    """Filter to cognate sets with valid alignments.
-
-    Args:
-        cognate_sets: List of GoldCognateSet objects.
-
-    Returns:
-        List of cognate sets that are valid for training/evaluation.
-    """
-    valid_sets = []
-
-    for cog_set in cognate_sets:
-        # Only use pairwise (2-sequence) sets for consistency
-        # Matrix learning currently requires fixed number of sequences
-        if len(cog_set.forms) != 2:
-            continue
-
-        # Skip sets with empty segments or alignments
-        if any(not form.segments or not form.alignment for form in cog_set.forms):
-            continue
-
-        valid_sets.append(cog_set)
-
-    return valid_sets
+_filter_valid_cognate_sets = filter_valid_cognate_sets
 
 
 def _convert_to_learning_format(cognate_sets):
@@ -70,40 +49,7 @@ def _convert_to_learning_format(cognate_sets):
     return learning_sets
 
 
-def _evaluate_matrix_accuracy(matrix, eval_cognate_sets):
-    """Evaluate a learned matrix on evaluation data.
-
-    Args:
-        matrix: Learned ScoringMatrix to evaluate.
-        eval_cognate_sets: List of GoldCognateSet objects for evaluation.
-
-    Returns:
-        Tuple of (average_accuracy, successful_tests).
-    """
-    accuracies = []
-
-    for cog_set in eval_cognate_sets:
-        try:
-            sequences = cognate_set_to_sequences(cog_set)
-            gold_alignment = cognate_set_to_gold_alignment(cog_set)
-
-            # Align with learned matrix
-            predicted_alms = malign.align(sequences, k=1, matrix=matrix, method="anw")
-
-            if predicted_alms:
-                predicted_alignment = predicted_alms[0]
-                acc = alignment_accuracy(predicted_alignment, gold_alignment)
-                accuracies.append(acc)
-
-        except Exception:
-            # Skip problematic sets
-            continue
-
-    if not accuracies:
-        return 0.0, 0
-
-    avg_accuracy = sum(accuracies) / len(accuracies)
-    return avg_accuracy, len(accuracies)
+_evaluate_matrix_accuracy = evaluate_matrix_accuracy
 
 
 @pytest.mark.slow

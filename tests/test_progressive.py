@@ -9,7 +9,7 @@ from malign.progressive import _expand_profile, upgma_progressive_align
 
 def _make_matrix(seqs):
     """Helper to create an identity matrix for sequences."""
-    return malign.malign.identity_matrix(seqs, match=+1, gap_score=-1)
+    return malign.ScoringMatrix.from_sequences(seqs, match=+1, gap_score=-1)
 
 
 def test_upgma_two_sequences():

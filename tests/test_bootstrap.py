@@ -14,7 +14,7 @@ def test_bootstrap_basic():
     matrix = malign.bootstrap_matrix(pairs, max_iter=3)
 
     assert isinstance(matrix, malign.ScoringMatrix)
-    assert matrix.num_domains == 2
+    assert len(matrix.domains) == 2
     assert matrix.gap == "-"
     assert len(matrix.scores) > 0
 
@@ -78,7 +78,7 @@ def test_bootstrap_single_pair():
     matrix = malign.bootstrap_matrix(pairs, max_iter=3)
 
     assert isinstance(matrix, malign.ScoringMatrix)
-    assert matrix.num_domains == 2
+    assert len(matrix.domains) == 2
 
 
 def test_bootstrap_custom_gap():
@@ -227,7 +227,7 @@ def test_bootstrap_block_merge_basic():
     matrix = malign.bootstrap_matrix(pairs, max_iter=3, block_merge=True)
 
     assert isinstance(matrix, malign.ScoringMatrix)
-    assert matrix.num_domains == 2
+    assert len(matrix.domains) == 2
     assert len(matrix.scores) > 0
 
 
@@ -269,7 +269,7 @@ def test_bootstrap_distfeat_pipeline():
     matrix = malign.bootstrap_matrix(pairs, max_iter=10, prior_matrix=prior, prior_weight=0.5)
 
     assert isinstance(matrix, malign.ScoringMatrix)
-    assert matrix.num_domains == 2
+    assert len(matrix.domains) == 2
     # Bootstrap produces asymmetric scores even from a symmetric prior
     # Check a pair where directionality matters
     if ("p", "b") in matrix.scores and ("b", "p") in matrix.scores:

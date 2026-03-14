@@ -11,15 +11,6 @@ def test_tabulate_alms():
     assert len(table) > 0
 
 
-def test_identity_matrix():
-    """Test identity matrix creation."""
-    from malign.utils import identity_matrix
-
-    seqs = [["A", "C", "G", "T"], ["A", "C", "G", "T"]]
-    matrix = identity_matrix(seqs)
-    assert matrix is not None
-
-
 def test_score_alignment_defaults_to_additive_objective():
     """Default scoring should match the additive matrix objective."""
     matrix = malign.ScoringMatrix(

@@ -5,19 +5,7 @@ from collections.abc import Hashable, Sequence
 
 from .alignment import Alignment
 from .scoring_matrix import ScoringMatrix
-from .utils import score_alignment, sort_alignments
-
-# Direction map: keys are (diagonal, horizontal, vertical) match tuples.
-DIRECTION_MAP = {
-    (False, False, False): "-",
-    (True, True, True): "*",
-    (True, False, False): "↖",
-    (False, True, False): "←",
-    (False, False, True): "↑",
-    (True, True, False): "←↖",
-    (True, False, True): "↑↖",
-    (False, True, True): "←↑",
-}
+from .utils import pad_sequence, score_alignment, sort_alignments
 
 
 def nw_grids(
@@ -188,8 +176,8 @@ def nw_align(
     Returns:
         Sorted list of best alignments.
     """
-    seq_a = [matrix.gap, *list(seq_a)]
-    seq_b = [matrix.gap, *list(seq_b)]
+    seq_a = pad_sequence(seq_a, matrix.gap)
+    seq_b = pad_sequence(seq_b, matrix.gap)
 
     _, d_grid = nw_grids(seq_a, seq_b, matrix)
 

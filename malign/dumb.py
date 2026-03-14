@@ -4,7 +4,8 @@ from collections.abc import Hashable, Sequence
 
 from .alignment import Alignment
 from .scoring_matrix import ScoringMatrix
-from .utils import identity_matrix, score_alignment
+from .scoring_matrix import ScoringMatrix
+from .utils import score_alignment
 
 
 def dumb_malign(
@@ -24,7 +25,7 @@ def dumb_malign(
         A single Alignment with gap-padded sequences.
     """
     if not matrix:
-        matrix = identity_matrix(seqs)
+        matrix = ScoringMatrix.from_sequences(seqs)
 
     max_length = max(len(seq) for seq in seqs)
 

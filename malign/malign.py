@@ -12,8 +12,10 @@ from .ndim_common import should_use_ndim
 from .ndim_yenksp import ndim_yenksp_align
 from .progressive import upgma_progressive_align
 from .scoring_matrix import ScoringMatrix
-from .utils import identity_matrix, score_alignment, sort_alignments
+from .utils import score_alignment, sort_alignments
 from .yenksp import yenksp_align
+
+_PW_FUNCS = {"anw": nw_align, "yenksp": yenksp_align}
 
 
 def _build_candidates(
@@ -146,7 +148,7 @@ def align(
     seqs: list[list[Hashable]] = [list(seq) for seq in sequences]
 
     if not matrix:
-        matrix = identity_matrix(seqs, match=+1, gap_score=-1)
+        matrix = ScoringMatrix.from_sequences(seqs, match=+1, gap_score=-1)
 
     if k < 1:
         raise ValueError("At least one alignment must be returned.")
@@ -156,19 +158,14 @@ def align(
 
     if method == "dumb":
         alms = [dumb_malign(seqs, matrix=matrix)]
-    elif len(seqs) == 2:
-        # Direct pairwise: skip _collect_alignments overhead
-        if method == "yenksp":
-            alms = yenksp_align(seqs[0], seqs[1], k=k, matrix=matrix)
-        else:
-            alms = nw_align(seqs[0], seqs[1], k=k, matrix=matrix)
-    elif should_use_ndim(len(seqs), [len(s) for s in seqs], method):
-        # True N-dimensional alignment via YenKSP (safe k-bounded enumeration)
-        alms = ndim_yenksp_align(seqs, k=k, matrix=matrix)
     else:
-        # UPGMA-guided progressive alignment for large N
-        pairwise_func = yenksp_align if method == "yenksp" else nw_align
-        alms = upgma_progressive_align(seqs, matrix, pw_func=pairwise_func, k=k)
+        pw_func = _PW_FUNCS[method]
+        if len(seqs) == 2:
+            alms = pw_func(seqs[0], seqs[1], k=k, matrix=matrix)
+        elif should_use_ndim(len(seqs), [len(s) for s in seqs], method):
+            alms = ndim_yenksp_align(seqs, k=k, matrix=matrix)
+        else:
+            alms = upgma_progressive_align(seqs, matrix, pw_func=pw_func, k=k)
 
     if merge_blocks:
         gap = matrix.gap if matrix else "-"

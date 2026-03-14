@@ -128,6 +128,64 @@ def cognate_set_to_gold_alignment(cog_set: GoldCognateSet) -> Alignment:
     return Alignment(aligned_seqs, score=None)  # Gold alignments don't have scores
 
 
+def filter_valid_cognate_sets(cognate_sets):
+    """Filter to pairwise cognate sets with valid alignments.
+
+    Args:
+        cognate_sets: List of GoldCognateSet objects.
+
+    Returns:
+        List of cognate sets that are valid for training/evaluation.
+    """
+    valid_sets = []
+
+    for cog_set in cognate_sets:
+        if len(cog_set.forms) != 2:
+            continue
+        if any(not form.segments or not form.alignment for form in cog_set.forms):
+            continue
+        valid_sets.append(cog_set)
+
+    return valid_sets
+
+
+def evaluate_matrix_accuracy(matrix, eval_cognate_sets):
+    """Evaluate a learned matrix on evaluation data.
+
+    Args:
+        matrix: Learned ScoringMatrix to evaluate.
+        eval_cognate_sets: List of GoldCognateSet objects for evaluation.
+
+    Returns:
+        Tuple of (average_accuracy, successful_tests).
+    """
+    import malign
+    from malign.metrics import alignment_accuracy
+
+    accuracies = []
+
+    for cog_set in eval_cognate_sets:
+        try:
+            sequences = cognate_set_to_sequences(cog_set)
+            gold_alignment = cognate_set_to_gold_alignment(cog_set)
+
+            predicted_alms = malign.align(sequences, k=1, matrix=matrix, method="anw")
+
+            if predicted_alms:
+                predicted_alignment = predicted_alms[0]
+                acc = alignment_accuracy(predicted_alignment, gold_alignment)
+                accuracies.append(acc)
+
+        except Exception:
+            continue
+
+    if not accuracies:
+        return 0.0, 0
+
+    avg_accuracy = sum(accuracies) / len(accuracies)
+    return avg_accuracy, len(accuracies)
+
+
 def filter_cognate_sets(
     cognate_sets: list[GoldCognateSet],
     min_forms: int | None = None,

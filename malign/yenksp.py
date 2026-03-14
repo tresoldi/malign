@@ -10,7 +10,7 @@ from itertools import pairwise
 
 from .alignment import Alignment
 from .scoring_matrix import ScoringMatrix
-from .utils import identity_matrix, score_alignment, sort_alignments
+from .utils import pad_sequence, score_alignment, sort_alignments
 
 # Type alias for graph: node -> {neighbor -> weight}
 type Node = tuple[int, int]
@@ -35,11 +35,6 @@ def _add_edge(graph: Graph, u: Node, v: Node, weight: float) -> None:
 def _neighbors(graph: Graph, node: Node) -> dict[Node, float]:
     """Return neighbors and weights for a node."""
     return graph.get(node, {})
-
-
-def _nodes(graph: Graph) -> set[Node]:
-    """Return all nodes in the graph."""
-    return set(graph.keys())
 
 
 def _dijkstra(
@@ -194,8 +189,8 @@ def compute_graph(
     max_score = max(matrix.scores.values())
 
     # Add gaps to the beginning of both sequences
-    seq_a = [matrix.gap, *list(seq_a)]
-    seq_b = [matrix.gap, *list(seq_b)]
+    seq_a = pad_sequence(seq_a, matrix.gap)
+    seq_b = pad_sequence(seq_b, matrix.gap)
 
     graph = _new_graph()
     for i in range(len(seq_a) - 1, -1, -1):
@@ -330,7 +325,7 @@ def yenksp_align(
         A sorted list of best alignments.
     """
     if not matrix:
-        matrix = identity_matrix([seq_a, seq_b])
+        matrix = ScoringMatrix.from_sequences([seq_a, seq_b])
 
     sw_loc = sw_loc or (len(seq_a), len(seq_b))
 

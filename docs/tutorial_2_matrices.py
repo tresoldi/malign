@@ -50,7 +50,7 @@ matrix = malign.ScoringMatrix.from_sequences(
     gap_score=-1.0,
 )
 
-print(f"\nCross-domain matrix: {matrix.num_domains} domains")
+print(f"\nCross-domain matrix: {len(matrix.domains)} domains")
 print(f"Domain 0 symbols: {list(matrix.domains[0])}")
 print(f"Domain 1 symbols: {list(matrix.domains[1])}")
 

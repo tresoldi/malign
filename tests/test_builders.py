@@ -47,7 +47,7 @@ def test_from_sequences_basic():
     )
 
     # Check structure
-    assert matrix.num_domains == 2
+    assert len(matrix.domains) == 2
     assert matrix.gap == "-"
     assert len(matrix.domains) == 2
 
@@ -104,7 +104,7 @@ def test_from_distfeat_basic():
         sequences=[["p", "t", "k"], ["b", "d", "g"]],
     )
 
-    assert matrix.num_domains == 2
+    assert len(matrix.domains) == 2
     assert matrix.gap == "-"
     assert len(matrix.domains) == 2
 

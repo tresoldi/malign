@@ -302,7 +302,7 @@ class TestIntegration:
         )
 
         assert isinstance(matrix, malign.ScoringMatrix)
-        assert matrix.num_domains == 2
+        assert len(matrix.domains) == 2
         assert len(matrix.scores) > 0
 
     def test_merge_alignment_blocks_importable(self):

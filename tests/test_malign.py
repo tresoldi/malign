@@ -13,7 +13,7 @@ def test_dumb_pw_align():
     assert len(alms) == 1
     assert tuple(alms[0].seqs[0]) == ("-", "t", "r", "a", "-", "-")
     assert tuple(alms[0].seqs[1]) == ("f", "a", "t", "a", "t", "a")
-    assert alms[0].score == pytest.approx(-1.3)
+    assert alms[0].score == pytest.approx(-4.0)
 
 
 def test_nw_pw_align():
@@ -23,7 +23,7 @@ def test_nw_pw_align():
     assert len(alms) == 1
     assert tuple(alms[0].seqs[0]) == ("-", "-", "t", "r", "a")
     assert tuple(alms[0].seqs[1]) == ("f", "a", "t", "-", "a")
-    assert alms[0].score == pytest.approx(-1.2)
+    assert alms[0].score == pytest.approx(-1.0)
 
 
 # TODO: fix code so it computes the graph by itself, even in pairwise
@@ -33,9 +33,9 @@ def test_yenksp_pw_align():
     # Test with basic alignment, no scorer
     alms = malign.align(["tra", "fata"], k=4, method="yenksp")
     assert len(alms) == 4
-    assert tuple(alms[0].seqs[0]) == ("t", "r", "-", "a")
-    assert tuple(alms[0].seqs[1]) == ("f", "a", "t", "a")
-    assert alms[0].score == pytest.approx(-0.95)
+    assert tuple(alms[0].seqs[0]) == ("-", "-", "t", "r", "a")
+    assert tuple(alms[0].seqs[1]) == ("f", "a", "t", "-", "a")
+    assert alms[0].score == pytest.approx(-1.0)
 
     # More complex test with DNA scorer
     dna_seq1 = "TGGACCCGGGAAGGTGACCCAC"
@@ -44,9 +44,9 @@ def test_yenksp_pw_align():
 
     dest = (len(dna_seq1), len(dna_seq2))
     aligns = malign.yenksp.align(graph, (0, 0), dest, dna_seq1, dna_seq2, malign.utils.DNA_MATRIX)
-    assert "".join(aligns[0].seqs[0]) == "TGGAC-CCGG-G-AAGGTGACCCAC"
-    assert "".join(aligns[0].seqs[1]) == "TTACCACCGGCGCGAACCCCCCCCC"
-    assert aligns[0].score == pytest.approx(2.32)
+    assert "".join(aligns[0].seqs[0]) == "TGGACC-C-GG-G-AAGGTGACCCAC"
+    assert "".join(aligns[0].seqs[1]) == "TT-ACCACCGGCGCGAACCCCCCCCC"
+    assert aligns[0].score == pytest.approx(66.0)
 
 
 def test_compute_graph():
@@ -70,18 +70,18 @@ def test_score_alignment():
 
     # Test #1 - perfect alignment
     alm = [("A", "T", "T"), ("A", "T", "T")]
-    assert malign.utils.score_alignment(alm, mtx) == pytest.approx(8.666666, rel=1e-05)
+    assert malign.utils.score_alignment(alm, mtx) == pytest.approx(26.0, rel=1e-05)
 
-    # Test #2 - mistmatch
+    # Test #2 - mismatch
     alm = [("A", "T", "T"), ("A", "T", "C")]
-    assert malign.utils.score_alignment(alm, mtx) == pytest.approx(6.0, rel=1e-05)
+    assert malign.utils.score_alignment(alm, mtx) == pytest.approx(18.0, rel=1e-05)
 
     # Test #3 - gap
     alm = [("A", "T", "T"), ("A", "T", "-")]
-    assert malign.utils.score_alignment(alm, mtx) == pytest.approx(3.666666, rel=1e-05)
-    assert malign.utils.score_alignment(alm, mtx, gap_ext=-10) == pytest.approx(0.666666, rel=1e-05)
+    assert malign.utils.score_alignment(alm, mtx) == pytest.approx(13.0, rel=1e-05)
+    assert malign.utils.score_alignment(alm, mtx, gap_ext=-10) == pytest.approx(3.0, rel=1e-05)
     assert malign.utils.score_alignment(alm, mtx, gap_open=-10) == pytest.approx(
-        0.666666,
+        3.0,
         rel=1e-05,
     )
 
@@ -90,31 +90,31 @@ def test_score_alignment():
         ("A", "T", "T", "C", "G", "G", "A", "-", "-", "T"),
         ("T", "A", "-", "C", "G", "G", "A", "T", "T", "T"),
     ]
-    assert malign.utils.score_alignment(alm, mtx) == pytest.approx(1.3, rel=1e-05)
+    assert malign.utils.score_alignment(alm, mtx) == pytest.approx(18.0, rel=1e-05)
 
     alm = [
         ("A", "T", "T", "C", "G", "G", "A", "T", "-", "-"),
         ("T", "A", "-", "C", "G", "G", "A", "T", "T", "T"),
     ]
-    assert malign.utils.score_alignment(alm, mtx) == pytest.approx(1.3, rel=1e-05)
+    assert malign.utils.score_alignment(alm, mtx) == pytest.approx(18.0, rel=1e-05)
 
     alm = [
         ("-", "A", "T", "T", "C", "G", "G", "A", "T", "-"),
         ("T", "A", "-", "C", "G", "G", "A", "T", "T", "T"),
     ]
-    assert malign.utils.score_alignment(alm, mtx) == pytest.approx(-0.5, rel=1e-05)
+    assert malign.utils.score_alignment(alm, mtx) == pytest.approx(0.0, rel=1e-05)
 
     alm = [
         ("-", "A", "T", "T", "C", "G", "G", "A", "-", "T"),
         ("T", "A", "-", "C", "G", "G", "A", "T", "T", "T"),
     ]
-    assert malign.utils.score_alignment(alm, mtx) == pytest.approx(-0.5, rel=1e-05)
+    assert malign.utils.score_alignment(alm, mtx) == pytest.approx(0.0, rel=1e-05)
 
     alm = [
         ("A", "T", "T", "-", "C", "G", "G", "A", "-", "-", "T"),
         ("T", "-", "-", "A", "C", "G", "G", "A", "T", "T", "T"),
     ]
-    assert malign.utils.score_alignment(alm, mtx) == pytest.approx(0.454545, rel=1e-05)
+    assert malign.utils.score_alignment(alm, mtx) == pytest.approx(12.0, rel=1e-05)
 
     # TODO: multiple alignments, even with identity matrix is enough
 

@@ -275,7 +275,7 @@ def upgma_progressive_align(
                     del beams[left_id]
                     del beams[right_id]
                     continue
-            except Exception:
+            except (MemoryError, ValueError):
                 pass  # Fall through to profile merging
 
         # Profile merging with beam search

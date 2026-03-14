@@ -9,7 +9,7 @@ import numpy as np
 from .alignment import Alignment
 from .ndim_common import _column_symbols, make_moves
 from .scoring_matrix import ScoringMatrix
-from .utils import score_alignment, sort_alignments
+from .utils import pad_sequence, score_alignment, sort_alignments
 from .yenksp import _add_edge, _new_graph, yen_ksp
 
 # Maximum number of graph nodes before refusing to build.
@@ -119,7 +119,7 @@ def ndim_yenksp_align(
     Returns:
         Sorted list of best alignments.
     """
-    padded = [[matrix.gap, *list(s)] for s in seqs]
+    padded = [pad_sequence(s, matrix.gap) for s in seqs]
 
     graph = compute_graph_nd(padded, matrix)
 

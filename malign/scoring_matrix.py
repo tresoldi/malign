@@ -162,7 +162,7 @@ class ScoringMatrix:
     scores: dict[tuple[Hashable, ...], float]
     domains: tuple[tuple[Hashable, ...], ...]
     gap: Hashable = "-"
-    num_domains: int = 0
+    _default_score: float = 0.0
 
     def __init__(
         self,
@@ -187,7 +187,7 @@ class ScoringMatrix:
             # Empty matrix - will be populated via from_yaml
             object.__setattr__(self, "scores", {})
             object.__setattr__(self, "domains", ())
-            object.__setattr__(self, "num_domains", 0)
+            object.__setattr__(self, "_default_score", 0.0)
             return
 
         built_domains = _build_domains(domains, scores, gap)
@@ -211,7 +211,7 @@ class ScoringMatrix:
 
         object.__setattr__(self, "scores", new_scores)
         object.__setattr__(self, "domains", built_domains)
-        object.__setattr__(self, "num_domains", num)
+        object.__setattr__(self, "_default_score", min(new_scores.values()))
 
     @classmethod
     def from_yaml(cls, filename: str, impute_method: str | None = "mean") -> "ScoringMatrix":
@@ -426,7 +426,7 @@ class ScoringMatrix:
             serial_data = {
                 "gap": self.gap,
                 "domains": [list(d) for d in self.domains],
-                "domain_range": list(range(self.num_domains)),
+                "domain_range": list(range(len(self.domains))),
                 "scores": _scores,
             }
             yaml.dump(serial_data, yaml_handler, default_flow_style=False, allow_unicode=True)
@@ -440,7 +440,7 @@ class ScoringMatrix:
         Returns:
             Dictionary mapping domain tuples to ScoringMatrix instances.
         """
-        domain_range = tuple(range(self.num_domains))
+        domain_range = tuple(range(len(self.domains)))
         sub_matrix_scores: dict[tuple[Hashable, ...], ScoringMatrix] = {}
 
         for sub_domain in domains:
@@ -464,13 +464,13 @@ class ScoringMatrix:
             A string with a tabular representation for human inspection.
         """
         rows = []
-        if self.num_domains == 2:
+        if len(self.domains) == 2:
             for symbol_a in self.domains[0]:
                 row = [symbol_a] + [self.scores[symbol_a, symbol_b] for symbol_b in self.domains[1]]
                 rows.append(row)
             headers = ["", *(str(symbol) for symbol in self.domains[1])]
 
-        elif self.num_domains == 3:
+        elif len(self.domains) == 3:
             for symbol_a in self.domains[0]:
                 row = [symbol_a] + [
                     self.scores.get((symbol_a, symbol_b, symbol_c), "-")
@@ -493,17 +493,9 @@ class ScoringMatrix:
             key: Symbol tuple to look up.
 
         Returns:
-            The score, or the minimum matching score if key is not found.
+            The score, or the precomputed default (minimum) score if key is not found.
         """
-        if key not in self.scores:
-            potential = []
-            for domain, state in enumerate(key):
-                for entry, score in self.scores.items():
-                    if entry[domain] == state:
-                        potential.append(score)
-
-            if not potential:
-                return min(self.scores.values())
-            return min(potential)
-
-        return self.scores[key]
+        try:
+            return self.scores[key]
+        except KeyError:
+            return self._default_score

@@ -1,7 +1,6 @@
 """Utility data and functions for the library."""
 
 import itertools
-from collections import Counter
 from collections.abc import Hashable, Sequence
 from string import ascii_uppercase
 
@@ -10,6 +9,11 @@ from tabulate import tabulate
 from malign.scoring_matrix import ScoringMatrix
 
 from .alignment import Alignment
+
+def pad_sequence(seq, gap):
+    """Prepend a gap symbol to a sequence."""
+    return [gap, *list(seq)]
+
 
 DNA_MATRIX = ScoringMatrix(
     {
@@ -53,21 +57,28 @@ def sort_alignments(alms: list[Alignment]) -> list[Alignment]:
     return sorted(alms, reverse=True, key=lambda e: (e.score, tuple(e.seqs)))
 
 
-def score_alignment(seqs: Sequence[Sequence[Hashable]], scorer, **kwargs) -> float:
+def score_alignment(
+    seqs: Sequence[Sequence[Hashable]],
+    scorer,
+    *,
+    gap="-",
+    gap_ext=0.0,
+    gap_open=0.0,
+    normalize=False,
+) -> float:
     """Compute the score of an alignment according to a scoring matrix.
 
     Args:
         seqs: Aligned sequences (all same length).
         scorer: Scoring matrix for looking up symbol-tuple scores.
-        **kwargs: Optional gap, gap_ext, gap_open parameters.
+        gap: Gap symbol. Defaults to "-".
+        gap_ext: Gap extension penalty. Defaults to 0.0.
+        gap_open: Gap opening penalty. Defaults to 0.0.
+        normalize: Whether to normalize by alignment length. Defaults to False.
 
     Returns:
         The computed alignment score.
     """
-    gap = kwargs.get("gap", "-")
-    gap_ext = kwargs.get("gap_ext", 0.0)
-    gap_open = kwargs.get("gap_open", 0.0)
-    normalize = kwargs.get("normalize", False)
 
     site_score = sum(scorer[corr] for corr in zip(*seqs, strict=False))
 
@@ -114,44 +125,3 @@ def tabulate_alms(alms) -> str:
     return tabulate(table, headers=headers, colalign=colalign, tablefmt="github")
 
 
-def identity_matrix(seqs: Sequence[Sequence[Hashable]], **kwargs) -> ScoringMatrix:
-    """Build an identity matrix from a list of sequences.
-
-    Args:
-        seqs: List of sequences whose alphabets define the domains.
-        **kwargs: Optional match, mismatch, gap, gap_score parameters.
-
-    Returns:
-        A ScoringMatrix with identity-style scoring.
-    """
-    match_score = kwargs.get("match", 1.0)
-    gap_score = kwargs.get("gap_score", -1.0)
-    gap = kwargs.get("gap", "-")
-    mismatch_score = kwargs.get("mismatch", gap_score * 0.9)
-
-    alphabet = list({*list(itertools.chain.from_iterable(seqs)), gap})
-
-    scores = {}
-    for key in itertools.product(alphabet, repeat=len(seqs)):
-        counter = Counter(key)
-        most_common = counter.most_common(1)[0]
-
-        if most_common[0] == gap:
-            scores[key] = gap_score
-        else:
-            scores[key] = most_common[1] ** (1 + match_score)
-
-    domains = list(itertools.combinations(range(len(seqs)), 2))
-    for domain in domains:
-        for symbols in itertools.product(alphabet, alphabet):
-            symbol_iter = iter(symbols)
-            key = tuple(next(symbol_iter) if idx in domain else None for idx in range(len(seqs)))
-
-            if gap in symbols:
-                scores[key] = gap_score
-            elif symbols[0] != symbols[1]:
-                scores[key] = mismatch_score
-            else:
-                scores[key] = match_score
-
-    return ScoringMatrix(scores)

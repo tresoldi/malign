@@ -7,7 +7,7 @@ import pytest
 import malign
 from malign.ndim_yenksp import ndim_yenksp_align
 from malign.scoring_matrix import ScoringMatrix
-from malign.utils import identity_matrix
+from malign.scoring_matrix import ScoringMatrix
 
 
 def test_asymmetric_matrix_scores_differ():
@@ -183,7 +183,7 @@ def test_from_substitution_counts_3way():
         ("B", "B", "B"): 15,
     }
     matrix = ScoringMatrix.from_substitution_counts(counts)
-    assert matrix.num_domains == 3
+    assert len(matrix.domains) == 3
 
 
 def test_threshold_logic():
@@ -209,7 +209,7 @@ def test_threshold_logic():
 def test_ndim_vs_progressive_score():
     """N-dim alignment should produce equal or better scores than progressive."""
     seqs = [["A", "C", "G"], ["A", "G", "G"], ["T", "C", "G"]]
-    matrix = identity_matrix(seqs, match=+1, gap_score=-1)
+    matrix = ScoringMatrix.from_sequences(seqs, match=+1, gap_score=-1)
 
     # N-dim alignment
     ndim_alms = ndim_yenksp_align(seqs, k=1, matrix=matrix)
