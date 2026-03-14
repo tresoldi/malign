@@ -17,7 +17,7 @@ import math
 from collections import Counter
 from pathlib import Path
 
-from malign import align, bootstrap_matrix
+from malign import ScoringMatrix, align, bootstrap_matrix
 
 DATA_DIR = Path(__file__).parent / "data"
 OUTPUT_DIR = Path(__file__).parent / "output"
@@ -86,6 +86,19 @@ learned = bootstrap_matrix(
     verbose=True,
 )
 
+# The bootstrap learns positive gap scores for frequent symbols (e.g. alpha
+# co-occurs with gaps in most alignments because Greek words are longer than
+# their Linear B equivalents).  This inflates gap affinity and causes
+# displacement artefacts when the learned matrix is used for alignment.
+# We keep the learned *match* scores but reset gap penalties to a fixed
+# negative value so that alignments prefer real matches over spurious gaps.
+gap = learned.gap
+alm_scores = {pair: sc for pair, sc in learned.scores.items() if gap not in pair}
+for pair, sc in learned.scores.items():
+    if gap in pair:
+        alm_scores[pair] = -1.0
+alm_matrix = ScoringMatrix(scores=alm_scores, domains=learned.domains, gap=gap)
+
 # --- Step 2: Annotated alignments ---
 # Select diverse, well-proportioned pairs (Greek/LB length ratio near 2.0)
 scored_pairs: list[tuple[float, list[str], list[str]]] = []
@@ -141,7 +154,7 @@ lines.append("--- Learned matrix (after bootstrap) ---")
 lines.append("")
 
 for greek, linearb in selected[:10]:
-    alms = align([greek, linearb], matrix=learned, k=1)
+    alms = align([greek, linearb], matrix=alm_matrix, method="yenksp", k=1)
     if not alms:
         continue
     a = alms[0]
@@ -158,7 +171,7 @@ lines.append("--- More learned alignments ---")
 lines.append("")
 
 for greek, linearb in selected[10:30]:
-    alms = align([greek, linearb], matrix=learned, k=1)
+    alms = align([greek, linearb], matrix=alm_matrix, method="yenksp", k=1)
     if not alms:
         continue
     a = alms[0]

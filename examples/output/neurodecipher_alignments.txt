@@ -73,183 +73,183 @@ a Greek consonant+vowel pair, producing structural gaps.
 --- Learned matrix (after bootstrap) ---
 
   αγει -> 𐀀𐀐
-  Greek:    α - γ ε ι
-  Linear B: - 𐀀 𐀐 - -
-  Reading:  - a ka - -
-  score: 6.79
+  Greek:    α γ ε ι
+  Linear B: 𐀀 𐀐 - -
+  Reading:  a ka - -
+  score: 3.53
 
   αγειρω -> 𐀀𐀐𐀩
-  Greek:    α - γ ε ι ρ ω
-  Linear B: - 𐀀 𐀐 - - 𐀩 -
-  Reading:  - a ka - - re -
-  score: 9.66
+  Greek:    α γ ε ι ρ ω
+  Linear B: 𐀀 𐀐 - - 𐀩 -
+  Reading:  a ka - - re -
+  score: 4.79
 
   αγετερες -> 𐀀𐀐𐀳𐀩
-  Greek:    α - γ ε τ ε ρ ε ς
-  Linear B: - 𐀀 𐀐 - 𐀳 - 𐀩 - -
-  Reading:  - a ka - te - re - -
-  score: 13.60
+  Greek:    α γ ε τ ε ρ ε ς
+  Linear B: 𐀀 𐀐 - 𐀳 - 𐀩 - -
+  Reading:  a ka - te - re - -
+  score: 6.67
 
   αγοραιος -> 𐀀𐀒𐀨𐀊
-  Greek:    α - γ ο ρ α ι ο ς
-  Linear B: - 𐀀 𐀒 - 𐀨 - 𐀊 - -
-  Reading:  - a ki - ra - ja - -
-  score: 12.92
+  Greek:    α γ ο ρ α ι ο ς
+  Linear B: 𐀀 𐀒 - 𐀨 - 𐀊 - -
+  Reading:  a ki - ra - ja - -
+  score: 5.76
 
   αγρευθεν -> 𐀀𐀐𐀩𐀄
-  Greek:    α - γ ρ ε υ θ ε ν
-  Linear B: - 𐀀 𐀐 𐀩 - 𐀄 - - -
-  Reading:  - a ka re - u - - -
-  score: 9.29
+  Greek:    α γ ρ ε υ θ ε ν
+  Linear B: 𐀀 𐀐 𐀩 - 𐀄 - - -
+  Reading:  a ka re - u - - -
+  score: 7.01
 
   αεθιστος -> 𐀀𐀁𐀴𐀵
-  Greek:    α ε - - θ ι σ τ ο ς
-  Linear B: - - 𐀀 𐀁 𐀴 - - 𐀵 - -
-  Reading:  - - a e ti - - to - -
-  score: 13.19
+  Greek:    α ε θ ι σ τ ο ς
+  Linear B: 𐀀 𐀁 𐀴 - - 𐀵 - -
+  Reading:  a e ti - - to - -
+  score: 6.47
 
   αιασμενα -> 𐀀𐀊𐀕𐀙
-  Greek:    α - ι α σ μ ε ν α
-  Linear B: - 𐀀 𐀊 - - 𐀕 - 𐀙 -
-  Reading:  - a ja - - ma - mu -
-  score: 13.04
+  Greek:    α ι α σ μ ε ν α
+  Linear B: 𐀀 𐀊 - - 𐀕 - 𐀙 -
+  Reading:  a ja - - ma - mu -
+  score: 7.14
 
   αιγα -> 𐁁𐀼
-  Greek:    α ι - γ α
-  Linear B: - - 𐁁 𐀼 -
-  Reading:  - - a3 za -
-  score: 7.47
+  Greek:    α ι γ α
+  Linear B: 𐁁 - 𐀼 -
+  Reading:  a3 - za -
+  score: 3.11
 
   αιγευς -> 𐁁𐀐𐀄
-  Greek:    α ι - γ ε υ ς
-  Linear B: - - 𐁁 𐀐 - 𐀄 -
-  Reading:  - - a3 ka - u -
-  score: 12.00
+  Greek:    α ι γ ε υ ς
+  Linear B: 𐁁 - 𐀐 - 𐀄 -
+  Reading:  a3 - ka - u -
+  score: 5.79
 
   αιγινοος -> 𐁁𐀑𐀜𐀃
-  Greek:    α ι - γ ι ν ο ο ς -
-  Linear B: - - 𐁁 𐀑 - 𐀜 - - - 𐀃
-  Reading:  - - a3 ke - no - - - o
-  score: 14.79
+  Greek:    α ι γ ι ν ο ο ς
+  Linear B: 𐁁 - 𐀑 - 𐀜 𐀃 - -
+  Reading:  a3 - ke - no o - -
+  score: 7.05
 
 --- More learned alignments ---
 
   αιζα -> 𐁁𐀼
-  Greek:    α ι - ζ α
-  Linear B: - - 𐁁 𐀼 -
-  Reading:  - - a3 za -
-  score: 10.18
+  Greek:    α ι ζ α
+  Linear B: 𐁁 - 𐀼 -
+  Reading:  a3 - za -
+  score: 5.82
 
   αιθιοπες -> 𐁁𐀴𐀍𐀤
-  Greek:    α ι - θ ι ο π ε ς
-  Linear B: - - 𐁁 𐀴 𐀍 - 𐀤 - -
-  Reading:  - - a3 ti jo - qe - -
-  score: 13.92
+  Greek:    α ι θ ι ο π ε ς
+  Linear B: 𐁁 - 𐀴 𐀍 - 𐀤 - -
+  Reading:  a3 - ti jo - qe - -
+  score: 6.00
 
   αιϝαια -> 𐁁𐀷𐀊
-  Greek:    α ι - ϝ α ι α
-  Linear B: - - 𐁁 𐀷 - 𐀊 -
-  Reading:  - - a3 wa - ja -
-  score: 10.95
+  Greek:    α ι ϝ α ι α
+  Linear B: 𐁁 - 𐀷 - 𐀊 -
+  Reading:  a3 - wa - ja -
+  score: 4.98
 
   ακαρανος -> 𐀀𐀏𐀨𐀜
-  Greek:    α - κ α ρ α ν ο ς
-  Linear B: - 𐀀 𐀏 - 𐀨 - 𐀜 - -
-  Reading:  - a ka2 - ra - no - -
-  score: 13.81
+  Greek:    α κ α ρ α ν ο ς
+  Linear B: 𐀀 𐀏 - 𐀨 - 𐀜 - -
+  Reading:  a ka2 - ra - no - -
+  score: 6.76
 
   ακτιστος -> 𐀀𐀑𐀴𐀵
-  Greek:    α - κ τ ι σ τ ο ς
-  Linear B: - 𐀀 𐀑 𐀴 - - 𐀵 - -
-  Reading:  - a ke ti - - to - -
-  score: 13.04
+  Greek:    α κ τ ι σ τ ο ς
+  Linear B: 𐀀 𐀑 𐀴 - - 𐀵 - -
+  Reading:  a ke ti - - to - -
+  score: 7.02
 
   ακτοινος -> 𐀀𐀒𐀵𐀜
-  Greek:    α - κ τ ο ι ν ο ς
-  Linear B: - 𐀀 𐀒 𐀵 - - 𐀜 - -
-  Reading:  - a ki to - - no - -
-  score: 14.35
+  Greek:    α κ τ ο ι ν ο ς
+  Linear B: 𐀀 𐀒 𐀵 - - 𐀜 - -
+  Reading:  a ki to - - no - -
+  score: 7.43
 
   αλακατειαι -> 𐀀𐀨𐀏𐀳𐀊
-  Greek:    α - λ α κ α τ ε ι α ι
-  Linear B: - 𐀀 𐀨 - 𐀏 - 𐀳 - 𐀊 - -
-  Reading:  - a ra - ka2 - te - ja - -
-  score: 16.51
+  Greek:    α λ α κ α τ ε ι α ι
+  Linear B: 𐀀 𐀨 - 𐀏 - 𐀳 - 𐀊 - -
+  Reading:  a ra - ka2 - te - ja - -
+  score: 8.43
 
   αλακατειαιον -> 𐀀𐀨𐀏𐀳𐀊𐀃
-  Greek:    α - λ α κ α τ ε ι α ι ο ν -
-  Linear B: - 𐀀 𐀨 - 𐀏 - 𐀳 - 𐀊 - - - - 𐀃
-  Reading:  - a ra - ka2 - te - ja - - - - o
-  score: 18.88
+  Greek:    α λ α κ α τ ε ι α ι ο ν
+  Linear B: 𐀀 𐀨 - 𐀏 - 𐀳 - 𐀊 - - 𐀃 -
+  Reading:  a ra - ka2 - te - ja - - o -
+  score: 9.61
 
   αλειφαζοος -> 𐀀𐀩𐀞𐀿𐀃
-  Greek:    α - λ ε ι φ α ζ ο ο ς -
-  Linear B: - 𐀀 𐀩 - - 𐀞 - 𐀿 - - - 𐀃
-  Reading:  - a re - - pa - zu - - - o
-  score: 20.13
+  Greek:    α λ ε ι φ α ζ ο ο ς
+  Linear B: 𐀀 𐀩 - - 𐀞 - 𐀿 𐀃 - -
+  Reading:  a re - - pa - zu o - -
+  score: 11.66
 
   αλειφοβιος -> 𐀀𐀩𐀞𐀿𐀃
-  Greek:    α - λ ε ι φ ο β ι ο ς -
-  Linear B: - 𐀀 𐀩 - - 𐀞 - 𐀿 - - - 𐀃
-  Reading:  - a re - - pa - zu - - - o
-  score: 18.06
+  Greek:    α λ ε ι φ ο β ι ο ς
+  Linear B: 𐀀 𐀩 - - 𐀞 - 𐀿 - 𐀃 -
+  Reading:  a re - - pa - zu - o -
+  score: 9.82
 
   αλκευς -> 𐀀𐀐𐀄
-  Greek:    α λ - κ ε υ ς
-  Linear B: - - 𐀀 𐀐 - 𐀄 -
-  Reading:  - - a ka - u -
-  score: 8.45
+  Greek:    α λ κ ε υ ς
+  Linear B: 𐀀 - 𐀐 - 𐀄 -
+  Reading:  a - ka - u -
+  score: 5.35
 
   αλκμανωρ -> 𐀀𐀏𐀔𐀜
-  Greek:    α λ - κ μ α ν ω ρ
-  Linear B: - - 𐀀 𐀏 𐀔 - 𐀜 - -
-  Reading:  - - a ka2 ku - no - -
-  score: 11.53
+  Greek:    α λ κ μ α ν ω ρ
+  Linear B: 𐀀 - 𐀏 𐀔 - 𐀜 - -
+  Reading:  a - ka2 ku - no - -
+  score: 7.99
 
   αλοιφη -> 𐀀𐀩𐀞
-  Greek:    α - λ ο ι φ η
-  Linear B: - 𐀀 𐀩 - - 𐀞 -
-  Reading:  - a re - - pa -
-  score: 10.95
+  Greek:    α λ ο ι φ η
+  Linear B: 𐀀 𐀩 - - 𐀞 -
+  Reading:  a re - - pa -
+  score: 5.87
 
   αμφι -> 𐀀𐀠
-  Greek:    α μ - φ ι
-  Linear B: - - 𐀀 𐀠 -
-  Reading:  - - a pi -
-  score: 5.13
+  Greek:    α μ φ ι
+  Linear B: 𐀀 - 𐀠 -
+  Reading:  a - pi -
+  score: 3.81
 
   αμφιαρηϝος -> 𐀀𐀠𐀊𐀩𐀺
-  Greek:    α μ - φ ι α ρ η ϝ ο ς
-  Linear B: - - 𐀀 𐀠 𐀊 - 𐀩 - 𐀺 - -
-  Reading:  - - a pi ja - re - wo - -
-  score: 15.55
+  Greek:    α μ φ ι α ρ η ϝ ο ς
+  Linear B: 𐀀 - 𐀠 𐀊 - 𐀩 - 𐀺 - -
+  Reading:  a - pi ja - re - wo - -
+  score: 8.71
 
   αμφιφορευς -> 𐀀𐀠𐀡𐀩𐀸
-  Greek:    α μ - φ ι φ ο ρ ε υ ς -
-  Linear B: - - 𐀀 𐀠 - 𐀡 - 𐀩 - - - 𐀸
-  Reading:  - - a pi - po - re - - - we
-  score: 14.70
+  Greek:    α μ φ ι φ ο ρ ε υ ς
+  Linear B: 𐀀 - 𐀠 - 𐀡 - 𐀩 - 𐀸 -
+  Reading:  a - pi - po - re - we -
+  score: 7.25
 
   αμφιἁλος -> 𐀀𐀠𐁀𐀫
-  Greek:    α μ - φ ι ἁ λ ο ς
-  Linear B: - - 𐀀 𐀠 - 𐁀 𐀫 - -
-  Reading:  - - a pi - a2 ro - -
-  score: 15.36
+  Greek:    α μ φ ι ἁ λ ο ς
+  Linear B: 𐀀 - 𐀠 - 𐁀 𐀫 - -
+  Reading:  a - pi - a2 ro - -
+  score: 10.48
 
   αμφονευς -> 𐀀𐀡𐀚𐀸
-  Greek:    α μ - φ ο ν ε υ ς -
-  Linear B: - - 𐀀 𐀡 - 𐀚 - - - 𐀸
-  Reading:  - - a po - na - - - we
-  score: 11.55
+  Greek:    α μ φ ο ν ε υ ς
+  Linear B: 𐀀 - 𐀡 - 𐀚 - 𐀸 -
+  Reading:  a - po - na - we -
+  score: 5.48
 
   ανδριαντει -> 𐀀𐀇𐀪𐀊𐀠
-  Greek:    α - ν δ ρ ι α ν τ ε ι -
-  Linear B: - 𐀀 - 𐀇 𐀪 - - - - - 𐀊 𐀠
-  Reading:  - a - di ri - - - - - ja pi
-  score: 14.02
+  Greek:    α ν δ ρ ι α ν τ ε ι
+  Linear B: 𐀀 - 𐀇 𐀪 𐀊 - - 𐀠 - -
+  Reading:  a - di ri ja - - pi - -
+  score: 5.65
 
   ανθρωπος -> 𐀀𐀵𐀫𐀡
-  Greek:    α - ν θ ρ ω π ο ς
-  Linear B: - 𐀀 - 𐀵 𐀫 - 𐀡 - -
-  Reading:  - a - to ro - po - -
-  score: 14.08
+  Greek:    α ν θ ρ ω π ο ς
+  Linear B: 𐀀 - 𐀵 𐀫 - 𐀡 - -
+  Reading:  a - to ro - po - -
+  score: 7.48
