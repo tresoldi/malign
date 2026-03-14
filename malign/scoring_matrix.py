@@ -331,6 +331,108 @@ class ScoringMatrix:
         return cls(scores=scores, domains=hashable_domains, gap=gap, impute_method=impute_method)
 
     @classmethod
+    def from_lingpy(
+        cls,
+        sequences: list[list[str]],
+        model: str = "sca",
+        gap: str = "-",
+        gap_score: float = -5.0,
+    ) -> "ScoringMatrix":
+        """Create a scoring matrix from LingPy's sound class models.
+
+        Maps each IPA token to its sound class in the chosen model, then
+        assigns the model's substitution score for each class pair.  This
+        gives malign's aligner a linguistically-informed matrix equivalent
+        to aligning with LingPy directly.
+
+        Available models:
+
+        - ``"sca"`` — Sound Class Alignments (List 2012): 30 classes,
+          strong consonant-vowel separation (C-V score = -10).
+        - ``"dolgo"`` — Dolgopolsky (1964): 14 broad classes, the coarsest
+          grouping; groups all stops, all fricatives, etc.
+        - ``"asjp"`` — Automated Similarity Judgement Program: 47 classes,
+          finer-grained than SCA.
+
+        Args:
+            sequences: List of sequence alphabets (lists of IPA tokens).
+                Tokens not recognized by the model map to the catch-all
+                class ``"0"`` and receive default mismatch scores.
+            model: LingPy model name: ``"sca"`` (default), ``"asjp"``, or
+                ``"dolgo"``.
+            gap: Gap symbol (default: ``"-"``).
+            gap_score: Score for gap alignments (default: ``-5.0``).
+
+        Returns:
+            A new ScoringMatrix with sound-class-derived scores.
+
+        Raises:
+            ImportError: If lingpy is not installed.
+            ValueError: If model name is not recognized.
+
+        Example:
+            >>> m = ScoringMatrix.from_lingpy([["p", "t", "k"], ["b", "d", "g"]])
+            >>> m[("p", "b")]  # p → P, b → P in SCA → high score (voicing pair)
+            6.0
+            >>> m[("p", "a")]  # consonant-vowel -> strong penalty
+            -10.0
+        """
+        try:
+            from lingpy.data.model import Model as _LingPyModel
+            from lingpy.sequence.sound_classes import tokens2class as _tokens2class
+        except ImportError:
+            raise ImportError(
+                "lingpy is required for from_lingpy(). "
+                "Install it with: pip install malign[lingpy]"
+            ) from None
+
+        valid_models = ("sca", "asjp", "dolgo")
+        if model not in valid_models:
+            raise ValueError(f"Unknown model {model!r}. Choose from: {valid_models}")
+
+        lingpy_model = _LingPyModel(model)
+
+        # Collect all unique tokens and map to sound classes
+        all_tokens: set[str] = set()
+        for seq in sequences:
+            all_tokens.update(seq)
+        all_tokens.discard(gap)
+
+        token_to_class: dict[str, str] = {}
+        for token in all_tokens:
+            try:
+                classes = _tokens2class([token], model)
+                token_to_class[token] = classes[0] if classes else "0"
+            except ValueError:
+                token_to_class[token] = "0"
+
+        # Build scoring matrix: score(tok_a, tok_b) = model_score(class_a, class_b)
+        scores: dict[tuple[Hashable, ...], float] = {}
+        tokens_list = sorted(all_tokens)
+
+        for ta in tokens_list:
+            ca = token_to_class[ta]
+            for tb in tokens_list:
+                cb = token_to_class[tb]
+                try:
+                    scores[(ta, tb)] = float(lingpy_model.scorer[ca, cb])
+                except (KeyError, IndexError):
+                    scores[(ta, tb)] = 0.0 if ca == cb else gap_score
+
+            scores[(ta, gap)] = gap_score
+            scores[(gap, ta)] = gap_score
+
+        scores[(gap, gap)] = 0.0
+
+        domain: list[Hashable] = sorted(all_tokens | {gap}, key=_symbol_sort_key)
+        return cls(
+            scores=scores,
+            domains=cast("list[list[Hashable]]", [domain, domain]),
+            gap=gap,
+            impute_method=None,
+        )
+
+    @classmethod
     def from_substitution_counts(
         cls,
         counts: dict[tuple[Hashable, ...], int],

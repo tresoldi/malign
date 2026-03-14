@@ -9,6 +9,45 @@ from collections.abc import Hashable
 from .alignment import Alignment
 
 
+def strip_common_gaps(alignment: Alignment, gap: Hashable = "-") -> Alignment:
+    """Remove columns where all sequences are gaps.
+
+    When gold alignments are extracted from a multiple sequence alignment (MSA),
+    pairwise slices may contain columns where both sequences are gaps (induced
+    by a third sequence in the MSA). No pairwise aligner will produce these
+    all-gap columns, so they must be stripped before comparing a predicted
+    pairwise alignment against an MSA-derived gold standard.
+
+    Args:
+        alignment: The alignment to strip.
+        gap: Gap symbol (default: "-").
+
+    Returns:
+        A new Alignment with all-gap columns removed and the same score.
+
+    Example:
+        >>> gold = Alignment([["a", "-", "-", "b"], ["a", "-", "c", "b"]], score=0.0)
+        >>> stripped = strip_common_gaps(gold)
+        >>> stripped.seqs  # Column 1 (all gaps) removed; column 2 kept (only one gap)
+        [['a', '-', 'b'], ['a', 'c', 'b']]
+    """
+    if not alignment.seqs or not alignment.seqs[0]:
+        return alignment
+
+    num_seqs = len(alignment.seqs)
+    aln_len = len(alignment.seqs[0])
+
+    new_seqs: list[list[Hashable]] = [[] for _ in range(num_seqs)]
+    for col_idx in range(aln_len):
+        column = [alignment.seqs[seq_idx][col_idx] for seq_idx in range(num_seqs)]
+        if all(s == gap for s in column):
+            continue
+        for seq_idx in range(num_seqs):
+            new_seqs[seq_idx].append(column[seq_idx])
+
+    return Alignment(seqs=new_seqs, score=alignment.score)
+
+
 def alignment_accuracy(predicted: Alignment, gold: Alignment) -> float:
     """Calculate alignment accuracy as the proportion of matching columns.
 

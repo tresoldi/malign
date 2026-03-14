@@ -40,6 +40,7 @@ from malign import (
     alignment_precision_recall,
     bootstrap_matrix,
     learn_matrix,
+    strip_common_gaps,
 )
 from malign.scoring_matrix import ScoringMatrix
 
@@ -60,10 +61,6 @@ try:
 except ImportError:
     HAS_DISTFEAT = False
 
-# Import LingPy's sound class mapping (available since we already import Pairwise)
-from lingpy.data.model import Model as LingPyModel
-from lingpy.sequence.sound_classes import tokens2class
-
 # --- Paths ---
 DATA_DIR = Path(__file__).resolve().parent.parent / "examples" / "data"
 OUTPUT_DIR = Path(__file__).resolve().parent / "output"
@@ -81,22 +78,12 @@ GAP = "-"
 # ============================================================================
 
 
-def strip_gap_gap(ref_a: list[str], ref_b: list[str]) -> tuple[list[str], list[str]]:
-    """Remove gap-gap columns from MSA-derived pairwise gold alignments.
-
-    When gold alignments come from MSA, pairwise slices may have columns where
-    both sequences are gaps (induced by a third sequence). No pairwise aligner
-    produces these, so they must be stripped for fair evaluation.
-    """
-    new_a, new_b = [], []
+def _strip_ref_gaps(ref_a: list[str], ref_b: list[str]) -> tuple[list[str], list[str]]:
+    """Strip common gaps from a pair of MSA-derived gold reference sequences."""
     if len(ref_a) != len(ref_b):
         return ref_a, ref_b  # Can't strip if lengths differ (not from same MSA slice)
-    for a, b in zip(ref_a, ref_b, strict=True):
-        if a == GAP and b == GAP:
-            continue
-        new_a.append(a)
-        new_b.append(b)
-    return new_a, new_b
+    gold = strip_common_gaps(Alignment(seqs=[ref_a, ref_b], score=0.0))
+    return list(gold.seqs[0]), list(gold.seqs[1])
 
 
 def load_bdpa() -> list[PairData]:
@@ -130,7 +117,7 @@ def load_bdpa() -> list[PairData]:
             ref_a = row[f"{lang_a}_REF"].split()
             ref_b = row[f"{lang_b}_REF"].split()
             # Strip gap-gap columns from MSA-derived gold
-            ref_a, ref_b = strip_gap_gap(ref_a, ref_b)
+            ref_a, ref_b = _strip_ref_gaps(ref_a, ref_b)
             pairs.append({
                 "id": gloss,
                 "lang_a": lang_a,
@@ -178,7 +165,7 @@ def load_northeuralex(n_sample: int = 500, seed: int = 42) -> list[PairData]:
 
             if seq_a and seq_b and ref_a and ref_b:
                 # Strip gap-gap columns from MSA-derived gold
-                ref_a, ref_b = strip_gap_gap(ref_a, ref_b)
+                ref_a, ref_b = _strip_ref_gaps(ref_a, ref_b)
                 pairs.append({
                     "id": cogid,
                     "lang_a": lang_a,
@@ -226,7 +213,7 @@ def load_lexibank() -> list[PairData]:
             seg_b, alm_b = langs[lang_b]
             if alm_a and alm_b:
                 # Strip gap-gap columns (if any)
-                alm_a, alm_b = strip_gap_gap(alm_a, alm_b)
+                alm_a, alm_b = _strip_ref_gaps(alm_a, alm_b)
                 pairs.append({
                     "id": cog_id,
                     "lang_a": "Turkish",
@@ -241,67 +228,7 @@ def load_lexibank() -> list[PairData]:
 
 
 # ============================================================================
-# C. SCA-based Matrix Building
-# ============================================================================
-
-
-def build_sca_matrix(pairs: list[PairData]) -> ScoringMatrix:
-    """Build a malign ScoringMatrix using LingPy's SCA class-level scores.
-
-    Maps each IPA token to its SCA sound class, then assigns the SCA scorer's
-    value for the class pair. This gives malign's aligner an SCA-equivalent
-    substitution matrix without going through LingPy's alignment pipeline.
-    """
-    sca_model = LingPyModel("sca")
-
-    # Collect all unique tokens and map to SCA classes
-    all_tokens: set[str] = set()
-    for p in pairs:
-        all_tokens.update(p["seq_a"])
-        all_tokens.update(p["seq_b"])
-
-    token_to_class: dict[str, str] = {}
-    for token in all_tokens:
-        try:
-            classes = tokens2class([token], "sca")
-            token_to_class[token] = classes[0] if classes else "0"
-        except ValueError:
-            token_to_class[token] = "0"
-
-    # Build scoring matrix: score(tok_a, tok_b) = SCA_score(class_a, class_b)
-    scores: dict[tuple[str, ...], float] = {}
-    all_tokens.discard(GAP)  # Handle gap separately
-    tokens_list = sorted(all_tokens)
-
-    for ta in tokens_list:
-        ca = token_to_class[ta]
-        for tb in tokens_list:
-            cb = token_to_class[tb]
-            try:
-                score = float(sca_model.scorer[ca, cb])
-            except (KeyError, IndexError):
-                # Unknown class pair — use 0 for same class, -5 otherwise
-                score = 0.0 if ca == cb else -5.0
-            scores[(ta, tb)] = score
-
-        # Gap scores: SCA uses -X for gap penalty (typically around -5 to -10)
-        # We use a moderate gap penalty consistent with SCA's scale
-        scores[(ta, GAP)] = -5.0
-        scores[(GAP, ta)] = -5.0
-
-    scores[(GAP, GAP)] = 0.0
-
-    # Domains must include the gap symbol
-    domain = sorted(all_tokens | {GAP})
-    return ScoringMatrix(
-        scores=scores,
-        domains=[domain, domain],
-        gap=GAP,
-    )
-
-
-# ============================================================================
-# C2. Alignment Wrappers
+# C. Alignment Wrappers
 # ============================================================================
 
 
@@ -596,7 +523,8 @@ def main():
 
     # SCA-equivalent matrix via LingPy's sound class mapping
     print("  Building SCA matrix for malign...")
-    bdpa_sca = build_sca_matrix(bdpa_pairs)
+    sym_a, sym_b = collect_symbols(bdpa_pairs)
+    bdpa_sca = ScoringMatrix.from_lingpy([sorted(sym_a), sorted(sym_b)], model="sca")
 
     # Bootstrap without prior (identity start)
     print("  Bootstrapping matrix (identity start)...")
@@ -646,7 +574,8 @@ def main():
     nel_boot_pairs = [(p["seq_a"], p["seq_b"]) for p in nel_pairs[:200]]
 
     print("  Building SCA matrix for malign...")
-    nel_sca = build_sca_matrix(nel_pairs)
+    sym_a, sym_b = collect_symbols(nel_pairs)
+    nel_sca = ScoringMatrix.from_lingpy([sorted(sym_a), sorted(sym_b)], model="sca")
 
     print("  Bootstrapping matrix (identity start)...")
     nel_boot_identity = bootstrap_matrix(nel_boot_pairs, max_iter=15, verbose=False)
@@ -694,7 +623,8 @@ def main():
     lex_cognate_sets = [[p["seq_a"], p["seq_b"]] for p in lex_pairs]
 
     print("  Building SCA matrix for malign...")
-    lex_sca = build_sca_matrix(lex_pairs)
+    sym_a, sym_b = collect_symbols(lex_pairs)
+    lex_sca = ScoringMatrix.from_lingpy([sorted(sym_a), sorted(sym_b)], model="sca")
 
     print("  Learning matrix (no prior)...")
     lex_learned = learn_matrix(lex_cognate_sets, max_iter=5, verbose=False)

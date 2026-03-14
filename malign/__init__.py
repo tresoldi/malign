@@ -8,7 +8,12 @@ from malign.alignment import Alignment
 from malign.blocks import merge_alignment_blocks
 from malign.learning import bootstrap_matrix, learn_matrix
 from malign.malign import align
-from malign.metrics import alignment_accuracy, alignment_f1, alignment_precision_recall
+from malign.metrics import (
+    alignment_accuracy,
+    alignment_f1,
+    alignment_precision_recall,
+    strip_common_gaps,
+)
 from malign.scoring_matrix import ScoringMatrix
 from malign.utils import tabulate_alms
 
@@ -22,5 +27,6 @@ __all__ = [
     "bootstrap_matrix",
     "learn_matrix",
     "merge_alignment_blocks",
+    "strip_common_gaps",
     "tabulate_alms",
 ]
