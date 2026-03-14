@@ -21,14 +21,17 @@ quality: ## Run code quality checks (ruff format --check, ruff check, mypy)
 format: ## Auto-format code with ruff
 	ruff format .
 
-test: ## Run test suite
+test: ## Run test suite (excludes slow tests by default)
 	pytest tests/
+
+test-all: ## Run full test suite including slow tests
+	pytest -m "" --timeout=300 tests/
 
 test-cov: ## Run tests with coverage (HTML report)
 	pytest --cov=malign --cov-report=html:tests/htmlcov \
 	       --cov-report=term-missing tests/
 
-test-fast: ## Run tests in parallel
+test-fast: ## Run tests in parallel (excludes slow)
 	pytest -n auto tests/
 
 bump-version: ## Bump version (TYPE=patch|minor|major), commit, and tag

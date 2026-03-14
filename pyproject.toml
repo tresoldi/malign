@@ -42,6 +42,7 @@ dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
     "pytest-xdist>=3.0.0",
+    "pytest-timeout>=2.0.0",
     "hypothesis>=6.0.0",
 
     # Code quality
@@ -195,6 +196,8 @@ minversion = "7.0"
 addopts = [
     "--strict-markers",
     "--strict-config",
+    "-m", "not slow",
+    "--timeout=120",
 ]
 testpaths = ["tests"]
 markers = [

@@ -2,6 +2,7 @@
 
 from collections.abc import Hashable
 from itertools import pairwise
+from math import prod
 
 import numpy as np
 
@@ -10,6 +11,10 @@ from .ndim_common import _column_symbols, make_moves
 from .scoring_matrix import ScoringMatrix
 from .utils import score_alignment, sort_alignments
 from .yenksp import _add_edge, _new_graph, yen_ksp
+
+# Maximum number of graph nodes before refusing to build.
+# 10M nodes ≈ several GB of RAM for the adjacency structure.
+MAX_GRAPH_NODES = 10_000_000
 
 
 def compute_graph_nd(
@@ -27,9 +32,21 @@ def compute_graph_nd(
 
     Returns:
         Graph as adjacency dict suitable for yen_ksp.
+
+    Raises:
+        MemoryError: If the grid would exceed MAX_GRAPH_NODES.
     """
     n = len(seqs)
     shape = tuple(len(s) for s in seqs)
+
+    grid_size = prod(shape)
+    if grid_size > MAX_GRAPH_NODES:
+        dims_str = " × ".join(str(s) for s in shape)
+        raise MemoryError(
+            f"N-dimensional alignment grid too large: {dims_str} = {grid_size:,} nodes "
+            f"(limit is {MAX_GRAPH_NODES:,}). Reduce the number or length of sequences."
+        )
+
     moves = make_moves(n)
     max_score = max(matrix.scores.values())
 

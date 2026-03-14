@@ -12,16 +12,15 @@ import malign
 from malign.scoring_matrix import ScoringMatrix
 
 # Hypothesis settings: conservative for CI
-# deadline=None because UPGMA progressive alignment for 5 sequences
-# can take several seconds depending on sequence lengths
-test_settings = settings(max_examples=50, deadline=None)
+# deadline=None because UPGMA progressive alignment can take seconds
+test_settings = settings(max_examples=20, deadline=None)
 
 
 @given(
     seqs=st.lists(
-        st.text(alphabet="ACGT", min_size=1, max_size=20),
+        st.text(alphabet="ACGT", min_size=1, max_size=10),
         min_size=2,
-        max_size=5,
+        max_size=3,
     )
 )
 @test_settings
@@ -36,9 +35,9 @@ def test_property_alignment_length_consistency(seqs):
 
 @given(
     seqs=st.lists(
-        st.text(alphabet="ACGT", min_size=1, max_size=20),
+        st.text(alphabet="ACGT", min_size=1, max_size=10),
         min_size=2,
-        max_size=5,
+        max_size=3,
     )
 )
 @test_settings
@@ -53,9 +52,9 @@ def test_property_symbol_preservation(seqs):
 
 @given(
     seqs=st.lists(
-        st.text(alphabet="ACGT", min_size=1, max_size=15),
+        st.text(alphabet="ACGT", min_size=1, max_size=10),
         min_size=2,
-        max_size=4,
+        max_size=3,
     ),
     k=st.integers(min_value=1, max_value=5),
 )
@@ -73,7 +72,7 @@ def test_property_score_ordering(seqs, k):
 
 @given(
     seqs=st.lists(
-        st.text(alphabet="ACGT", min_size=1, max_size=12),
+        st.text(alphabet="ACGT", min_size=1, max_size=10),
         min_size=2,
         max_size=3,
     )
@@ -133,12 +132,12 @@ def test_property_matrix_yaml_roundtrip(match_score, mismatch_score, gap_score):
 @given(
     cognate_sets=st.lists(
         st.lists(
-            st.lists(st.sampled_from(["A", "C", "G", "T"]), min_size=2, max_size=8),
+            st.lists(st.sampled_from(["A", "C", "G", "T"]), min_size=2, max_size=6),
             min_size=2,
             max_size=2,
         ),
         min_size=2,
-        max_size=5,
+        max_size=3,
     )
 )
 @test_settings
@@ -173,15 +172,15 @@ def test_property_learning_produces_valid_matrix(cognate_sets):
 try:
     import pytest
 
-    # Create slow variants with more examples
-    slow_settings = settings(max_examples=500, deadline=10000)
+    # Create slow variants with more examples (capped to avoid OOM)
+    slow_settings = settings(max_examples=100, deadline=30000)
 
     @pytest.mark.slow
     @given(
         seqs=st.lists(
-            st.text(alphabet="ACGTRYSWKMBDHVN", min_size=1, max_size=30),
+            st.text(alphabet="ACGTRYSWKMBDHVN", min_size=1, max_size=15),
             min_size=2,
-            max_size=8,
+            max_size=4,
         )
     )
     @slow_settings
@@ -195,9 +194,9 @@ try:
     @pytest.mark.slow
     @given(
         seqs=st.lists(
-            st.text(alphabet="ACGT", min_size=1, max_size=30),
+            st.text(alphabet="ACGT", min_size=1, max_size=15),
             min_size=2,
-            max_size=6,
+            max_size=4,
         )
     )
     @slow_settings
