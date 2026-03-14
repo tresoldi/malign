@@ -530,17 +530,6 @@ def bootstrap_matrix(
                     else:
                         new_scores[pair_key] = 0.0
 
-            # Gap-involving scores must be non-positive: gaps are penalties,
-            # never rewards.  Without this clamp the log-odds ratio can go
-            # positive for rare symbols, creating a feedback loop where the
-            # aligner inserts gratuitous gaps that inflate alignment length.
-            for pair_key in new_scores:
-                if gap in pair_key:
-                    new_scores[pair_key] = min(new_scores[pair_key], 0.0)
-
-            # All-gap vector always scores 0
-            new_scores[(gap, gap)] = 0.0
-
             # Prior regularization with linear decay
             alpha = prior_weight * (1.0 - iteration / max_iter)
             if prior_matrix is not None and alpha > 0:
@@ -548,6 +537,19 @@ def bootstrap_matrix(
                     prior_score = prior_matrix.scores.get(pair_key)
                     if prior_score is not None:
                         new_scores[pair_key] += alpha * prior_score
+
+            # Gap-involving scores must be non-positive: gaps are penalties,
+            # never rewards.  Without this clamp the log-odds ratio can go
+            # positive for rare symbols, creating a feedback loop where the
+            # aligner inserts gratuitous gaps that inflate alignment length.
+            # Applied after prior blending so priors can't re-introduce
+            # positive gap scores.
+            for pair_key in new_scores:
+                if gap in pair_key:
+                    new_scores[pair_key] = min(new_scores[pair_key], 0.0)
+
+            # All-gap vector always scores 0
+            new_scores[(gap, gap)] = 0.0
 
             matrix = ScoringMatrix(
                 scores=new_scores,

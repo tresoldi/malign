@@ -262,8 +262,11 @@ def build_sca_matrix(pairs: list[PairData]) -> ScoringMatrix:
 
     token_to_class: dict[str, str] = {}
     for token in all_tokens:
-        classes = tokens2class([token], "sca")
-        token_to_class[token] = classes[0] if classes else "0"
+        try:
+            classes = tokens2class([token], "sca")
+            token_to_class[token] = classes[0] if classes else "0"
+        except ValueError:
+            token_to_class[token] = "0"
 
     # Build scoring matrix: score(tok_a, tok_b) = SCA_score(class_a, class_b)
     scores: dict[tuple[str, ...], float] = {}
