@@ -1,0 +1,83 @@
+=== Cross-domain alignment (letters <-> phonemes) ===
+
+--- Identity matrix (first 10 words) ---
+  D E C E A S E D
+  d ɪ s i s t - -
+  score: -8.00
+
+  A T O N E
+  ʌ t oʊ n -
+  score: -5.00
+
+  L U C K Y N
+  l ʌ k ɪ n -
+  score: -6.00
+
+  K E R I E N
+  k ɛ ɹ i ʌ n
+  score: -6.00
+
+  I M P E R T I N E N T
+  ɪ m p ɝ t ʌ n ʌ n t -
+  score: -11.00
+
+  E I C H L E R
+  aɪ k l ɝ - - -
+  score: -7.00
+
+  C R O A K E R
+  k ɹ oʊ k ɝ - -
+  score: -7.00
+
+  C O F E R
+  k oʊ f ɝ -
+  score: -5.00
+
+  S I L B E R M A N
+  s ɪ l b ɝ m ʌ n -
+  score: -9.00
+
+  B A N J O
+  b æ n dʒ oʊ
+  score: -5.00
+
+--- Substitution-count matrix (first 10 words) ---
+  D E C E A S E D
+  d ɪ s i - s - t
+  score: 4.11
+
+  A T O N E
+  ʌ t oʊ n -
+  score: 7.13
+
+  L U C K Y N
+  l ʌ k - ɪ n
+  score: 8.02
+
+  K E R I E N
+  k ɛ ɹ i ʌ n
+  score: 9.95
+
+  I M P E R T I N E N T
+  ɪ m p ɝ - t ʌ n ʌ n t
+  score: 18.31
+
+  E I C H L E R
+  - aɪ k - l ɝ -
+  score: 4.81
+
+  C R O A K E R
+  k ɹ oʊ - k ɝ -
+  score: 8.72
+
+  C O F E R
+  k oʊ f ɝ -
+  score: 9.20
+
+  S I L B E R M A N
+  s ɪ l b ɝ - m ʌ n
+  score: 16.53
+
+  B A N J O
+  b æ n dʒ oʊ
+  score: 15.13

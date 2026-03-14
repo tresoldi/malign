@@ -1,0 +1,79 @@
+  d o l - e r e
+  d o l e - ɾ -
+  score: -21.47
+
+  d i n u o - v o
+  d e n - w e β o
+  score: -33.93
+
+  t u tː o
+  t o ð o
+  score: -18.72
+
+  d a s o l o
+  - a s o l o
+  score: -19.43
+
+  s e - m p r e -
+  s j e m p ɾ - e
+  score: -26.42
+
+  k - w a n t i t a -
+  k a n - - t i ð a ð
+  score: -32.48
+
+  a n i m a l e
+  a n i m a l -
+  score: -20.02
+
+  f o r m i k a
+  - o ɾ m i ɣ a
+  score: -24.17
+
+  a p r i l e
+  a β ɾ i l -
+  score: -19.01
+
+  b r a t tʃ o
+  b ɾ a - θ o
+  score: -20.78
+
+  - - p r e g a r e
+  ɾ o ɣ - - - a ɾ -
+  score: -25.05
+
+  r i n u n i r z i
+  ɾ e - u n i ɾ s e
+  score: -34.31
+
+  d a pː r i m - - a
+  p - - ɾ i m e ɾ o
+  score: -37.73
+
+  a g o s t o
+  a ɣ o s t o
+  score: -19.72
+
+  ts i a
+  t i a
+  score: -11.66
+
+  a u t u nː o
+  o - t o ɲ o
+  score: -23.55
+
+  u n p o k o
+  u n p o k o
+  score: -19.39
+
+  b o r z a
+  b o l s o
+  score: -23.48
+
+  - - k - u ɔ tʃ e r e a l f o r n o
+  k o θ e ɾ a l - - - o ɾ n o - - -
+  score: -46.24
+
+  l a t r a r e
+  l a ð ɾ a ɾ -
+  score: -19.60

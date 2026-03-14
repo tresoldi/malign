@@ -1,0 +1,121 @@
+=== Multilingual alignment (3+ sequences, mixed scripts) ===
+
+--- Entry 1 (English, Portuguese, Russian) ---
+       English: g o r s e
+    Portuguese: - t o j o
+       Russian: у л е к с
+         score: -5.00
+
+--- Entry 2 (English, Georgian, Italian) ---
+       English: - - - - - d e b t
+      Georgian: მ ო ვ ა ლ ე ო ბ ა
+       Italian: - - i m p e g n o
+         score: -9.00
+
+--- Entry 3 (English, Russian, Finnish) ---
+       English: - - - - C a m b r i a n
+       Russian: - - - - в а л л и ́ е ц
+       Finnish: w a l e s i l a i n e n
+         score: -12.00
+
+--- Entry 4 (English, Italian, Portuguese) ---
+       English: - s p e c t r u m
+       Italian: - s p e t t r - o
+    Portuguese: e s p e - t r - o
+         score: 1.00
+
+--- Entry 5 (English, Georgian, Hebrew) ---
+       English: - - g l o o m
+      Georgian: უ კ უ ნ ე თ ი
+        Hebrew: - - - - ח ש ך
+         score: -7.00
+
+--- Entry 6 (English, Georgian, Italian) ---
+       English: l i v e s t o c k
+      Georgian: - ს ა ქ ო ნ ე ლ ი
+       Italian: - b e s t i a m e
+         score: -9.00
+
+--- Entry 7 (English, Italian, Russian) ---
+       English: s w a r d
+       Italian: z o l l a
+       Russian: - д ё р н
+         score: -5.00
+
+--- Entry 8 (English, Italian, Portuguese) ---
+       English: g a u z e
+       Italian: g a r z a
+    Portuguese: g a - z e
+         score: 1.00
+
+--- Entry 9 (English, Portuguese, Russian) ---
+       English: - M a g e l l a n
+    Portuguese: M a g a l h ã e s
+       Russian: М а г е л л а ́ н
+         score: -9.00
+
+--- Entry 10 (English, Portuguese, Russian) ---
+       English: - - - s p o o f
+    Portuguese: b e s t e i r a
+       Russian: - н о н с е н с
+         score: -8.00
+
+--- Entry 11 (English, Russian, Finnish) ---
+       English: - - - c r e d i t
+       Russian: - - - - - с р о к
+       Finnish: m a k s u a i k a
+         score: -9.00
+
+--- Entry 12 (English, Russian, Finnish) ---
+       English: - - s l o u g h
+       Russian: к о р о ́ с т а
+       Finnish: - - - - r u p i
+         score: -8.00
+
+--- Entry 13 (English, Georgian, Italian) ---
+       English: a n c h o v y
+      Georgian: - ქ ა ფ შ ი ა
+       Italian: a c c i u g a
+         score: -7.00
+
+--- Entry 14 (English, Georgian, Portuguese) ---
+       English: - - d e a l w i t h
+      Georgian: გ ა მ კ ლ ა ვ ე ბ ა
+    Portuguese: - - - - - l i d a r
+         score: -10.00
+
+--- Entry 15 (English, Bengali, Georgian) ---
+       English: h i s t o r y
+       Bengali: - ই ত ি হ া স
+      Georgian: ი ს ტ ო რ ი ა
+         score: -7.00
+
+--- Entry 16 (English, Bengali, Georgian) ---
+       English: t e n
+       Bengali: - দ শ
+      Georgian: ა თ ი
+         score: -3.00
+
+--- Entry 17 (English, Portuguese, Russian) ---
+       English: - - - - l e s s
+    Portuguese: - - - m e n o r
+       Russian: м е ́ н ь ш и й
+         score: -8.00
+
+--- Entry 18 (English, Hebrew, Portuguese) ---
+       English: d i o d e
+        Hebrew: ד י ו ד ה
+    Portuguese: d i o d o
+         score: -5.00
+
+--- Entry 19 (English, Italian, Portuguese) ---
+       English: n a m e - - - - - - l y
+       Italian: o v v e - - - r o s i a
+    Portuguese: n o m e a d a m e n t e
+         score: -10.00
+
+--- Entry 20 (English, Italian, Portuguese) ---
+       English: - - - - b u r s t
+       Italian: e s p l o d e r e
+    Portuguese: - e s t o u r a r
+         score: -9.00

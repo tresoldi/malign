@@ -139,6 +139,3 @@ docs/*.out.*
 
 # Benchmark results
 benchmark_results*/
-
-# Example outputs
-examples/output/

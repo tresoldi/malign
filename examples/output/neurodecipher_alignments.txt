@@ -1,0 +1,83 @@
+=== Greek -> Linear B cross-script alignment ===
+
+--- Identity matrix (first 10 pairs) ---
+  Greek:    φασγιανιοι
+  Linear B: 𐀞𐀑𐀊𐀛𐀊-----
+  score: -10.00
+
+  Greek:    αχαιϝιανδε
+  Linear B: 𐀀𐀏𐀹𐀊𐀆-----
+  score: -10.00
+
+  Greek:    αιϝαια
+  Linear B: 𐁁𐀷𐀊---
+  score: -6.00
+
+  Greek:    θεον
+  Linear B: 𐀳𐀃--
+  score: -4.00
+
+  Greek:    ευθαλεϝοςϝορϝος
+  Linear B: 𐀁𐀄𐀲𐀩𐀺𐀺𐀺--------
+  score: -15.00
+
+  Greek:    εραθρεϝα
+  Linear B: 𐀁𐀨𐀳𐀩𐀸---
+  score: -8.00
+
+  Greek:    δεσμος
+  Linear B: 𐀆𐀰𐀗---
+  score: -6.00
+
+  Greek:    ατυγος
+  Linear B: 𐀀𐀶𐀒---
+  score: -6.00
+
+  Greek:    ϝενδανευς
+  Linear B: 𐀸𐀅𐀚𐀄-----
+  score: -9.00
+
+  Greek:    ποσιδαεϝες
+  Linear B: 𐀡𐀯𐀅𐀁𐀸-----
+  score: -10.00
+
+--- Learned matrix (first 10 pairs) ---
+  Greek:    φα-σ-γιανιοι-
+  Linear B: 𐀞-𐀑-𐀊𐀛------𐀊
+  score: 21.76
+
+  Greek:    α--χαιϝιανδε--
+  Linear B: -𐀀𐀏𐀹--------𐀊𐀆
+  score: 20.38
+
+  Greek:    αιϝαια--
+  Linear B: --𐁁---𐀷𐀊
+  score: 12.50
+
+  Greek:    -θεον
+  Linear B: 𐀳𐀃---
+  score: 8.76
+
+  Greek:    ευ----θαλεϝοςϝορϝος--
+  Linear B: --𐀁𐀄𐀲𐀩𐀺------------𐀺𐀺
+  score: 29.51
+
+  Greek:    ερα--θρεϝα--
+  Linear B: ---𐀁𐀨𐀳----𐀩𐀸
+  score: 18.87
+
+  Greek:    δε-σμος
+  Linear B: --𐀆𐀰𐀗--
+  score: 14.31
+
+  Greek:    ατυ-γος-
+  Linear B: ---𐀀𐀶--𐀒
+  score: 12.98
+
+  Greek:    ϝενδανευς----
+  Linear B: ---------𐀸𐀅𐀚𐀄
+  score: 16.98
+
+  Greek:    ποσιδαεϝες-----
+  Linear B: ----------𐀡𐀯𐀅𐀁𐀸
+  score: 18.99

@@ -1,0 +1,216 @@
+=== Turkish-Azeri alignments ===
+
+  b u r a d a
+  b u r a d a
+  score: -16.87
+
+  v u r
+  v u r
+  score: -11.64
+  accuracy vs gold: 1.0000
+
+  d e l i k
+  d æ l i k
+  score: -16.70
+  accuracy vs gold: 1.0000
+
+  b o j n u z
+  b u j n u z
+  score: -22.60
+
+  s ɯ ʥ a k
+  i s t - i
+  score: -30.08
+
+  e v
+  e v
+  score: -10.12
+
+  n a s ɯ l
+  n - e tɕ æ
+  score: -27.01
+
+  - - a - - v l a
+  o v a + tɕ ɯ χ -
+  score: -39.03
+
+  b u z
+  b u z
+  score: -10.25
+
+  k y l
+  k y l
+  score: -10.56
+  accuracy vs gold: 1.0000
+
+  i tɕ - i n d e
+  i tɕ æ r i d æ
+  score: -31.95
+
+  a t l a
+  a t ɯ l
+  score: -19.02
+
+  ø l d y r
+  ø l d y r
+  score: -17.03
+
+  d i z
+  d i z
+  score: -10.14
+
+  b i l
+  b i l
+  score: -9.80
+  accuracy vs gold: 1.0000
+
+  g ø l
+  gʲ ø l
+  score: -12.18
+
+  g y l
+  gʲ y l
+  score: -11.59
+
+  j a p r a k
+  j a r p a ɢ
+  score: -21.95
+
+  s o l
+  s o l
+  score: -11.04
+
+  a j a k
+  a j a ɢ
+  score: -10.58
+
+  j a l a
+  j a l a
+  score: -10.79
+
+  j a ʃ a
+  j a ʃ a
+  score: -11.35
+  accuracy vs gold: 1.0000
+
+  u z u n
+  u z u n
+  score: -12.73
+
+  b a k
+  b a χ
+  score: -10.16
+  accuracy vs gold: 1.0000
+
+  b i t
+  b i t
+  score: -10.54
+
+  tɕ o k
+  ʨ o χ
+  score: -14.78
+
+  t a
+  d a
+  score: -6.62
+  accuracy vs gold: 1.0000
+
+  e t
+  æ t
+  score: -7.46
+
+  a j
+  a j
+  score: -5.27
+
+  a j
+  a j
+  score: -5.27
+
+  a nː e
+  a n a
+  score: -14.95
+
+  d a ɣ
+  d a ɣ
+  score: -9.78
+  accuracy vs gold: 1.0000
+
+  a ɣ ɯ z
+  a ɣ ɯ z
+  score: -14.33
+
+  a d
+  a d
+  score: -5.35
+
+  d a r
+  d a r
+  score: -8.33
+  accuracy vs gold: 1.0000
+
+  g ø b e k
+  k ø b æ k
+  score: -19.17
+
+  a r k a
+  a r χ a
+  score: -11.94
+  accuracy vs gold: 1.0000
+
+  j a k ɯ n
+  j a χ ɯ n
+  score: -16.55
+  accuracy vs gold: 1.0000
+
+  b o j u n
+  b o j u n
+  score: -16.14
+
+  j e n i
+  j e n i
+  score: -13.48
+
+  g e ʥ e
+  k e ʥ ɛ
+  score: -20.39
+  accuracy vs gold: 1.0000
+
+  b u r u n
+  b u r u n
+  score: -15.20
+
+  m a
+  m a
+  score: -6.96
+  accuracy vs gold: 1.0000
+
+  b i r
+  b i r
+  score: -9.44
+  accuracy vs gold: 1.0000
+
+  a tɕ
+  a tɕ
+  score: -6.26
+
+  b a ʃ q a
+  b a ʃ ɢ a
+  score: -17.34
+  accuracy vs gold: 1.0000
+
+  o j n a
+  o j n a
+  score: -11.97
+
+  tɕ e k
+  tɕ æ k
+  score: -11.20
+
+  i r i n
+  i r i n
+  score: -12.02
+
+  i t - - -
+  i t æ l æ
+  score: -24.10
