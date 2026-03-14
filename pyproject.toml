@@ -62,9 +62,14 @@ features = [
     "distfeat>=0.5.0",
 ]
 
+# LingPy comparison benchmark
+lingpy = [
+    "lingpy>=2.6.0",
+]
+
 # All optional dependencies
 all = [
-    "malign[dev,features]",
+    "malign[dev,features,lingpy]",
 ]
 
 [project.urls]
@@ -157,6 +162,14 @@ ignore = [
 ]
 "examples/*.py" = [
     "D100", "D103",      # Missing docstrings
+    "T201",              # Allow print statements
+    "C416",              # List comprehension style
+    "B007",              # Unused loop variables
+    "RUF001",            # Ambiguous unicode (intentional for demos)
+]
+"benchmarks/*.py" = [
+    "D100", "D103",      # Missing docstrings
+    "E402",              # Module import not at top (logging setup)
     "T201",              # Allow print statements
     "C416",              # List comprehension style
     "B007",              # Unused loop variables
