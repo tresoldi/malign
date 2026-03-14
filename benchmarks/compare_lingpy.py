@@ -4,13 +4,17 @@ LingPy uses static scoring matrices (SCA/DOLGO/ASJP) while malign can learn
 matrices from data via bootstrap/EM. Evaluation uses malign's own metrics for
 apples-to-apples comparison.
 
+Gold alignments are extracted from MSA, so pairwise slices may contain gap-gap
+columns. These are stripped before comparison so that all methods are evaluated
+on the same pairs.
+
 Datasets:
   - BDPA Romance (8 languages, ~840 pairwise comparisons)
   - NorthEuralex Italic (500 sampled pairs)
   - Lexibank savelyevturkic (Turkish-Azeri, ~200 pairs)
 
 Usage:
-  pip install malign[lingpy]
+  pip install malign[lingpy,features]
   python benchmarks/compare_lingpy.py
 """
 
@@ -37,6 +41,7 @@ from malign import (
     bootstrap_matrix,
     learn_matrix,
 )
+from malign.scoring_matrix import ScoringMatrix
 
 try:
     from lingpy import Pairwise
@@ -48,6 +53,17 @@ except ImportError:
         "  pip install lingpy"
     )
 
+# Check distfeat availability
+try:
+    ScoringMatrix.from_distfeat([["a", "b"], ["a", "b"]])
+    HAS_DISTFEAT = True
+except ImportError:
+    HAS_DISTFEAT = False
+
+# Import LingPy's sound class mapping (available since we already import Pairwise)
+from lingpy.data.model import Model as LingPyModel
+from lingpy.sequence.sound_classes import tokens2class
+
 # --- Paths ---
 DATA_DIR = Path(__file__).resolve().parent.parent / "examples" / "data"
 OUTPUT_DIR = Path(__file__).resolve().parent / "output"
@@ -56,10 +72,31 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 # Type alias for pair data
 PairData = dict[str, object]
 
+# Gap symbol
+GAP = "-"
+
 
 # ============================================================================
 # B. Data Loaders
 # ============================================================================
+
+
+def strip_gap_gap(ref_a: list[str], ref_b: list[str]) -> tuple[list[str], list[str]]:
+    """Remove gap-gap columns from MSA-derived pairwise gold alignments.
+
+    When gold alignments come from MSA, pairwise slices may have columns where
+    both sequences are gaps (induced by a third sequence). No pairwise aligner
+    produces these, so they must be stripped for fair evaluation.
+    """
+    new_a, new_b = [], []
+    if len(ref_a) != len(ref_b):
+        return ref_a, ref_b  # Can't strip if lengths differ (not from same MSA slice)
+    for a, b in zip(ref_a, ref_b, strict=True):
+        if a == GAP and b == GAP:
+            continue
+        new_a.append(a)
+        new_b.append(b)
+    return new_a, new_b
 
 
 def load_bdpa() -> list[PairData]:
@@ -90,14 +127,18 @@ def load_bdpa() -> list[PairData]:
 
         # Generate all pairwise combinations
         for lang_a, lang_b in itertools.combinations(available, 2):
+            ref_a = row[f"{lang_a}_REF"].split()
+            ref_b = row[f"{lang_b}_REF"].split()
+            # Strip gap-gap columns from MSA-derived gold
+            ref_a, ref_b = strip_gap_gap(ref_a, ref_b)
             pairs.append({
                 "id": gloss,
                 "lang_a": lang_a,
                 "lang_b": lang_b,
                 "seq_a": row[f"{lang_a}_SEQ"].split(),
                 "seq_b": row[f"{lang_b}_SEQ"].split(),
-                "ref_a": row[f"{lang_a}_REF"].split(),
-                "ref_b": row[f"{lang_b}_REF"].split(),
+                "ref_a": ref_a,
+                "ref_b": ref_b,
             })
 
     return pairs
@@ -136,6 +177,8 @@ def load_northeuralex(n_sample: int = 500, seed: int = 42) -> list[PairData]:
             ref_b = [s for s in row[f"{lang_b}_REF"].split() if s != "+"]
 
             if seq_a and seq_b and ref_a and ref_b:
+                # Strip gap-gap columns from MSA-derived gold
+                ref_a, ref_b = strip_gap_gap(ref_a, ref_b)
                 pairs.append({
                     "id": cogid,
                     "lang_a": lang_a,
@@ -182,6 +225,8 @@ def load_lexibank() -> list[PairData]:
             seg_a, alm_a = langs[lang_a]
             seg_b, alm_b = langs[lang_b]
             if alm_a and alm_b:
+                # Strip gap-gap columns (if any)
+                alm_a, alm_b = strip_gap_gap(alm_a, alm_b)
                 pairs.append({
                     "id": cog_id,
                     "lang_a": "Turkish",
@@ -196,7 +241,64 @@ def load_lexibank() -> list[PairData]:
 
 
 # ============================================================================
-# C. Alignment Wrappers
+# C. SCA-based Matrix Building
+# ============================================================================
+
+
+def build_sca_matrix(pairs: list[PairData]) -> ScoringMatrix:
+    """Build a malign ScoringMatrix using LingPy's SCA class-level scores.
+
+    Maps each IPA token to its SCA sound class, then assigns the SCA scorer's
+    value for the class pair. This gives malign's aligner an SCA-equivalent
+    substitution matrix without going through LingPy's alignment pipeline.
+    """
+    sca_model = LingPyModel("sca")
+
+    # Collect all unique tokens and map to SCA classes
+    all_tokens: set[str] = set()
+    for p in pairs:
+        all_tokens.update(p["seq_a"])
+        all_tokens.update(p["seq_b"])
+
+    token_to_class: dict[str, str] = {}
+    for token in all_tokens:
+        classes = tokens2class([token], "sca")
+        token_to_class[token] = classes[0] if classes else "0"
+
+    # Build scoring matrix: score(tok_a, tok_b) = SCA_score(class_a, class_b)
+    scores: dict[tuple[str, ...], float] = {}
+    all_tokens.discard(GAP)  # Handle gap separately
+    tokens_list = sorted(all_tokens)
+
+    for ta in tokens_list:
+        ca = token_to_class[ta]
+        for tb in tokens_list:
+            cb = token_to_class[tb]
+            try:
+                score = float(sca_model.scorer[ca, cb])
+            except (KeyError, IndexError):
+                # Unknown class pair — use 0 for same class, -5 otherwise
+                score = 0.0 if ca == cb else -5.0
+            scores[(ta, tb)] = score
+
+        # Gap scores: SCA uses -X for gap penalty (typically around -5 to -10)
+        # We use a moderate gap penalty consistent with SCA's scale
+        scores[(ta, GAP)] = -5.0
+        scores[(GAP, ta)] = -5.0
+
+    scores[(GAP, GAP)] = 0.0
+
+    # Domains must include the gap symbol
+    domain = sorted(all_tokens | {GAP})
+    return ScoringMatrix(
+        scores=scores,
+        domains=[domain, domain],
+        gap=GAP,
+    )
+
+
+# ============================================================================
+# C2. Alignment Wrappers
 # ============================================================================
 
 
@@ -342,8 +444,87 @@ def summarize(results: list[dict], elapsed: float) -> dict:
 
 
 # ============================================================================
-# E. Main
+# E. Helpers
 # ============================================================================
+
+
+def collect_symbols(pairs: list[PairData]) -> tuple[set[str], set[str]]:
+    """Collect all unique symbols from pairs for matrix building."""
+    symbols_a: set[str] = set()
+    symbols_b: set[str] = set()
+    for p in pairs:
+        symbols_a.update(p["seq_a"])
+        symbols_b.update(p["seq_b"])
+    return symbols_a, symbols_b
+
+
+def build_distfeat_prior(pairs: list[PairData]) -> ScoringMatrix | None:
+    """Build a distfeat phonological prior from the symbols in pairs.
+
+    Falls back to identity matrix if distfeat can't handle some symbols.
+    """
+    if not HAS_DISTFEAT:
+        return None
+    symbols_a, symbols_b = collect_symbols(pairs)
+    try:
+        return ScoringMatrix.from_distfeat(
+            [sorted(symbols_a), sorted(symbols_b)],
+            impute_method="mean",
+        )
+    except (KeyError, ValueError) as e:
+        # Some symbols (diphthongs, rare IPA) may not be in distfeat's database.
+        # Filter to known symbols and build a partial prior, then merge with identity.
+        print(f"    distfeat warning: {e}")
+        print("    Building partial distfeat prior (filtering unknown symbols)...")
+        return _build_partial_distfeat(symbols_a, symbols_b)
+
+
+def _build_partial_distfeat(symbols_a: set[str], symbols_b: set[str]) -> ScoringMatrix:
+    """Build distfeat prior for known symbols, identity fallback for unknown."""
+    from distfeat import distance as distfeat_distance
+
+    # Test each symbol individually
+    known_a, known_b = set(), set()
+    for s in symbols_a:
+        try:
+            distfeat_distance(s, s)
+            known_a.add(s)
+        except (KeyError, ValueError):
+            pass
+    for s in symbols_b:
+        try:
+            distfeat_distance(s, s)
+            known_b.add(s)
+        except (KeyError, ValueError):
+            pass
+
+    unknown_a = symbols_a - known_a
+    unknown_b = symbols_b - known_b
+    if unknown_a or unknown_b:
+        print(f"    Unknown symbols filtered: {sorted(unknown_a | unknown_b)}")
+
+    # Build distfeat matrix for known symbols
+    if known_a and known_b:
+        distfeat_matrix = ScoringMatrix.from_distfeat(
+            [sorted(known_a), sorted(known_b)],
+            impute_method="mean",
+        )
+    else:
+        distfeat_matrix = ScoringMatrix(scores={}, domains=[set(), set()])
+
+    # Merge with identity for all symbols (unknown ones get identity scores)
+    all_matrix = ScoringMatrix.from_sequences(
+        [sorted(symbols_a), sorted(symbols_b)],
+        match=1.0,
+        mismatch=-0.5,
+        gap_score=-1.0,
+    )
+
+    # Override with distfeat scores where available
+    merged_scores = dict(all_matrix.scores)
+    merged_scores.update(distfeat_matrix.scores)
+
+    return ScoringMatrix(scores=merged_scores, domains=all_matrix.domains)
 
 
 def run_dataset(
@@ -385,8 +566,18 @@ def run_dataset(
     return all_details, summary_rows
 
 
+# ============================================================================
+# F. Main
+# ============================================================================
+
+
 def main():
     print("=== malign vs LingPy Benchmark ===")
+    if HAS_DISTFEAT:
+        print("  distfeat available — phonological priors enabled")
+    else:
+        print("  distfeat not installed — skipping distfeat methods")
+        print("  Install with: pip install malign[features]")
 
     all_details: list[dict] = []
     all_summaries: list[dict] = []
@@ -396,22 +587,50 @@ def main():
     bdpa_pairs = load_bdpa()
     print(f"  {len(bdpa_pairs)} pairwise comparisons")
 
-    print("  Bootstrapping matrix...")
-    bdpa_bootstrap = bootstrap_matrix(
-        [(p["seq_a"], p["seq_b"]) for p in bdpa_pairs],
-        max_iter=15,
-        verbose=False,
+    # Build priors
+    bdpa_distfeat = build_distfeat_prior(bdpa_pairs)
+    bdpa_pair_seqs = [(p["seq_a"], p["seq_b"]) for p in bdpa_pairs]
+
+    # SCA-equivalent matrix via LingPy's sound class mapping
+    print("  Building SCA matrix for malign...")
+    bdpa_sca = build_sca_matrix(bdpa_pairs)
+
+    # Bootstrap without prior (identity start)
+    print("  Bootstrapping matrix (identity start)...")
+    bdpa_boot_identity = bootstrap_matrix(bdpa_pair_seqs, max_iter=15, verbose=False)
+
+    # Bootstrap with SCA prior
+    print("  Bootstrapping matrix (SCA prior)...")
+    bdpa_boot_sca = bootstrap_matrix(
+        bdpa_pair_seqs, max_iter=15, prior_matrix=bdpa_sca, prior_weight=0.3, verbose=False,
     )
 
-    details, summaries = run_dataset(
-        "BDPA Romance",
-        bdpa_pairs,
-        [
-            ("LingPy SCA", lambda a, b: align_lingpy(a, b)),
-            ("malign (identity)", lambda a, b: align_malign(a, b)),
-            ("malign (bootstrap)", lambda a, b, m=bdpa_bootstrap: align_malign(a, b, matrix=m)),
-        ],
-    )
+    bdpa_methods = [
+        ("LingPy SCA", lambda a, b: align_lingpy(a, b)),
+        ("malign (identity)", lambda a, b: align_malign(a, b)),
+        ("malign (bootstrap)", lambda a, b, m=bdpa_boot_identity: align_malign(a, b, matrix=m)),
+        ("malign (SCA matrix)", lambda a, b, m=bdpa_sca: align_malign(a, b, matrix=m)),
+        ("malign (SCA+boot)", lambda a, b, m=bdpa_boot_sca: align_malign(a, b, matrix=m)),
+    ]
+
+    if bdpa_distfeat is not None:
+        bdpa_methods.append(
+            ("malign (distfeat)", lambda a, b, m=bdpa_distfeat: align_malign(a, b, matrix=m))
+        )
+
+        print("  Bootstrapping matrix (distfeat prior)...")
+        bdpa_boot_distfeat = bootstrap_matrix(
+            bdpa_pair_seqs, max_iter=15, prior_matrix=bdpa_distfeat,
+            prior_weight=0.3, verbose=False,
+        )
+        bdpa_methods.append(
+            (
+                "malign (distfeat+boot)",
+                lambda a, b, m=bdpa_boot_distfeat: align_malign(a, b, matrix=m),
+            )
+        )
+
+    details, summaries = run_dataset("BDPA Romance", bdpa_pairs, bdpa_methods)
     all_details.extend(details)
     all_summaries.extend(summaries)
 
@@ -420,23 +639,46 @@ def main():
     nel_pairs = load_northeuralex(n_sample=500, seed=42)
     print(f"  {len(nel_pairs)} pairwise comparisons (sampled)")
 
-    print("  Bootstrapping matrix...")
-    nel_bootstrap_pairs = [(p["seq_a"], p["seq_b"]) for p in nel_pairs[:200]]
-    nel_bootstrap = bootstrap_matrix(
-        nel_bootstrap_pairs,
-        max_iter=15,
-        verbose=False,
+    nel_distfeat = build_distfeat_prior(nel_pairs)
+    nel_boot_pairs = [(p["seq_a"], p["seq_b"]) for p in nel_pairs[:200]]
+
+    print("  Building SCA matrix for malign...")
+    nel_sca = build_sca_matrix(nel_pairs)
+
+    print("  Bootstrapping matrix (identity start)...")
+    nel_boot_identity = bootstrap_matrix(nel_boot_pairs, max_iter=15, verbose=False)
+
+    print("  Bootstrapping matrix (SCA prior)...")
+    nel_boot_sca = bootstrap_matrix(
+        nel_boot_pairs, max_iter=15, prior_matrix=nel_sca, prior_weight=0.3, verbose=False,
     )
 
-    details, summaries = run_dataset(
-        "NorthEuralex Italic",
-        nel_pairs,
-        [
-            ("LingPy SCA", lambda a, b: align_lingpy(a, b)),
-            ("malign (identity)", lambda a, b: align_malign(a, b)),
-            ("malign (bootstrap)", lambda a, b, m=nel_bootstrap: align_malign(a, b, matrix=m)),
-        ],
-    )
+    nel_methods = [
+        ("LingPy SCA", lambda a, b: align_lingpy(a, b)),
+        ("malign (identity)", lambda a, b: align_malign(a, b)),
+        ("malign (bootstrap)", lambda a, b, m=nel_boot_identity: align_malign(a, b, matrix=m)),
+        ("malign (SCA matrix)", lambda a, b, m=nel_sca: align_malign(a, b, matrix=m)),
+        ("malign (SCA+boot)", lambda a, b, m=nel_boot_sca: align_malign(a, b, matrix=m)),
+    ]
+
+    if nel_distfeat is not None:
+        nel_methods.append(
+            ("malign (distfeat)", lambda a, b, m=nel_distfeat: align_malign(a, b, matrix=m))
+        )
+
+        print("  Bootstrapping matrix (distfeat prior)...")
+        nel_boot_distfeat = bootstrap_matrix(
+            nel_boot_pairs, max_iter=15, prior_matrix=nel_distfeat,
+            prior_weight=0.3, verbose=False,
+        )
+        nel_methods.append(
+            (
+                "malign (distfeat+boot)",
+                lambda a, b, m=nel_boot_distfeat: align_malign(a, b, matrix=m),
+            )
+        )
+
+    details, summaries = run_dataset("NorthEuralex Italic", nel_pairs, nel_methods)
     all_details.extend(details)
     all_summaries.extend(summaries)
 
@@ -445,23 +687,46 @@ def main():
     lex_pairs = load_lexibank()
     print(f"  {len(lex_pairs)} pairwise comparisons")
 
-    print("  Learning matrix...")
+    lex_distfeat = build_distfeat_prior(lex_pairs)
     lex_cognate_sets = [[p["seq_a"], p["seq_b"]] for p in lex_pairs]
-    lex_learned = learn_matrix(
-        lex_cognate_sets,
-        max_iter=5,
-        verbose=False,
+
+    print("  Building SCA matrix for malign...")
+    lex_sca = build_sca_matrix(lex_pairs)
+
+    print("  Learning matrix (no prior)...")
+    lex_learned = learn_matrix(lex_cognate_sets, max_iter=5, verbose=False)
+
+    print("  Learning matrix (SCA prior)...")
+    lex_learned_sca = learn_matrix(
+        lex_cognate_sets, max_iter=5, prior_matrix=lex_sca, prior_weight=0.3, verbose=False,
     )
 
-    details, summaries = run_dataset(
-        "Lexibank Turkish-Azeri",
-        lex_pairs,
-        [
-            ("LingPy SCA", lambda a, b: align_lingpy(a, b)),
-            ("malign (identity)", lambda a, b: align_malign(a, b)),
-            ("malign (learned)", lambda a, b, m=lex_learned: align_malign(a, b, matrix=m)),
-        ],
-    )
+    lex_methods = [
+        ("LingPy SCA", lambda a, b: align_lingpy(a, b)),
+        ("malign (identity)", lambda a, b: align_malign(a, b)),
+        ("malign (learned)", lambda a, b, m=lex_learned: align_malign(a, b, matrix=m)),
+        ("malign (SCA matrix)", lambda a, b, m=lex_sca: align_malign(a, b, matrix=m)),
+        ("malign (SCA+learn)", lambda a, b, m=lex_learned_sca: align_malign(a, b, matrix=m)),
+    ]
+
+    if lex_distfeat is not None:
+        lex_methods.append(
+            ("malign (distfeat)", lambda a, b, m=lex_distfeat: align_malign(a, b, matrix=m))
+        )
+
+        print("  Learning matrix (distfeat prior)...")
+        lex_learned_distfeat = learn_matrix(
+            lex_cognate_sets, max_iter=5, prior_matrix=lex_distfeat,
+            prior_weight=0.3, verbose=False,
+        )
+        lex_methods.append(
+            (
+                "malign (distfeat+learn)",
+                lambda a, b, m=lex_learned_distfeat: align_malign(a, b, matrix=m),
+            )
+        )
+
+    details, summaries = run_dataset("Lexibank Turkish-Azeri", lex_pairs, lex_methods)
     all_details.extend(details)
     all_summaries.extend(summaries)
 

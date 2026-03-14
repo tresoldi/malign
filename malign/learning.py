@@ -530,6 +530,14 @@ def bootstrap_matrix(
                     else:
                         new_scores[pair_key] = 0.0
 
+            # Gap-involving scores must be non-positive: gaps are penalties,
+            # never rewards.  Without this clamp the log-odds ratio can go
+            # positive for rare symbols, creating a feedback loop where the
+            # aligner inserts gratuitous gaps that inflate alignment length.
+            for pair_key in new_scores:
+                if gap in pair_key:
+                    new_scores[pair_key] = min(new_scores[pair_key], 0.0)
+
             # All-gap vector always scores 0
             new_scores[(gap, gap)] = 0.0
 
