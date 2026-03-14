@@ -1,7 +1,6 @@
 # MAlign
 
 [![PyPI](https://img.shields.io/pypi/v/malign.svg)](https://pypi.org/project/malign)
-![CI](https://github.com/tresoldi/malign/workflows/CI/badge.svg)
 
 **MAlign** is a Python library for multiple sequence alignment with asymmetric
 scoring matrices across different domains. Unlike standard alignment tools that
@@ -96,6 +95,11 @@ cognate_sets = [
     [["f", "a", "t", "o"], ["h", "a", "d", "o"]],
 ]
 matrix = malign.learn_matrix(cognate_sets, method="em", max_iter=10)
+
+# Optionally regularize with a phonological prior
+matrix = malign.learn_matrix(
+    cognate_sets, method="em", max_iter=10, prior_matrix=prior,
+)
 ```
 
 ### Unsupervised Bootstrap Learning
@@ -143,13 +147,17 @@ alms = malign.align([["a"], ["j", "e"]], k=1, merge_blocks=True)
 - [User Guide](docs/USER_GUIDE.md)
 - [API Reference](docs/API_REFERENCE.md)
 - [Algorithm Selection Guide](docs/algorithm_selection_guide.md)
-- [Tutorials](docs/)
+- [LLM Documentation](docs/LLM_DOCUMENTATION.md)
+- Tutorials:
+  - [Basics](docs/tutorial_1_basics.py)
+  - [Scoring Matrices](docs/tutorial_2_matrices.py)
+  - [Matrix Learning](docs/tutorial_3_learning.py)
+  - [Advanced Features](docs/tutorial_4_advanced.py)
 
-## Community Guidelines
+## Community
 
 Contributions, bug reports, and feature requests are welcome via
 [GitHub issues](https://github.com/tresoldi/malign/issues) and pull requests.
-See `CONTRIBUTING.md` for guidelines.
 
 ## Author and Citation
 
@@ -167,19 +175,20 @@ No. [ERC Grant #715618](https://cordis.europa.eu/project/rcn/206320/factsheet/en
 
 If you use `malign`, please cite it as:
 
-  > Tresoldi, Tiago (2025). MALIGN, a library for multiple asymmetric alignments on
-  > different domains. Version 0.5. Uppsala: Uppsala Universitet.
+  > Tresoldi, Tiago (2026). MALIGN, a library for multiple asymmetric alignments on
+  > different domains. Version 0.5. Uppsala: Department of Linguistics and Philology,
+  > Uppsala University.
 
 In BibTeX:
 
 ```bibtex
-@misc{Tresoldi2025malign,
+@misc{Tresoldi2026malign,
   author = {Tresoldi, Tiago},
   title = {MALIGN, a library for multiple asymmetric alignments on different domains. Version 0.5},
   howpublished = {\url{https://github.com/tresoldi/malign}},
   address = {Uppsala},
-  publisher = {Uppsala Universitet},
-  year = {2025},
+  publisher = {Department of Linguistics and Philology, Uppsala University},
+  year = {2026},
 }
 ```
 
