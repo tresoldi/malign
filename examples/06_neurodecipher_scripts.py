@@ -13,6 +13,7 @@ Data: data/neurodecipher/greek_linearb.tsv.
 """
 
 import csv
+import math
 from collections import Counter
 from pathlib import Path
 
@@ -81,6 +82,7 @@ print(f"Bootstrapping scoring matrix from {len(all_pairs)} pairs...")
 learned = bootstrap_matrix(
     all_pairs,
     max_iter=15,
+    alignment_method="yenksp",
     verbose=True,
 )
 
@@ -191,15 +193,21 @@ gap = learned.gap
 
 
 def best_matches(g_char: str, top_n: int = 3) -> list[tuple[str, float, int]]:
-    """Return top-N (lb_sign, score, count) for a Greek char, filtered to co-occur > 0."""
-    candidates: list[tuple[float, str, int]] = []
+    """Return top-N (lb_sign, score, count) for a Greek char, filtered to co-occur > 0.
+
+    Ranks by score * log(count + 1) to balance learned affinity with
+    co-occurrence evidence -- pure score picks rare noise, pure count
+    ignores what the matrix learned.
+    """
+    candidates: list[tuple[float, float, str, int]] = []
     for pair, score in learned.scores.items():
         if pair[0] == g_char and gap not in pair:
             count = cooccur.get((g_char, pair[1]), 0)
             if count > 0 and pair[1] in LB_VALUES:
-                candidates.append((score, pair[1], count))
+                rank = score * math.log1p(count)
+                candidates.append((rank, score, pair[1], count))
     candidates.sort(reverse=True)
-    return [(lb, sc, ct) for sc, lb, ct in candidates[:top_n]]
+    return [(lb, sc, ct) for _, sc, lb, ct in candidates[:top_n]]
 
 
 score_lines: list[str] = [
