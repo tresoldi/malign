@@ -16,10 +16,11 @@ def analyze_gold_data():
     """Analyze the gold standard alignment data."""
     csv_path = Path(__file__).parent.parent / "resources" / "forms_with_alignments.csv"
 
-    datasets = Counter()
-    cognate_sets = defaultdict(list)
-    cognate_set_sizes = Counter()
-    cognate_set_datasets = defaultdict(set)
+    FormRecord = dict[str, str]
+    datasets: Counter[str] = Counter()
+    cognate_sets: defaultdict[str, list[FormRecord]] = defaultdict(list)
+    cognate_set_sizes: Counter[int] = Counter()
+    cognate_set_datasets: defaultdict[str, set[str]] = defaultdict(set)
     total_forms = 0
     alignments_with_gaps = 0
 

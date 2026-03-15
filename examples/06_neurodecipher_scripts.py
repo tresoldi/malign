@@ -25,36 +25,78 @@ OUTPUT_DIR.mkdir(exist_ok=True)
 
 # Known Linear B phonetic values (syllabary readings)
 LB_VALUES = {
-    "\U00010000": "a", "\U00010001": "e", "\U00010002": "i",
-    "\U00010003": "o", "\U00010004": "u",
-    "\U00010005": "da", "\U00010006": "de", "\U00010007": "di",
-    "\U00010008": "do", "\U00010009": "du",
-    "\U0001000A": "ja", "\U0001000B": "je",
-    "\U0001000D": "jo", "\U0001000F": "ka2",
-    "\U00010010": "ka", "\U00010011": "ke", "\U00010012": "ki",
-    "\U00010013": "ko", "\U00010014": "ku",
-    "\U00010015": "ma", "\U00010016": "me", "\U00010017": "mi",
-    "\U00010018": "mo", "\U00010019": "mu",
-    "\U0001001A": "na", "\U0001001B": "ni", "\U0001001C": "no",
-    "\U0001001D": "nu",
-    "\U0001001E": "pa", "\U0001001F": "pe", "\U00010020": "pi",
-    "\U00010021": "po", "\U00010022": "pu",
-    "\U00010023": "qa", "\U00010024": "qe", "\U00010025": "qi",
+    "\U00010000": "a",
+    "\U00010001": "e",
+    "\U00010002": "i",
+    "\U00010003": "o",
+    "\U00010004": "u",
+    "\U00010005": "da",
+    "\U00010006": "de",
+    "\U00010007": "di",
+    "\U00010008": "do",
+    "\U00010009": "du",
+    "\U0001000a": "ja",
+    "\U0001000b": "je",
+    "\U0001000d": "jo",
+    "\U0001000f": "ka2",
+    "\U00010010": "ka",
+    "\U00010011": "ke",
+    "\U00010012": "ki",
+    "\U00010013": "ko",
+    "\U00010014": "ku",
+    "\U00010015": "ma",
+    "\U00010016": "me",
+    "\U00010017": "mi",
+    "\U00010018": "mo",
+    "\U00010019": "mu",
+    "\U0001001a": "na",
+    "\U0001001b": "ni",
+    "\U0001001c": "no",
+    "\U0001001d": "nu",
+    "\U0001001e": "pa",
+    "\U0001001f": "pe",
+    "\U00010020": "pi",
+    "\U00010021": "po",
+    "\U00010022": "pu",
+    "\U00010023": "qa",
+    "\U00010024": "qe",
+    "\U00010025": "qi",
     "\U00010026": "qo",
-    "\U00010028": "ra", "\U00010029": "re", "\U0001002A": "ri",
-    "\U0001002B": "ro", "\U0001002C": "ru",
-    "\U0001002D": "sa", "\U0001002E": "se", "\U0001002F": "si",
-    "\U00010030": "so", "\U00010031": "su",
-    "\U00010032": "ta", "\U00010033": "te", "\U00010034": "ti",
-    "\U00010035": "to", "\U00010036": "tu",
-    "\U00010037": "wa", "\U00010038": "we", "\U00010039": "wi",
-    "\U0001003A": "wo",
-    "\U0001003C": "za", "\U0001003D": "ze", "\U0001003E": "zo",
-    "\U0001003F": "zu",
-    "\U00010040": "a2", "\U00010041": "a3", "\U00010042": "au",
-    "\U00010043": "dwe", "\U00010044": "dwo", "\U00010045": "nwa",
-    "\U00010046": "pu2", "\U00010047": "pte", "\U00010048": "ra2",
-    "\U00010049": "ra3", "\U0001004A": "ro2", "\U0001004B": "ta2",
+    "\U00010028": "ra",
+    "\U00010029": "re",
+    "\U0001002a": "ri",
+    "\U0001002b": "ro",
+    "\U0001002c": "ru",
+    "\U0001002d": "sa",
+    "\U0001002e": "se",
+    "\U0001002f": "si",
+    "\U00010030": "so",
+    "\U00010031": "su",
+    "\U00010032": "ta",
+    "\U00010033": "te",
+    "\U00010034": "ti",
+    "\U00010035": "to",
+    "\U00010036": "tu",
+    "\U00010037": "wa",
+    "\U00010038": "we",
+    "\U00010039": "wi",
+    "\U0001003a": "wo",
+    "\U0001003c": "za",
+    "\U0001003d": "ze",
+    "\U0001003e": "zo",
+    "\U0001003f": "zu",
+    "\U00010040": "a2",
+    "\U00010041": "a3",
+    "\U00010042": "au",
+    "\U00010043": "dwe",
+    "\U00010044": "dwo",
+    "\U00010045": "nwa",
+    "\U00010046": "pu2",
+    "\U00010047": "pte",
+    "\U00010048": "ra2",
+    "\U00010049": "ra3",
+    "\U0001004a": "ro2",
+    "\U0001004b": "ta2",
 }
 
 
@@ -269,9 +311,7 @@ for g_char in greek_consonants:
         correct_set = CORRECT.get(g_char, set())
         mark = " *" if reading in correct_set else ""
         prefix = g_char if i == 0 else ""
-        score_lines.append(
-            f"  {prefix:>6}  {lb:<6}  {reading:<8}  {sc:>+8.3f}  {ct:>8}{mark}"
-        )
+        score_lines.append(f"  {prefix:>6}  {lb:<6}  {reading:<8}  {sc:>+8.3f}  {ct:>8}{mark}")
     if len(matches) > 0:
         score_lines.append("")
 
@@ -286,9 +326,7 @@ for g_char in "αεηιου":
         correct_set = CORRECT.get(g_char, set())
         mark = " *" if reading in correct_set else ""
         prefix = g_char if i == 0 else ""
-        score_lines.append(
-            f"  {prefix:>6}  {lb:<6}  {reading:<8}  {sc:>+8.3f}  {ct:>8}{mark}"
-        )
+        score_lines.append(f"  {prefix:>6}  {lb:<6}  {reading:<8}  {sc:>+8.3f}  {ct:>8}{mark}")
     if len(matches) > 0:
         score_lines.append("")
 
@@ -305,8 +343,7 @@ for g_char in greek_consonants + "αεηιου":
             n_correct += 1
 
 score_lines.append(
-    f"  Top-1 accuracy: {n_correct}/{n_total} correct"
-    f" ({100 * n_correct / n_total:.0f}%)"
+    f"  Top-1 accuracy: {n_correct}/{n_total} correct ({100 * n_correct / n_total:.0f}%)"
 )
 
 top_file = OUTPUT_DIR / "neurodecipher_top_scores.txt"

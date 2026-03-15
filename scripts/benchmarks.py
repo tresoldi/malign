@@ -105,7 +105,7 @@ def benchmark_sequence_count(method: str = "anw", quick: bool = False) -> dict:
     for count in counts:
         sequences = generate_test_sequences(count, length)
         avg_time, min_time = benchmark_function(
-            malign.multi_align, sequences, k=k, method=method, iterations=3
+            malign.align, sequences, k=k, method=method, iterations=3
         )
         results[count] = (avg_time, min_time)
         print(f"  {count} sequences: {avg_time:.4f}s (min: {min_time:.4f}s)")
@@ -139,7 +139,7 @@ def benchmark_sequence_length(method: str = "anw", quick: bool = False) -> dict:
     for length in lengths:
         sequences = generate_test_sequences(count, length)
         avg_time, min_time = benchmark_function(
-            malign.multi_align, sequences, k=k, method=method, iterations=3
+            malign.align, sequences, k=k, method=method, iterations=3
         )
         results[length] = (avg_time, min_time)
         print(f"  Length {length}: {avg_time:.4f}s (min: {min_time:.4f}s)")
@@ -174,7 +174,7 @@ def benchmark_k_value(method: str = "anw", quick: bool = False) -> dict:
     results = {}
     for k in k_values:
         avg_time, min_time = benchmark_function(
-            malign.multi_align, sequences, k=k, method=method, iterations=3
+            malign.align, sequences, k=k, method=method, iterations=3
         )
         results[k] = (avg_time, min_time)
         print(f"  k={k}: {avg_time:.4f}s (min: {min_time:.4f}s)")

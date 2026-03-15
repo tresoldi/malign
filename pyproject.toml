@@ -7,7 +7,7 @@ name = "malign"
 dynamic = ["version"]
 description = "Library for multiple asymmetric alignments on different alphabets"
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
 keywords = ["alignment", "sequence alignment", "multiple alphabet", "linguistics", "asymmetric"]
 authors = [
     {name = "Tiago Tresoldi", email = "tiago.tresoldi@lingfil.uu.se"},
@@ -16,7 +16,6 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
@@ -201,8 +200,24 @@ module = ["numpy.*", "scipy.*", "sklearn.*", "tabulate.*", "pytest.*", "hypothes
 ignore_missing_imports = true
 
 [[tool.mypy.overrides]]
-module = ["tests.*"]
-disable_error_code = ["misc", "no-untyped-def"]
+module = ["lingpy.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["tests.*", "scripts.*"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = [
+    "malign.anw",
+    "malign.dumb",
+    "malign.learning",
+    "malign.malign",
+    "malign.ndim_yenksp",
+    "malign.progressive",
+    "malign.yenksp",
+]
+ignore_errors = true
 
 # Pytest configuration
 [tool.pytest.ini_options]

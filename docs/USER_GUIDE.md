@@ -741,17 +741,24 @@ alms = malign.align(sequences, k=1, merge_blocks=True, max_block_size=3)
 
 ### Batch Processing
 
-**TODO**: Document align_batch() in Phase 4.
+MAlign does not currently expose a dedicated `align_batch()` helper.
+For batch workloads, iterate over sequence groups and call `malign.align()`
+directly, optionally using `multiprocessing` or a job queue.
 
 ### Validation Metrics
 
-**TODO**: Document all metrics in Phase 4.
+The validation helpers in `malign.metrics` cover the main comparison modes:
+
+- `alignment_accuracy(predicted, gold)`: exact column match ratio.
+- `alignment_precision_recall(predicted, gold)`: pairwise symbol precision/recall.
+- `alignment_f1(predicted, gold)`: harmonic mean of precision and recall.
+- `strip_common_gaps(alignment)`: remove all-gap columns before pairwise evaluation.
 
 ### Integration with External Libraries
 
-- **freqprob**: TODO
-- **asymcat**: TODO
-- **nhandu**: TODO
+- **distfeat**: Use `ScoringMatrix.from_distfeat()` for feature-based priors.
+- **LingPy**: Use `ScoringMatrix.from_lingpy()` for sound-class-derived scores.
+- **nhandu**: Used to render the tutorial sources into HTML documentation.
 
 ---
 
@@ -869,11 +876,16 @@ From `scripts/benchmarks.py` (Phase 3):
 
 ### Common Issues
 
-**TODO**: Populate based on user feedback.
+Most alignment failures fall into three buckets:
+
+- Invalid scoring domains: rebuild the matrix from the sequences you are aligning.
+- Large N-dimensional problems: reduce sequence count or let `align()` dispatch to progressive alignment.
+- Gold-standard comparisons with extra all-gap columns: normalize with `strip_common_gaps()` before scoring.
 
 ### Performance Issues
 
-**TODO**: Add profiling and optimization tips.
+If performance degrades, lower `k`, prefer shorter sequences for exact multi-alignment,
+and reuse learned or feature-based matrices so the search space is better constrained.
 
 ---
 
@@ -883,4 +895,4 @@ See [API_REFERENCE.md](API_REFERENCE.md) for complete API documentation.
 
 ---
 
-**Document Status**: Essential sections completed for v0.4.0-beta.1. Advanced topics (sections 5, 7) to be expanded based on user feedback.
+**Document Status**: Updated for the v0.5.0 release. Advanced workflow sections remain intentionally concise and are backed by the API reference and runnable examples.

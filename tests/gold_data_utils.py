@@ -125,7 +125,7 @@ def cognate_set_to_gold_alignment(cog_set: GoldCognateSet) -> Alignment:
         3
     """
     aligned_seqs = [tuple(form.alignment) for form in cog_set.forms]
-    return Alignment(aligned_seqs, score=None)  # Gold alignments don't have scores
+    return Alignment(aligned_seqs, score=0.0)
 
 
 def filter_valid_cognate_sets(cognate_sets):

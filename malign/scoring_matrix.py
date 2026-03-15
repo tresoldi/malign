@@ -382,8 +382,7 @@ class ScoringMatrix:
             from lingpy.sequence.sound_classes import tokens2class as _tokens2class
         except ImportError:
             raise ImportError(
-                "lingpy is required for from_lingpy(). "
-                "Install it with: pip install malign[lingpy]"
+                "lingpy is required for from_lingpy(). Install it with: pip install malign[lingpy]"
             ) from None
 
         valid_models = ("sca", "asjp", "dolgo")

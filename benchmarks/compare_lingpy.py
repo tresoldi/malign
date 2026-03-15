@@ -118,15 +118,17 @@ def load_bdpa() -> list[PairData]:
             ref_b = row[f"{lang_b}_REF"].split()
             # Strip gap-gap columns from MSA-derived gold
             ref_a, ref_b = _strip_ref_gaps(ref_a, ref_b)
-            pairs.append({
-                "id": gloss,
-                "lang_a": lang_a,
-                "lang_b": lang_b,
-                "seq_a": row[f"{lang_a}_SEQ"].split(),
-                "seq_b": row[f"{lang_b}_SEQ"].split(),
-                "ref_a": ref_a,
-                "ref_b": ref_b,
-            })
+            pairs.append(
+                {
+                    "id": gloss,
+                    "lang_a": lang_a,
+                    "lang_b": lang_b,
+                    "seq_a": row[f"{lang_a}_SEQ"].split(),
+                    "seq_b": row[f"{lang_b}_SEQ"].split(),
+                    "ref_a": ref_a,
+                    "ref_b": ref_b,
+                }
+            )
 
     return pairs
 
@@ -166,15 +168,17 @@ def load_northeuralex(n_sample: int = 500, seed: int = 42) -> list[PairData]:
             if seq_a and seq_b and ref_a and ref_b:
                 # Strip gap-gap columns from MSA-derived gold
                 ref_a, ref_b = _strip_ref_gaps(ref_a, ref_b)
-                pairs.append({
-                    "id": cogid,
-                    "lang_a": lang_a,
-                    "lang_b": lang_b,
-                    "seq_a": seq_a,
-                    "seq_b": seq_b,
-                    "ref_a": ref_a,
-                    "ref_b": ref_b,
-                })
+                pairs.append(
+                    {
+                        "id": cogid,
+                        "lang_a": lang_a,
+                        "lang_b": lang_b,
+                        "seq_a": seq_a,
+                        "seq_b": seq_b,
+                        "ref_a": ref_a,
+                        "ref_b": ref_b,
+                    }
+                )
 
     # Sample for evaluation
     rng = random.Random(seed)
@@ -214,15 +218,17 @@ def load_lexibank() -> list[PairData]:
             if alm_a and alm_b:
                 # Strip gap-gap columns (if any)
                 alm_a, alm_b = _strip_ref_gaps(alm_a, alm_b)
-                pairs.append({
-                    "id": cog_id,
-                    "lang_a": "Turkish",
-                    "lang_b": "Azeri",
-                    "seq_a": seg_a,
-                    "seq_b": seg_b,
-                    "ref_a": alm_a,
-                    "ref_b": alm_b,
-                })
+                pairs.append(
+                    {
+                        "id": cog_id,
+                        "lang_a": "Turkish",
+                        "lang_b": "Azeri",
+                        "seq_a": seg_a,
+                        "seq_b": seg_b,
+                        "ref_a": alm_a,
+                        "ref_b": alm_b,
+                    }
+                )
 
     return pairs
 
@@ -273,70 +279,78 @@ def evaluate_pairs(
         predicted = align_fn(seq_a, seq_b)
 
         if predicted is None:
-            results.append({
-                "Dataset": dataset_label,
-                "ID": pair["id"],
-                "Lang_A": pair["lang_a"],
-                "Lang_B": pair["lang_b"],
-                "Method": method_label,
-                "Accuracy": None,
-                "Precision": None,
-                "Recall": None,
-                "F1": None,
-                "Status": "error",
-            })
+            results.append(
+                {
+                    "Dataset": dataset_label,
+                    "ID": pair["id"],
+                    "Lang_A": pair["lang_a"],
+                    "Lang_B": pair["lang_b"],
+                    "Method": method_label,
+                    "Accuracy": None,
+                    "Precision": None,
+                    "Recall": None,
+                    "F1": None,
+                    "Status": "error",
+                }
+            )
             continue
 
         # Build gold alignment — skip if ref lengths don't match each other
         if len(ref_a) != len(ref_b):
-            results.append({
-                "Dataset": dataset_label,
-                "ID": pair["id"],
-                "Lang_A": pair["lang_a"],
-                "Lang_B": pair["lang_b"],
-                "Method": method_label,
-                "Accuracy": None,
-                "Precision": None,
-                "Recall": None,
-                "F1": None,
-                "Status": "skipped",
-            })
+            results.append(
+                {
+                    "Dataset": dataset_label,
+                    "ID": pair["id"],
+                    "Lang_A": pair["lang_a"],
+                    "Lang_B": pair["lang_b"],
+                    "Method": method_label,
+                    "Accuracy": None,
+                    "Precision": None,
+                    "Recall": None,
+                    "F1": None,
+                    "Status": "skipped",
+                }
+            )
             continue
 
         gold = Alignment(seqs=[ref_a, ref_b], score=0.0)
 
         # Check length compatibility
         if len(predicted.seqs[0]) != len(gold.seqs[0]):
-            results.append({
-                "Dataset": dataset_label,
-                "ID": pair["id"],
-                "Lang_A": pair["lang_a"],
-                "Lang_B": pair["lang_b"],
-                "Method": method_label,
-                "Accuracy": None,
-                "Precision": None,
-                "Recall": None,
-                "F1": None,
-                "Status": "skipped",
-            })
+            results.append(
+                {
+                    "Dataset": dataset_label,
+                    "ID": pair["id"],
+                    "Lang_A": pair["lang_a"],
+                    "Lang_B": pair["lang_b"],
+                    "Method": method_label,
+                    "Accuracy": None,
+                    "Precision": None,
+                    "Recall": None,
+                    "F1": None,
+                    "Status": "skipped",
+                }
+            )
             continue
 
         acc = alignment_accuracy(predicted, gold)
         prec, rec = alignment_precision_recall(predicted, gold)
         f1 = alignment_f1(predicted, gold)
 
-        results.append({
-            "Dataset": dataset_label,
-            "ID": pair["id"],
-            "Lang_A": pair["lang_a"],
-            "Lang_B": pair["lang_b"],
-            "Method": method_label,
-            "Accuracy": acc,
-            "Precision": prec,
-            "Recall": rec,
-            "F1": f1,
-            "Status": "ok",
-        })
+        results.append(
+            {
+                "Dataset": dataset_label,
+                "ID": pair["id"],
+                "Lang_A": pair["lang_a"],
+                "Lang_B": pair["lang_b"],
+                "Method": method_label,
+                "Accuracy": acc,
+                "Precision": prec,
+                "Recall": rec,
+                "F1": f1,
+                "Status": "ok",
+            }
+        )
 
     elapsed = time.perf_counter() - t0
     return results, elapsed
@@ -472,22 +486,26 @@ def run_dataset(
         all_details.extend(results)
 
         stats = summarize(results, elapsed)
-        summary_rows.append({
-            "Dataset": dataset_label,
-            "Method": method_label,
-            **stats,
-        })
+        summary_rows.append(
+            {
+                "Dataset": dataset_label,
+                "Method": method_label,
+                **stats,
+            }
+        )
 
-        table_rows.append([
-            method_label,
-            f"{stats['Avg_Accuracy']:.3f}",
-            f"{stats['Avg_Precision']:.3f}",
-            f"{stats['Avg_Recall']:.3f}",
-            f"{stats['Avg_F1']:.3f}",
-            stats["Num_Pairs"],
-            stats["Num_Skipped"],
-            f"{stats['Runtime_Seconds']:.1f}s",
-        ])
+        table_rows.append(
+            [
+                method_label,
+                f"{stats['Avg_Accuracy']:.3f}",
+                f"{stats['Avg_Precision']:.3f}",
+                f"{stats['Avg_Recall']:.3f}",
+                f"{stats['Avg_F1']:.3f}",
+                stats["Num_Pairs"],
+                stats["Num_Skipped"],
+                f"{stats['Runtime_Seconds']:.1f}s",
+            ]
+        )
 
     headers = ["Method", "Acc", "Prec", "Rec", "F1", "Pairs", "Skip", "Time"]
     print(f"\n{dataset_label}")
@@ -533,7 +551,11 @@ def main():
     # Bootstrap with SCA prior
     print("  Bootstrapping matrix (SCA prior)...")
     bdpa_boot_sca = bootstrap_matrix(
-        bdpa_pair_seqs, max_iter=15, prior_matrix=bdpa_sca, prior_weight=0.3, verbose=False,
+        bdpa_pair_seqs,
+        max_iter=15,
+        prior_matrix=bdpa_sca,
+        prior_weight=0.3,
+        verbose=False,
     )
 
     bdpa_methods = [
@@ -551,8 +573,11 @@ def main():
 
         print("  Bootstrapping matrix (distfeat prior)...")
         bdpa_boot_distfeat = bootstrap_matrix(
-            bdpa_pair_seqs, max_iter=15, prior_matrix=bdpa_distfeat,
-            prior_weight=0.3, verbose=False,
+            bdpa_pair_seqs,
+            max_iter=15,
+            prior_matrix=bdpa_distfeat,
+            prior_weight=0.3,
+            verbose=False,
         )
         bdpa_methods.append(
             (
@@ -582,7 +607,11 @@ def main():
 
     print("  Bootstrapping matrix (SCA prior)...")
     nel_boot_sca = bootstrap_matrix(
-        nel_boot_pairs, max_iter=15, prior_matrix=nel_sca, prior_weight=0.3, verbose=False,
+        nel_boot_pairs,
+        max_iter=15,
+        prior_matrix=nel_sca,
+        prior_weight=0.3,
+        verbose=False,
     )
 
     nel_methods = [
@@ -600,8 +629,11 @@ def main():
 
         print("  Bootstrapping matrix (distfeat prior)...")
         nel_boot_distfeat = bootstrap_matrix(
-            nel_boot_pairs, max_iter=15, prior_matrix=nel_distfeat,
-            prior_weight=0.3, verbose=False,
+            nel_boot_pairs,
+            max_iter=15,
+            prior_matrix=nel_distfeat,
+            prior_weight=0.3,
+            verbose=False,
         )
         nel_methods.append(
             (
@@ -631,7 +663,11 @@ def main():
 
     print("  Learning matrix (SCA prior)...")
     lex_learned_sca = learn_matrix(
-        lex_cognate_sets, max_iter=5, prior_matrix=lex_sca, prior_weight=0.3, verbose=False,
+        lex_cognate_sets,
+        max_iter=5,
+        prior_matrix=lex_sca,
+        prior_weight=0.3,
+        verbose=False,
     )
 
     lex_methods = [
@@ -649,8 +685,11 @@ def main():
 
         print("  Learning matrix (distfeat prior)...")
         lex_learned_distfeat = learn_matrix(
-            lex_cognate_sets, max_iter=5, prior_matrix=lex_distfeat,
-            prior_weight=0.3, verbose=False,
+            lex_cognate_sets,
+            max_iter=5,
+            prior_matrix=lex_distfeat,
+            prior_weight=0.3,
+            verbose=False,
         )
         lex_methods.append(
             (
@@ -667,8 +706,16 @@ def main():
     # Summary TSV
     summary_file = OUTPUT_DIR / "compare_lingpy_summary.tsv"
     summary_fields = [
-        "Dataset", "Method", "Avg_Accuracy", "Avg_Precision", "Avg_Recall",
-        "Avg_F1", "Num_Pairs", "Num_Skipped", "Num_Errors", "Runtime_Seconds",
+        "Dataset",
+        "Method",
+        "Avg_Accuracy",
+        "Avg_Precision",
+        "Avg_Recall",
+        "Avg_F1",
+        "Num_Pairs",
+        "Num_Skipped",
+        "Num_Errors",
+        "Runtime_Seconds",
     ]
     with open(summary_file, "w", encoding="utf-8", newline="") as fh:
         writer = csv.DictWriter(fh, fieldnames=summary_fields, delimiter="\t")
@@ -680,8 +727,16 @@ def main():
     # Detail TSV
     detail_file = OUTPUT_DIR / "compare_lingpy_detail.tsv"
     detail_fields = [
-        "Dataset", "ID", "Lang_A", "Lang_B", "Method",
-        "Accuracy", "Precision", "Recall", "F1", "Status",
+        "Dataset",
+        "ID",
+        "Lang_A",
+        "Lang_B",
+        "Method",
+        "Accuracy",
+        "Precision",
+        "Recall",
+        "F1",
+        "Status",
     ]
     with open(detail_file, "w", encoding="utf-8", newline="") as fh:
         writer = csv.DictWriter(fh, fieldnames=detail_fields, delimiter="\t")

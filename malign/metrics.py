@@ -8,6 +8,8 @@ from collections.abc import Hashable
 
 from .alignment import Alignment
 
+AlignmentPair = tuple[int, int, Hashable, Hashable, int]
+
 
 def strip_common_gaps(alignment: Alignment, gap: Hashable = "-") -> Alignment:
     """Remove columns where all sequences are gaps.
@@ -100,7 +102,7 @@ def alignment_accuracy(predicted: Alignment, gold: Alignment) -> float:
     return matching_columns / pred_len
 
 
-def _get_alignment_pairs(alignment: Alignment) -> set[tuple[int, int, Hashable, Hashable]]:
+def _get_alignment_pairs(alignment: Alignment) -> set[AlignmentPair]:
     """Extract aligned symbol pairs from an alignment.
 
     For each column, extracts all pairwise symbol alignments between sequences.
@@ -113,7 +115,7 @@ def _get_alignment_pairs(alignment: Alignment) -> set[tuple[int, int, Hashable, 
         Set of (seq_i, seq_j, symbol_i, symbol_j, col_idx) tuples representing
         all pairwise alignments in the alignment.
     """
-    pairs = set()
+    pairs: set[AlignmentPair] = set()
     num_seqs = len(alignment.seqs)
     aln_len = len(alignment.seqs[0]) if alignment.seqs else 0
 

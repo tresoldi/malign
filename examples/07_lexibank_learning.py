@@ -100,6 +100,8 @@ alm_file.write_text("\n".join(lines), encoding="utf-8")
 print(f"Alignments written to {alm_file}")
 
 if evaluated > 0:
-    print(f"Evaluated {evaluated} alignments against gold, avg accuracy: {total_acc / evaluated:.4f}")
+    print(
+        f"Evaluated {evaluated} alignments against gold, avg accuracy: {total_acc / evaluated:.4f}"
+    )
 else:
     print("No gold alignments matched for evaluation.")
