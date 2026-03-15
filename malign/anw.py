@@ -96,6 +96,10 @@ def nw_backtrace(
     """
     alms: list[dict[str, list[Hashable]]] = [{"a": [], "b": []}]
 
+    # Base case: origin cell has no direction to follow
+    if i == 0 and j == 0:
+        return alms
+
     if i is None or j is None:
         i = len(seq_a) - 1
         j = len(seq_b) - 1

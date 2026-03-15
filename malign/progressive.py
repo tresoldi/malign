@@ -20,6 +20,25 @@ from .scoring_matrix import ScoringMatrix
 from .utils import score_alignment, sort_alignments
 
 
+def _is_pairwise_matrix(matrix: ScoringMatrix) -> bool:
+    """Check if a matrix is a 2-domain pairwise matrix (usable for any pair)."""
+    return len(matrix.domains) == 2
+
+
+def _get_pw_matrix(
+    matrix: ScoringMatrix,
+    pair: tuple[int, int],
+) -> ScoringMatrix:
+    """Get the pairwise sub-matrix for a pair of sequence indices.
+
+    For 2-domain matrices, returns the matrix directly.
+    For N-domain matrices, extracts the relevant sub-matrix.
+    """
+    if _is_pairwise_matrix(matrix):
+        return matrix
+    return matrix.compute_submatrices([pair])[pair]
+
+
 def _pairwise_distances(
     seqs: list[list[Hashable]],
     matrix: ScoringMatrix,
@@ -29,21 +48,21 @@ def _pairwise_distances(
 
     Args:
         seqs: Sequences to align pairwise.
-        matrix: Scoring matrix with sub-matrices for all pairs.
+        matrix: Scoring matrix (2-domain pairwise or N-domain).
         pw_func: Pairwise alignment function (yenksp_align or nw_align).
 
     Returns:
         Tuple of (NxN distance matrix, cache of pairwise alignments).
     """
     n = len(seqs)
-    domains = list(itertools.combinations(range(n), 2))
-    sub_matrices = matrix.compute_submatrices(domains)
+    pairs = list(itertools.combinations(range(n), 2))
 
     scores = np.zeros((n, n))
     cache: dict[tuple[int, int], list[Alignment]] = {}
 
-    for i, j in domains:
-        alms = pw_func(seqs[i], seqs[j], k=1, matrix=sub_matrices[i, j])
+    for i, j in pairs:
+        pw_mtx = _get_pw_matrix(matrix, (i, j))
+        alms = pw_func(seqs[i], seqs[j], k=1, matrix=pw_mtx)
         cache[i, j] = alms
         if alms and alms[0].score is not None:
             scores[i, j] = alms[0].score
@@ -177,11 +196,15 @@ def _score_profile(
         return 0.0
 
     pair_domains = list(itertools.combinations(indices, 2))
-    sub_matrices = matrix.compute_submatrices(pair_domains)
 
-    for (pi, pj), (idx_i, idx_j) in zip(pairs, pair_domains, strict=True):
-        sub_mtx = sub_matrices[idx_i, idx_j]
-        total += score_alignment([profile[pi], profile[pj]], sub_mtx)
+    if _is_pairwise_matrix(matrix):
+        for (pi, pj), _pair in zip(pairs, pair_domains, strict=True):
+            total += score_alignment([profile[pi], profile[pj]], matrix)
+    else:
+        sub_matrices = matrix.compute_submatrices(pair_domains)
+        for (pi, pj), (idx_i, idx_j) in zip(pairs, pair_domains, strict=True):
+            sub_mtx = sub_matrices[idx_i, idx_j]
+            total += score_alignment([profile[pi], profile[pj]], sub_mtx)
 
     return total
 
@@ -248,21 +271,17 @@ def upgma_progressive_align(
         subtree_n = len(merged_indices)
 
         # Check if we can use true N-dim alignment for small subtrees
-        if subtree_n <= 4 and should_use_ndim(
-            subtree_n,
-            [len(seqs[i]) for i in merged_indices],
-            "yenksp",
+        # (only with N-domain matrices; pairwise matrices can't drive ndim)
+        if (
+            not _is_pairwise_matrix(matrix)
+            and subtree_n <= 4
+            and should_use_ndim(
+                subtree_n,
+                [len(seqs[i]) for i in merged_indices],
+                "yenksp",
+            )
         ):
-            # Use true N-dim alignment on raw sequences
             subtree_seqs = [seqs[i] for i in merged_indices]
-            sub_domains = list(itertools.combinations(merged_indices, 2))
-            sub_matrices = matrix.compute_submatrices(sub_domains)
-            # Build a local matrix for the subtree
-            local_scores: dict[tuple[Hashable, ...], float] = {}
-            for key, val in matrix.scores.items():
-                if key is not None:
-                    local_scores[key] = val
-
             try:
                 ndim_alms = ndim_yenksp_align(subtree_seqs, k=k, matrix=matrix)
                 new_beam = []
@@ -271,7 +290,6 @@ def upgma_progressive_align(
                     new_beam.append((profile, merged_indices))
                 if new_beam:
                     beams[new_id] = new_beam[:k]
-                    # Clean up
                     del beams[left_id]
                     del beams[right_id]
                     continue
@@ -287,9 +305,7 @@ def upgma_progressive_align(
                 li = left_indices[0]
                 ri = right_indices[0]
                 pair = (min(li, ri), max(li, ri))
-                domains_list = [pair]
-                sub_matrices = matrix.compute_submatrices(domains_list)
-                sub_mtx = sub_matrices[pair]
+                sub_mtx = _get_pw_matrix(matrix, pair)
 
                 all_indices = left_indices + right_indices
 
@@ -337,7 +353,14 @@ def upgma_progressive_align(
         else:
             cleaned = ordered_profile
 
-        score = score_alignment(cleaned, matrix)
+        if _is_pairwise_matrix(matrix):
+            # Sum-of-pairs scoring for pairwise matrices
+            score = sum(
+                score_alignment([cleaned[pi], cleaned[pj]], matrix)
+                for pi, pj in itertools.combinations(range(len(cleaned)), 2)
+            )
+        else:
+            score = score_alignment(cleaned, matrix)
         results.append(Alignment(seqs=cleaned, score=score))
 
     return sort_alignments(results)

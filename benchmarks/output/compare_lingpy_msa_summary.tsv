@@ -1,0 +1,57 @@
+Dataset	Method	Avg_ColScore	Avg_Precision	Avg_Recall	Avg_F1	Num_Sets	Num_LenMismatch	Num_Errors	Avg_NumSeqs	Runtime_Seconds
+BDPA Romance	LingPy prog	0.9146	0.9544	0.9527	0.9534	29	1	0	8.0000	0.0432
+BDPA Romance	malign auto (SCA)	0.7905	0.8015	0.8188	0.8091	25	5	0	8.0000	0.0578
+BDPA Romance	malign auto (boot)	0.4917	0.5056	0.5096	0.5060	16	14	0	8.0000	0.0598
+BDPA Romance	malign auto (SCA+boot)	0.5965	0.6451	0.6413	0.6429	25	5	0	8.0000	0.0572
+BDPA Slavic	LingPy prog	0.9444	0.9033	0.9140	0.9082	18	2	0	5.0000	0.0189
+BDPA Slavic	malign auto (SCA)	1.0000	0.9488	0.9478	0.9481	18	2	0	5.0000	0.0177
+BDPA Slavic	malign auto (boot)	0.8405	0.8105	0.8152	0.8106	14	6	0	5.0000	0.0176
+BDPA Slavic	malign auto (SCA+boot)	0.9050	0.9310	0.9400	0.9350	19	1	0	5.0000	0.0176
+BDPA Bai	LingPy prog	0.9600	0.9308	0.9217	0.9256	82	8	0	7.9889	0.1021
+BDPA Bai	malign auto (SCA)	0.9195	0.8001	0.7894	0.7941	69	21	0	7.9889	0.1629
+BDPA Bai	malign auto (boot)	0.6496	0.5664	0.5597	0.5621	56	34	0	7.9889	0.1648
+BDPA Bai	malign auto (SCA+boot)	0.7380	0.6934	0.6801	0.6858	66	24	0	7.9889	0.1582
+BDPA Germanic	LingPy prog	0.9662	0.9628	0.9629	0.9625	103	6	0	8.0000	0.1409
+BDPA Germanic	malign auto (SCA)	0.8934	0.8723	0.8787	0.8749	97	12	0	8.0000	0.1855
+BDPA Germanic	malign auto (boot)	0.6478	0.5048	0.5546	0.5240	46	63	0	8.0000	0.2201
+BDPA Germanic	malign auto (SCA+boot)	0.7540	0.8208	0.8126	0.8161	97	12	0	8.0000	0.1809
+BDPA Sinitic	LingPy prog	0.8769	0.9692	0.9692	0.9692	5	0	0	8.0000	0.0210
+BDPA Sinitic	malign auto (SCA)	1.0000	0.5751	0.6434	0.6053	1	4	0	8.0000	0.0169
+BDPA Sinitic	malign auto (boot)	0.5256	0.5657	0.5953	0.5788	3	2	0	8.0000	0.0167
+BDPA Sinitic	malign auto (SCA+boot)	0.8333	0.7324	0.7527	0.7420	3	2	0	8.0000	0.0163
+BDPA Andean	LingPy prog	1.0000	0.9858	0.9870	0.9864	43	1	0	7.8636	0.0376
+BDPA Andean	malign auto (SCA)	0.9905	0.9679	0.9713	0.9695	42	2	0	7.8636	0.0836
+BDPA Andean	malign auto (boot)	0.9370	0.8772	0.9008	0.8874	36	8	0	7.8636	0.0853
+BDPA Andean	malign auto (SCA+boot)	0.9239	0.9258	0.9322	0.9288	41	3	0	7.8636	0.0827
+BDPA French	LingPy prog	0.9891	0.9389	0.9334	0.9358	61	6	0	7.7761	0.0896
+BDPA French	malign auto (SCA)	0.8927	0.8663	0.8558	0.8601	57	10	0	7.7761	0.1369
+BDPA French	malign auto (boot)	0.7205	0.6167	0.6183	0.6147	36	31	0	7.7761	0.1407
+BDPA French	malign auto (SCA+boot)	0.7576	0.7520	0.7412	0.7457	52	15	0	7.7761	0.1355
+BDPA French	malign prog (SCA)	0.9027	0.8677	0.8583	0.8620	56	11	0	7.7761	0.1236
+BDPA Japanese	LingPy prog	0.8086	0.8178	0.8145	0.8160	22	2	0	7.7083	0.0296
+BDPA Japanese	malign auto (SCA)	0.7464	0.7624	0.7623	0.7619	19	5	0	7.7083	0.0885
+BDPA Japanese	malign auto (boot)	0.5444	0.6534	0.6725	0.6608	16	8	0	7.7083	0.0903
+BDPA Japanese	malign auto (SCA+boot)	0.6952	0.6938	0.7016	0.6964	15	9	0	7.7083	0.0881
+BDPA Japanese	malign prog (SCA)	0.7591	0.7874	0.7900	0.7884	20	4	0	7.7083	0.0465
+BDPA Norwegian	LingPy prog	0.9794	0.9455	0.9478	0.9464	35	3	0	8.0000	0.0316
+BDPA Norwegian	malign auto (SCA)	0.9634	0.9322	0.9415	0.9362	32	6	0	8.0000	0.0742
+BDPA Norwegian	malign auto (boot)	0.8189	0.8365	0.8548	0.8439	32	6	0	8.0000	0.0755
+BDPA Norwegian	malign auto (SCA+boot)	0.9121	0.9316	0.9312	0.9310	34	4	0	8.0000	0.0722
+BDPA Ob-Ugrian	LingPy prog	1.0000	0.9663	0.9605	0.9631	43	3	0	7.6304	0.0497
+BDPA Ob-Ugrian	malign auto (SCA)	0.9495	0.9061	0.8989	0.9019	40	6	0	7.6304	0.2491
+BDPA Ob-Ugrian	malign auto (boot)	0.8192	0.7889	0.7825	0.7846	36	10	0	7.6304	0.2511
+BDPA Ob-Ugrian	malign auto (SCA+boot)	0.8538	0.8829	0.8719	0.8768	41	5	0	7.6304	0.2483
+BDPA Ob-Ugrian	malign prog (SCA)	0.9495	0.9037	0.8967	0.8996	40	6	0	7.6304	0.0787
+BDPA Bulgarian	LingPy prog	0.9677	0.9599	0.9597	0.9596	146	6	0	8.0000	0.1738
+BDPA Bulgarian	malign auto (SCA)	0.9481	0.9046	0.9051	0.9046	137	15	0	8.0000	0.3049
+BDPA Bulgarian	malign auto (boot)	0.7858	0.6856	0.7124	0.6965	97	55	0	8.0000	0.3245
+BDPA Bulgarian	malign auto (SCA+boot)	0.8008	0.8296	0.8276	0.8284	138	14	0	8.0000	0.3038
+BDPA Dutch	LingPy prog	0.9201	0.8886	0.8788	0.8831	44	6	0	8.0000	0.1222
+BDPA Dutch	malign auto (SCA)	0.5913	0.6130	0.6098	0.6108	35	15	0	8.0000	0.1311
+BDPA Dutch	malign auto (boot)	0.4491	0.4768	0.4775	0.4757	28	22	0	8.0000	0.1319
+BDPA Dutch	malign auto (SCA+boot)	0.5228	0.5295	0.5165	0.5221	31	19	0	8.0000	0.1245
+NorthEuralex Italic	LingPy prog	0.9613	0.9660	0.9649	0.9654	866	22	0	4.5619	1.1355
+NorthEuralex Italic	malign auto (SCA)	0.4620	0.5167	0.5184	0.5171	677	211	0	4.5619	16.9729
+NorthEuralex Italic	malign auto (boot)	0.3801	0.4449	0.4493	0.4464	614	274	0	4.5619	17.2001
+NorthEuralex Italic	malign auto (SCA+boot)	0.4264	0.4856	0.4844	0.4845	669	219	0	4.5619	17.1481
+NorthEuralex Italic	malign prog (SCA)	0.8217	0.7988	0.8051	0.8014	701	187	0	4.5619	0.8914
